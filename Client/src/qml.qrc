@@ -1,0 +1,6 @@
+<RCC>
+    <qresource>
+        <file alias="main.qml">../qml/main.qml</file>
+        <file alias="client.qml">../qml/client.qml</file>
+    </qresource>
+</RCC>
