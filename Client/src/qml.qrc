@@ -1,6 +1,8 @@
 <RCC>
     <qresource>
         <file alias="main.qml">../qml/main.qml</file>
-        <file alias="client.qml">../qml/client.qml</file>
+        <file alias="Client.qml">../qml/Client.qml</file>
+        <file alias="Card.qml">../qml/Card.qml</file>
+        <file alias="List.qml">../qml/List.qml</file>        
     </qresource>
 </RCC>

@@ -1,7 +1,8 @@
 # Start client
 
 ```
-cmake -B./build
-make -C ./build
-./client
+cd build
+cmake ..
+make
+../client
 ```

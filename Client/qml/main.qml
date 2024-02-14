@@ -14,7 +14,7 @@ ApplicationWindow {
     }
 
     ColumnLayout{
-        id: lay
+        id: login
         visible: true
         anchors.centerIn: parent
         spacing: 10
@@ -41,9 +41,9 @@ ApplicationWindow {
                 color: "#514e92"
             }
             onClicked: {
-                lay.visible = false
-                client_loader.source = "client.qml"    
+                login.visible = false
+                client_loader.source = "Client.qml"    
             }
-        } 
+        }
     }
 }
