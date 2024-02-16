@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QtQml/QQmlApplicationEngine>
-#include "client.hpp"
+#include <QQmlContext>
+#include "listmodel.hpp"
 
 int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
@@ -18,6 +19,10 @@ int main(int argc, char *argv[]) {
         },
         Qt::QueuedConnection
     );
+
+    qmlRegisterType<ListModel>("Client", 1, 0, "ClientListModel");
+
+    //engine.rootContext()->setContextProperty("ListModel", new ListModel());
     engine.load(url);
     return app.exec();
 }

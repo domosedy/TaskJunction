@@ -1,14 +1,17 @@
 #include "boardmodel.hpp"
 
-BoardModel::BoardModel(QObject *parent): QAbstractListModel(parent) {
+// BoardModel::BoardModel(QObject *parent): QAbstractListModel(parent) {
 
-}
+// }
 
-int BoardModel::rowCount(const QModelIndex &) const
-{
-    return static_cast<int>(lists.size());
-}
+// int BoardModel::rowCount(const QModelIndex &parent) const {
+//     return board->get_lists().count();
+// }
 
-QVariant BoardModel::data([[maybe_unused]] const QModelIndex &index, [[maybe_unused]] int role) const {
-    return {};
-}
+// QVariant BoardModel::data(const QModelIndex &index, int role) const {
+//     if (!index.isValid())
+//         return QVariant();
+
+//     if (role == Qt::DisplayRole)
+//         return board->get_lists(index.row());
+// }

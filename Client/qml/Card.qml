@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import Client
 
 Component {
     id: card
@@ -8,7 +9,7 @@ Component {
         width: 150
         height: 40
         Text {
-            text: cardtext
+            text: "test"
         }
     }
 }     

@@ -3,12 +3,27 @@ import QtQuick.Controls
 import Client
 import "qrc:"
 
-Component {
+Rectangle {
+    id: background
+    color: "#aaaaaa"
+    width: root.width
+    height: root.height
+
+    MyListModel {
+        id: model
+    }
+
+    Button {
+        onClicked: model.add_card()
+    }
+
     Rectangle {
         y: 20
         id: listMain  
         width: 160
-        height: Math.max(90, Math.min((listmodel.count+1) * 45,mainarea.height-40))
+        anchors.horizontalCenter: parent.horizontalCenter
+        height: Math.max(90, Math.min((model.count+1) * 45,root.height-40))
+        //height: root.height
         color: "#a9aaad"
         Rectangle {
             anchors.top: parent.top
@@ -17,7 +32,7 @@ Component {
             color: "#282c34"
             id: listheader
             Text {
-                text: name
+                text: "Name"
                 color: "white"
                 anchors.centerIn: listheader
             }
@@ -36,7 +51,7 @@ Component {
                 anchors.right: listheader.right
                 onClicked: {
                     //listmodel.append({cardtext: "TestCard   "})
-                    listmodel.add_card()
+                    model.add_card()
                 }
             }
         }
@@ -48,9 +63,6 @@ Component {
             y: 30
             color: "#a9aaad"
 
-            ClientListModel {
-                id: listmodel
-            }
 
             ListView {
                 id:thislist
@@ -59,9 +71,9 @@ Component {
                 anchors.fill: parent
                 anchors.topMargin: 10
                 anchors.leftMargin: 5
-                model: listmodel
+                model: model
                 spacing: 5
-                delegate: Card {}               
+                delegate: Card {}
             }               
         }
     }

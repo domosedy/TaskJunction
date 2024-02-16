@@ -10,10 +10,11 @@ class Client : public QObject {
 
 public:
     explicit Client(QObject *parent = nullptr);
+    void create_board();
 
 private:
     QTcpSocket *socket = nullptr;
-    Board* board;
+    //Board* board = nullptr;
 };
 
 #endif  // CLIENT_HPP

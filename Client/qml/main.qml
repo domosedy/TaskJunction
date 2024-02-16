@@ -45,5 +45,20 @@ ApplicationWindow {
                 client_loader.source = "Client.qml"    
             }
         }
+        Button {  
+            Layout.preferredWidth: root.width / 6
+            Layout.preferredHeight: root.height / 12                
+            Text {
+                text: "Testing mode"
+                anchors.centerIn: parent
+                font.family: "Helvetica"
+                font.pointSize: 12
+                color: "#514e92"
+            }
+            onClicked: {
+                login.visible = false
+                client_loader.source = "test.qml"    
+            }
+        }        
     }
 }

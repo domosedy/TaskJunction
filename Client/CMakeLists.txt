@@ -24,12 +24,14 @@ set(PROJECT_SOURCES
         src/list.cpp
         src/card.cpp
         src/boardmodel.cpp
+        src/listmodel.cpp
         src/qml.qrc
         include/client.hpp
         include/board.hpp
         include/list.hpp
         include/card.hpp
         include/boardmodel.hpp
+        include/listmodel.hpp
 )
 
 add_executable(client
