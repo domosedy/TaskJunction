@@ -2,12 +2,10 @@
 #include <QtQml/QQmlApplicationEngine>
 #include <QQmlContext>
 #include "listmodel.hpp"
+#include "boardmodel.hpp"
 
 int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
-
-    //Client client;
-
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:main.qml"));
     QObject::connect(
@@ -21,8 +19,8 @@ int main(int argc, char *argv[]) {
     );
 
     qmlRegisterType<ListModel>("Client", 1, 0, "ClientListModel");
+    qmlRegisterType<BoardModel>("Client", 1, 0, "ClientBoardModel");
 
-    //engine.rootContext()->setContextProperty("ListModel", new ListModel());
     engine.load(url);
     return app.exec();
 }

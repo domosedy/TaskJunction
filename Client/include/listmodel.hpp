@@ -14,7 +14,7 @@ public:
     int rowCount(const QModelIndex &parent = {}) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     Q_INVOKABLE void add_card();
-    Q_INVOKABLE int get_count();
+    int get_count();
 signals:
     void countChanged();
 private:

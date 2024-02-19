@@ -35,7 +35,7 @@ Component {
                 }                
                 anchors.right: listheader.right
                 onClicked: {
-                    //listmodel.append({cardtext: "TestCard   "})
+                    //model.append({cardtext: "TestCard   "})
                     listmodel.add_card()
                 }
             }
@@ -47,10 +47,6 @@ Component {
             height: listMain.height-40
             y: 30
             color: "#a9aaad"
-
-            ClientListModel {
-                id: listmodel
-            }
 
             ListView {
                 id:thislist

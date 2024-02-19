@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import Client
 import "qrc:"
 
 
@@ -32,7 +33,7 @@ Rectangle {
                         (parent.hovered ? "#1c1e24" : "#282c34")
             }
             onClicked: {
-                boardmodel.append({name: "test"})
+                boardmodel.add_list()
             }
         }
     }
@@ -43,7 +44,7 @@ Rectangle {
         y: topmenu.height
         color: "#686b70"
 
-        ListModel {
+        ClientBoardModel {
             id: boardmodel
         }
 

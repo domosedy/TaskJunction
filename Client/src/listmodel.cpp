@@ -2,7 +2,7 @@
 #include "card.hpp"
 
 ListModel::ListModel(QObject *parent): QAbstractListModel(parent) {
-    qDebug() << "Created!";
+    qDebug() << "Created listmodel!";
 }
 
 int ListModel::rowCount(const QModelIndex &parent) const {
@@ -34,7 +34,7 @@ QVariant ListModel::data(const QModelIndex &index, int role) const {
 }
 
 void ListModel::add_card() {
-    qDebug() << "creating test!\n";
+    qDebug() << "Add card!";
     beginInsertRows(QModelIndex(), cards.size(), cards.size());
     cards.append(Card("test"));
     endInsertRows();
