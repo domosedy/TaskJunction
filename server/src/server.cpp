@@ -12,8 +12,8 @@ Server::Server(quint16 port) : port(port) {
 
     connect(server, SIGNAL(newConnection()), this, SLOT(newConnection()));
     connect(
-        db, SIGNAL(executed_query(int, const QString &)), this,
-        SLOT(database_executed(int, const QString &))
+        db, SIGNAL(executed_query(uint, const QString &)), this,
+        SLOT(database_executed(uint, const QString &))
     );
 
     if (!server->listen(QHostAddress::Any, port)) {
