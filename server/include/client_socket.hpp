@@ -25,7 +25,7 @@ public:
         socket->close();
     }
 
-    quint128 get_client_id() const noexcept {
+    uint get_client_id() const noexcept {
         return user_id;
     }
 
