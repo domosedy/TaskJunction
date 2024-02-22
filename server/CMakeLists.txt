@@ -9,6 +9,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(EXECUTABLE_OUTPUT_PATH ../)
 find_package(Qt6 REQUIRED COMPONENTS Core Network)
 
 set(FILES include/logging.hpp src/main.cpp)
