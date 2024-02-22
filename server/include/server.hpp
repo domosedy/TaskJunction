@@ -13,11 +13,11 @@ class ClientSocket;
 class Database : public QObject {
     Q_OBJECT
 signals:
-    void executed_query(int user_id, const QString &query);
+    void executed_query(uint user_id, const QString &query);
 
 public slots:
 
-    void execute_query(int user_id, std::shared_ptr<query> query) {
+    void execute_query(uint user_id, std::shared_ptr<query> query) {
         query->execute();
         rDebug() << user_id << "\n";
         QString answer = "hello from database";
@@ -43,7 +43,7 @@ public slots:
     void newConnection();
     void removeConnection();
     void readyRead();
-    void database_executed(int user_id, const QString &response);
+    void database_executed(uint user_id, const QString &response);
 };
 
 #endif

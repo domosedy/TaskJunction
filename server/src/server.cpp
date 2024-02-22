@@ -37,8 +37,8 @@ void Server::newConnection() {
 
     connect(
         id_of_all_connections[socket_id],
-        SIGNAL(request_to_database(int, std::shared_ptr<query>)), db,
-        SLOT(execute_query(int, std::shared_ptr<query>))
+        SIGNAL(request_to_database(uint, std::shared_ptr<query>)), db,
+        SLOT(execute_query(uint, std::shared_ptr<query>))
     );
 
     ++id;
@@ -63,7 +63,7 @@ void Server::readyRead() {
     clientSocket->write(data);
 }
 
-void Server::database_executed(int user_id, const QString &query) {
+void Server::database_executed(uint user_id, const QString &query) {
     id_of_all_connections[pointer_to_authorized[user_id]]->sendData(
         query.toUtf8()
     );

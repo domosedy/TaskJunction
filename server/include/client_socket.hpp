@@ -12,10 +12,10 @@ class ClientSocket : public QObject {
 
 private:
     QTcpSocket *socket;
-    quint128 user_id;
+    uint user_id;
 
 public:
-    ClientSocket(QTcpSocket *sock, int user_id)
+    ClientSocket(QTcpSocket *sock, uint user_id)
         : socket(sock), user_id(user_id) {
         connect(socket, SIGNAL(readyRead()), this, SLOT(readData()));
         connect(socket, SIGNAL(disconnected()), this, SLOT(removeConnection()));
@@ -42,7 +42,7 @@ public slots:
     void removeConnection();
 
 signals:
-    void request_to_database(int user_id, std::shared_ptr<query> query);
+    void request_to_database(uint user_id, std::shared_ptr<query> query);
     void disconnected();
 };
 

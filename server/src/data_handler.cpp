@@ -34,17 +34,6 @@ static std::shared_ptr<query> parseCreateQuery(const json &json_data) {
     return std::make_shared<create_query>(parent_id, value_type, value_name);
 }
 
-std::string remove_carret_symbols(const std::string &data) {
-    std::string good_answer = "";
-    for (std::size_t i = 0; i < data.size(); ++i) {
-        if (data[i] != '\\') {
-            good_answer += data[i];
-        }
-    }
-
-    return good_answer;
-}
-
 std::shared_ptr<query> parseData(const QString &data) {
     try {
         json parsedData = json::parse(data.toStdString());
