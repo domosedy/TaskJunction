@@ -2,8 +2,9 @@
 #include "card.hpp"
 
 ListModel::ListModel(QObject *parent): QAbstractListModel(parent) {
-    qDebug() << "Created listmodel!";
+    //qDebug() << "Created listmodel!";
 }
+
 
 int ListModel::rowCount(const QModelIndex &parent) const {
     Q_UNUSED(parent);
@@ -34,10 +35,22 @@ QVariant ListModel::data(const QModelIndex &index, int role) const {
 }
 
 void ListModel::add_card() {
-    qDebug() << "Add card!";
+    static int cnt = 1;
+    QString name = QString::fromStdString("test" + std::to_string(cnt));
+    cnt++;
+    //qDebug() << "Add card!";
     beginInsertRows(QModelIndex(), cards.size(), cards.size());
-    cards.append(Card("test"));
+    cards.append(Card(name));
     endInsertRows();
+
+    emit countChanged();
+}
+
+void ListModel::delete_card(int index) {
+    //qDebug() << "Delete card!" << index;
+    beginRemoveRows(QModelIndex(), index, index);
+    cards.remove(index);
+    endRemoveRows();
 
     emit countChanged();
 }

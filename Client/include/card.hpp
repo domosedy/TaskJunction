@@ -5,14 +5,11 @@
 #include <QString>
 
 class Card {
-
 public:
-    Card() = default;
-    Card(QString name = "card", QString description = "");
+    Card(QString name = "card", QString description = "random");
 
     QString get_name() const;
     QString get_description() const;
-
 private:
     QString name;
     QString description;

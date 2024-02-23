@@ -5,9 +5,10 @@ import "qrc:"
 
 Component {
     Rectangle {
-        y: 20
-        id: listMain  
-        width: 160
+        id: listMain 
+        signal deleteRequest(int index)
+        y: 20 
+        width: 240
         height: Math.max(90, Math.min((listmodel.count+1) * 45,mainarea.height-40))
         color: "#a9aaad"
         Rectangle {
@@ -19,6 +20,8 @@ Component {
             Text {
                 text: name
                 color: "white"
+                font.family: "Courier"
+                font.pointSize: 16
                 anchors.centerIn: listheader
             }
             Button {
@@ -33,17 +36,31 @@ Component {
                     color: parent.down ? "#1c1e24" :
                             (parent.hovered ? "#1c1e24" : "#282c34")
                 }                
-                anchors.right: listheader.right
+                anchors.left: listheader.left
                 onClicked: {
-                    //model.append({cardtext: "TestCard   "})
                     listmodel.add_card()
                 }
             }
+            Button {
+                Text {
+                    anchors.centerIn: parent
+                    text: "-"
+                    color: "white"
+                }
+                width: 30
+                height: 30
+                background: Rectangle {
+                    color: parent.down ? "#1c1e24" :
+                            (parent.hovered ? "#1c1e24" : "#282c34")
+                }                
+                anchors.right: listheader.right
+                onClicked: deleteRequest(index)
+            }            
         }
 
         Rectangle {
             id: listcontent
-            width: 160
+            width: parent.width
             height: listMain.height-40
             y: 30
             color: "#a9aaad"
@@ -58,7 +75,10 @@ Component {
                 model: listmodel
                 spacing: 5
                 delegate: Card {}               
-            }               
+            }             
+        }
+        Component.onCompleted: {
+            deleteRequest.connect(boardmodel.delete_list);
         }
     }
 }
