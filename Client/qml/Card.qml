@@ -9,9 +9,9 @@ Component {
     Rectangle {
         id: card_main
         signal deleteRequest(int index)
-        color: "#ffffff"
-        width: listMain.width-10
-        height: 40
+        color: "white"
+        width: style.cardWidth
+        height: style.cardHeight
         Text {  
             text: name
             font.family: "Courier"
@@ -22,7 +22,7 @@ Component {
         }
         MouseArea {
             anchors.fill: parent
-            onClicked: card_window.open()
+            onDoubleClicked: card_window.open()
         }
         Popup {
             id: card_window
@@ -35,7 +35,7 @@ Component {
             }
             contentItem: Rectangle{
                 id: content
-                border.color: "#282c34"
+                border.color: style.primaryColor
                 border.width: 5
                 Text {
                     id: card_name
@@ -67,8 +67,8 @@ Component {
                         anchors.centerIn: parent
                     }
                     background: Rectangle {
-                        color: parent.down ? "#ff9999" :
-                        (parent.hovered ? "#ff9999" : "#ff6666")
+                        color: parent.down ? Qt.lighter(style.deleteBackgroundColor, 1.2) :
+                        (parent.hovered ? Qt.lighter(style.deleteBackgroundColor, 1.2) : style.deleteBackgroundColor)
                     }     
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom

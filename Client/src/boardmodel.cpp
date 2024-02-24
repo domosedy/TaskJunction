@@ -51,12 +51,26 @@ void BoardModel::add_list() {
 }
 
 void BoardModel::delete_list(int index) {
-    //qDebug() << "Delete card!" << index;
+    //qDebug() << lists[index].get_name();
     beginRemoveRows(QModelIndex(), index, index);
     lists.remove(index);
     endRemoveRows();
 
     emit countChanged();
+}
+
+bool BoardModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+    if (!index.isValid() || index.row() > rowCount(index))
+        return false;
+    if (role == Qt::EditRole) {
+        lists[index.row()].get_name() = value.toString();
+    }
+    return false;
+}
+Qt::ItemFlags BoardModel::flags(const QModelIndex &index) const {
+    if (!index.isValid() || index.row() > rowCount(index))
+        return Qt::NoItemFlags;
+    return Qt::ItemIsEditable;
 }
 
 int BoardModel::get_count() {

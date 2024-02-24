@@ -8,14 +8,14 @@ Component {
         id: listMain 
         signal deleteRequest(int index)
         y: 20 
-        width: 240
+        width: style.listWidth
         height: Math.max(90, Math.min((listmodel.count+1) * 45,mainarea.height-40))
-        color: "#a9aaad"
+        color: style.listBackgroundColor
         Rectangle {
             anchors.top: parent.top
             width: parent.width
-            height: 30  
-            color: "#282c34"
+            height: style.headerHeight 
+            color: style.primaryColor
             id: listheader
             Text {
                 text: name
@@ -30,12 +30,12 @@ Component {
                     text: "+"
                     color: "white"
                 }
-                width: 30
-                height: 30
+                height: listheader.height
+                width: height
                 background: Rectangle {
-                    color: parent.down ? "#1c1e24" :
-                            (parent.hovered ? "#1c1e24" : "#282c34")
-                }                
+                    color: parent.down ? Qt.darker(style.primaryColor, 1.4) :
+                            (parent.hovered ? Qt.darker(style.primaryColor, 1.4) : style.primaryColor)
+                }            
                 anchors.left: listheader.left
                 onClicked: {
                     listmodel.add_card()
@@ -47,12 +47,12 @@ Component {
                     text: "-"
                     color: "white"
                 }
-                width: 30
-                height: 30
+                height: listheader.height
+                width: height
                 background: Rectangle {
-                    color: parent.down ? "#1c1e24" :
-                            (parent.hovered ? "#1c1e24" : "#282c34")
-                }                
+                    color: parent.down ? Qt.darker(style.primaryColor, 1.4) :
+                            (parent.hovered ? Qt.darker(style.primaryColor, 1.4) : style.primaryColor)
+                }            
                 anchors.right: listheader.right
                 onClicked: deleteRequest(index)
             }            
@@ -62,8 +62,8 @@ Component {
             id: listcontent
             width: parent.width
             height: listMain.height-40
-            y: 30
-            color: "#a9aaad"
+            anchors.top: listheader.bottom
+            color: style.listBackgroundColor
 
             ListView {
                 id:thislist

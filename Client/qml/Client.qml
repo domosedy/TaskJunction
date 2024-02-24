@@ -13,8 +13,8 @@ Rectangle {
         id: topmenu
         visible:true
         width: root.width
-        height: 30
-        color: "#282c34"
+        height: style.headerHeight
+        color: style.primaryColor
         anchors.top: root.top
         z: 100
 
@@ -29,8 +29,8 @@ Rectangle {
                 color: "white"
             }
             background: Rectangle {
-                color: parent.down ? "#1c1e24" :
-                        (parent.hovered ? "#1c1e24" : "#282c34")
+                color: parent.down ? Qt.darker(style.primaryColor, 1.4) :
+                        (parent.hovered ? Qt.darker(style.primaryColor, 1.4) : style.primaryColor)
             }
             onClicked: {
                 boardmodel.add_list()
@@ -42,7 +42,7 @@ Rectangle {
         width: root.width
         height: root.height-topmenu.height
         y: topmenu.height
-        color: "#686b70"
+        color: style.boardBackgroundColor
 
         ClientBoardModel {
             id: boardmodel
