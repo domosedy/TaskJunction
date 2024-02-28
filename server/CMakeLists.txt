@@ -18,19 +18,29 @@ target_include_directories(TestProject PRIVATE include)
 target_link_libraries(TestProject PRIVATE Qt6::Core)
 
 add_executable(server 
-    include/client_socket.hpp 
-    include/data_handler.hpp
-    include/json.hpp
-    include/logging.hpp 
-    include/query.hpp
-    include/server.hpp 
+include/client_socket.hpp 
+include/data_handler.hpp
+include/json.hpp
+include/logging.hpp 
+include/query.hpp
+include/server.hpp 
+include/datas.hpp
 
-    src/client_socket.cpp
-    src/data_handler.cpp
-    src/query.cpp
-    src/server_main.cpp
-    src/server.cpp)
+src/client_socket.cpp
+src/data_handler.cpp
+src/datas.cpp
+src/server_main.cpp
+src/server.cpp)
+
 
 target_include_directories(server PUBLIC include)
 target_link_libraries(server PRIVATE Qt6::Network)
 target_link_libraries(server PRIVATE Qt6::Core)
+
+add_executable(json-test
+    include/datas.hpp
+
+    src/datas.cpp
+    src/test_json.cpp)
+
+target_include_directories(json-test PRIVATE include)

@@ -4,6 +4,9 @@
 #include "client_socket.hpp"
 #include "logging.hpp"
 #include "query.hpp"
+#include "datas.hpp"
+
+enum class RequestType { ERROR, CREATE, DELETE, UPDATE, LOGIN };
 
 // How to emit when my connection is not authorized?
 Server::Server(quint16 port) : port(port) {
@@ -11,10 +14,6 @@ Server::Server(quint16 port) : port(port) {
     db = new Database();
 
     connect(server, SIGNAL(newConnection()), this, SLOT(newConnection()));
-    connect(
-        db, SIGNAL(executed_query(uint, const QString &)), this,
-        SLOT(database_executed(uint, const QString &))
-    );
 
     if (!server->listen(QHostAddress::Any, port)) {
         rDebug() << QObject::tr("Unable to start server: %1")
@@ -27,21 +26,16 @@ Server::~Server() {
 }
 
 void Server::newConnection() {
-    static int id = 0;
-
     QTcpSocket *clientSocket = server->nextPendingConnection();
-    ClientSocket *clientSock = new ClientSocket(clientSocket, id);
+    ClientSocket *clientSock = new ClientSocket(clientSocket, 0);
     auto socket_id = clientSock->get_socket_id();
     id_of_all_connections[socket_id] = clientSock;
-    pointer_to_authorized[id] = socket_id;
 
     connect(
         id_of_all_connections[socket_id],
-        SIGNAL(request_to_database(uint, std::shared_ptr<query>)), db,
-        SLOT(execute_query(uint, std::shared_ptr<query>))
+        SIGNAL(request_to_database(uint, query_type)), this,
+        SLOT(execute_query(uint, query_type))
     );
-
-    ++id;
 
     connect(
         id_of_all_connections[socket_id], SIGNAL(disconnected()), this,
@@ -63,10 +57,49 @@ void Server::readyRead() {
     clientSocket->write(data);
 }
 
-void Server::database_executed(uint user_id, const QString &query) {
-    id_of_all_connections[pointer_to_authorized[user_id]]->sendData(
-        query.toUtf8()
-    );
+void Server::execute_query(uint user_id, const query_type &query) {
+    auto clientSocket = dynamic_cast<ClientSocket *>(sender());
+    auto client_id = clientSocket->get_client_id();
+    auto socket_id = clientSocket->get_socket_id();
+
+    rDebug() << client_id;
+
+    auto result_code = std::visit([](auto &&arg) {
+        using T = std::decay_t<decltype(arg)>;
+        if constexpr (std::is_same_v<T, update_query>) {
+            return RequestType::UPDATE;
+        } else if constexpr (std::is_same_v<T, create_query>) {
+            return RequestType::CREATE;
+        } else if constexpr (std::is_same_v<T, delete_query>) {
+            return RequestType::DELETE;
+        } else if constexpr (std::is_same_v<T, login_query>) {
+            return RequestType::LOGIN;
+        }
+        return RequestType::ERROR;
+    }, query);
+
+    std::string result = "";
+    std::pair<uint, std::string> returned_value;
+    switch (result_code) {
+        case RequestType::UPDATE:
+            result = db->execute_update_query(std::get<update_query>(query), client_id);
+            break;
+        case RequestType::CREATE:
+            result = db->execute_create_query(std::get<create_query>(query), client_id);
+            break;
+        case RequestType::DELETE:
+            result = db->execute_delete_query(std::get<delete_query>(query), client_id);
+            break;
+        case RequestType::LOGIN:
+            returned_value = db->execute_login_query(std::get<login_query>(query));
+            id_of_all_connections[socket_id]->set_client_id(returned_value.first);
+            result = std::move(returned_value.second);
+            break;
+        default:
+            result = std::move(ErrorJson{"An error occured"}.to_json());        
+    }
+
+    clientSocket->sendData(result.c_str());    
 }
 
 void Server::removeConnection() {
@@ -76,7 +109,6 @@ void Server::removeConnection() {
         return;
     }
 
-    pointer_to_authorized.remove(clientSocket->get_client_id());
     id_of_all_connections.remove(clientSocket->get_socket_id());
     delete clientSocket;
 }

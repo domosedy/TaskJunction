@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <memory>
-class query;
+#include "query.hpp"
 
 class ClientSocket : public QObject {
     Q_OBJECT
@@ -33,6 +33,10 @@ public:
         return socket->socketDescriptor();
     }
 
+    void set_client_id(uint new_id) noexcept {
+        user_id = new_id;
+    }
+
     ClientSocket(const ClientSocket &) = delete;
     ClientSocket &operator=(const ClientSocket &) = delete;
 
@@ -42,7 +46,7 @@ public slots:
     void removeConnection();
 
 signals:
-    void request_to_database(uint user_id, std::shared_ptr<query> query);
+    void request_to_database(uint user_id, const query_type &query);
     void disconnected();
 };
 

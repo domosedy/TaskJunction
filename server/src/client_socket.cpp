@@ -3,43 +3,43 @@
 #include <sstream>
 #include "data_handler.hpp"
 #include "logging.hpp"
+#include "datas.hpp"
 
 void ClientSocket::sendData(const QByteArray &data) {
+    rDebug() << data.size();
     QByteArray data_size;
     QDataStream out(&data_size, QIODevice::WriteOnly);
-    out << data.size();
+    out << QVariant(data.size()).toString() << "\n";
 
-    socket->write(data_size);
-    socket->write(data);
+    socket->write(data_size + data);
 }
 
 void ClientSocket::readData() {
-    try {
-        QByteArray data = socket->readLine();
-        auto data_string = data.toStdString();
+    QByteArray data = socket->readLine();
+    auto data_string = data.toStdString();
 
-        std::stringstream in(data_string);
-        in.exceptions(std::ios::failbit | std::ios::badbit);
-        int size;
-        in >> size;
+    std::stringstream ss(data_string);
+    std::size_t size;
 
-        data = socket->read(size);
-        QString json_request = data.toStdString().c_str();
-
-        rDebug() << "Received from " << socket->peerAddress().toString() << size
-                 << " " << json_request;
-
-        auto value = parseData(json_request);
-
-        if (value == nullptr) {
-            throw std::runtime_error("nullptr recevied");
-        }
-
-        emit request_to_database(user_id, std::move(value));
-    } catch (std::exception &e) {
-        rDebug() << e.what();
-        sendData("Bad format of data");
+    if (!(ss >> size)) {
+        sendData(ErrorJson{"Bad format of data"}.to_json().c_str());
+        return;
     }
+
+    data = socket->read(size);
+    QString json_request = data.toStdString().c_str();
+
+    rDebug() << "Received from " << socket->peerAddress().toString() << size
+                << " " << json_request;
+
+    auto value = parseData(json_request);
+
+    if (!value.has_value()) {
+        sendData(ErrorJson{"Bad format of data"}.to_json().c_str());
+        return;
+    }
+
+    emit request_to_database(user_id, std::move(value.value()));
 }
 
 void ClientSocket::removeConnection() {

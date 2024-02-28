@@ -2,13 +2,9 @@
 #define QUERY_HPP_
 
 #include <string>
+#include <variant>
 
-struct query {
-    virtual ~query() = default;
-    virtual void execute() = 0;
-};
-
-struct update_query : query {
+struct update_query {
     std::size_t value_id;
     std::string new_value;
     std::string value_name;
@@ -26,21 +22,18 @@ struct update_query : query {
           updated_type(std::move(updated_type)) {
     }
 
-    void execute() override;
 };
 
-struct delete_query : query {
+struct delete_query {
     std::size_t value_id;
     std::string value_type;
 
     delete_query(std::size_t value_id, std::string &value_type)
         : value_id(value_id), value_type(std::move(value_type)) {
     }
-
-    void execute() override;
 };
 
-struct create_query : query {
+struct create_query {
     std::size_t parent_id;
     std::string value_type;
     std::string value_name;
@@ -54,8 +47,20 @@ struct create_query : query {
           value_type(std::move(value_type)),
           value_name(std::move(value_name)) {
     }
-
-    void execute() override;
 };
+
+struct login_query {
+    std::string password; // TODO: hash or salt it
+    std::string user_name;
+
+    login_query(
+        std::string &password,
+        std::string &user_name
+    ) : password(std::move(password)), user_name(std::move(user_name)) {
+    }
+};
+
+using query_type = std::variant<update_query, delete_query, create_query, login_query>;
+
 
 #endif

@@ -4,8 +4,9 @@
 #include <QString>
 #include <memory>
 #include <utility>
+#include <optional>
 #include "query.hpp"
 
-std::shared_ptr<query> parseData(const QString &data);
+std::optional<query_type> parseData(const QString &data);
 
 #endif
