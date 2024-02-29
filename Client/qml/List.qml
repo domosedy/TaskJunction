@@ -78,7 +78,7 @@ Component {
             }             
         }
         Component.onCompleted: {
-            deleteRequest.connect(boardmodel.delete_list);
+            deleteRequest.connect(listview.model.delete_list);
         }
     }
 }

@@ -33,7 +33,7 @@ Rectangle {
                         (parent.hovered ? Qt.darker(style.primaryColor, 1.4) : style.primaryColor)
             }
             onClicked: {
-                boardmodel.add_list()
+                listview.model.add_list()
             }
         }
     }
@@ -44,15 +44,12 @@ Rectangle {
         y: topmenu.height
         color: style.boardBackgroundColor
 
-        ClientBoardModel {
-            id: boardmodel
-        }
 
         ListView {
             id: listview
             anchors.fill: parent
             anchors.leftMargin: 10
-            model: boardmodel
+            model: mainClient.current_board
             orientation: ListView.Horizontal
             spacing: 5
             delegate: List {}

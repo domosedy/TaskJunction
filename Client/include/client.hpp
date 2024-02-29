@@ -3,18 +3,22 @@
 
 #include <QObject>
 #include <QTcpSocket>
-#include "board.hpp"
+#include "boardmodel.hpp"
 
 class Client : public QObject {
     Q_OBJECT
+    Q_PROPERTY(BoardModel* current_board MEMBER m_current_board READ get_current_board NOTIFY boardChanged)
 
 public:
     explicit Client(QObject *parent = nullptr);
-    void create_board();
+    Q_INVOKABLE void create_board();
+    BoardModel* get_current_board();
+signals:
+    void boardChanged();
 
 private:
     QTcpSocket *socket = nullptr;
-    //Board* board = nullptr;
+    BoardModel* m_current_board;
 };
 
 #endif  // CLIENT_HPP

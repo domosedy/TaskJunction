@@ -3,6 +3,7 @@
 #include <QQmlContext>
 #include "listmodel.hpp"
 #include "boardmodel.hpp"
+#include "client.hpp"
 
 int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
@@ -20,7 +21,10 @@ int main(int argc, char *argv[]) {
 
     qmlRegisterType<ListModel>("Client", 1, 0, "ClientListModel");
     qmlRegisterType<BoardModel>("Client", 1, 0, "ClientBoardModel");
+    qmlRegisterType<Client>("Client", 1, 0, "Client");
 
+    Client* client = new Client();
+    engine.rootContext()->setContextProperty("mainClient", client);
     engine.load(url);
     return app.exec();
 }

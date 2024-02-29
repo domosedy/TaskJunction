@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Client
 import "qrc:"
 
 ApplicationWindow {
@@ -47,7 +48,8 @@ ApplicationWindow {
             }
             onClicked: {
                 login.visible = false
-                client_loader.source = "Client.qml"    
+                client_loader.source = "Client.qml"   
+                mainClient.create_board()
             }
         }      
     }
