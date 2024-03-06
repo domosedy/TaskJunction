@@ -39,8 +39,8 @@ static std::optional<std::string> get_string_field_data(const json &data, const 
 
 static std::optional<update_query> parseUpdateQuery(const json &json_data) {
     auto value_id = get_int_field_data(json_data, "id");
-    auto new_value = get_string_field_data(json_data, "value");
-    auto value_name = get_string_field_data(json_data, "value-name");
+    auto new_value = get_string_field_data(json_data, "new-value");
+    auto value_name = get_string_field_data(json_data, "field");
     auto updated_type = get_string_field_data(json_data, "type");
 
     if (!value_id.has_value() || !new_value.has_value() || !value_name.has_value() || !updated_type.has_value()) {
@@ -54,7 +54,7 @@ static std::optional<update_query> parseUpdateQuery(const json &json_data) {
 
 static std::optional<delete_query> parseDeleteQuery(const json &json_data) {
     auto value_id = get_int_field_data(json_data, "id");
-    auto value_type = get_string_field_data(json_data, "value-type");
+    auto value_type = get_string_field_data(json_data, "type");
 
     if (!value_id.has_value() || !value_type.has_value()) {
         return std::nullopt;
