@@ -13,7 +13,7 @@ public:
     QHash<int, QByteArray> roleNames() const override;
     int rowCount(const QModelIndex &parent = {}) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    Q_INVOKABLE void add_card();
+    Q_INVOKABLE void add_card(QString& name, QString& description);
     Q_INVOKABLE void delete_card(int index);
     int get_count();
 signals:

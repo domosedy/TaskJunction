@@ -4,7 +4,7 @@
 #include <QVariant>
 
 BoardModel::BoardModel(QObject *parent): QAbstractListModel(parent) {
-    //qDebug() << "Created board!";
+    qDebug() << "Created board!";
 }
 
 int BoardModel::rowCount(const QModelIndex &parent) const {
@@ -38,11 +38,10 @@ QVariant BoardModel::data(const QModelIndex &index, int role) const {
     }
 }
 
-void BoardModel::add_list() {
+void BoardModel::add_list(QString& name) {
     //qDebug() << "Add list!";
-    static int cnt = 1;
-    QString name = QString::fromStdString("list_" + std::to_string(cnt));
-    cnt++;    
+    if (name == "")
+        name = "New list";
     beginInsertRows(QModelIndex(), lists.size(), lists.size());
     lists.append(List(name, "", this));
     endInsertRows();

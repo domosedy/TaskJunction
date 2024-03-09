@@ -34,13 +34,14 @@ QVariant ListModel::data(const QModelIndex &index, int role) const {
     }
 }
 
-void ListModel::add_card() {
-    static int cnt = 1;
-    QString name = QString::fromStdString("test" + std::to_string(cnt));
-    cnt++;
+void ListModel::add_card(QString& name, QString& description) {
+
+    if (name == "")
+        name = "New card";
+
     //qDebug() << "Add card!";
     beginInsertRows(QModelIndex(), cards.size(), cards.size());
-    cards.append(Card(name));
+    cards.append(Card(name, description));
     endInsertRows();
 
     emit countChanged();

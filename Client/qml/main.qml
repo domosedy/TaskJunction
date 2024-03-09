@@ -16,11 +16,11 @@ ApplicationWindow {
     }
 
     Loader {
-        id: client_loader
+        id: loader
     }
 
     ColumnLayout{
-        id: login
+        id: start_menu
         visible: true
         anchors.centerIn: parent
         spacing: 10
@@ -34,6 +34,10 @@ ApplicationWindow {
                 font.pointSize: 12
                 color: "#514e92"
             }
+            onClicked: {
+                start_menu.visible = false
+                loader.source = "Authorization.qml"   
+            }            
         }
 
         Button {  
@@ -47,8 +51,8 @@ ApplicationWindow {
                 color: "#514e92"
             }
             onClicked: {
-                login.visible = false
-                client_loader.source = "Client.qml"   
+                start_menu.visible = false
+                loader.source = "Client.qml"   
                 mainClient.create_board()
             }
         }      

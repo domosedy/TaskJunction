@@ -31,6 +31,7 @@ set(PROJECT_SOURCES
         src/card.cpp
         src/boardmodel.cpp
         src/listmodel.cpp
+        src/json_parser.cpp
         src/qml.qrc
         include/client.hpp
         include/board.hpp
@@ -38,6 +39,7 @@ set(PROJECT_SOURCES
         include/card.hpp
         include/boardmodel.hpp
         include/listmodel.hpp
+        include/json_parser.hpp
 )
 
 add_executable(client

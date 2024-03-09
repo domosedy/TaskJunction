@@ -18,6 +18,61 @@ Rectangle {
         anchors.top: root.top
         z: 100
 
+        Popup {
+            id: create_list
+            width: 210
+            height: 120
+            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+
+            background: Rectangle {
+                visible: false
+            }
+            contentItem: Rectangle{
+                id: content
+                border.color: style.primaryColor
+                border.width: 5
+                TextField {
+                    z: 1
+                    id: list_name
+                    placeholderText: "New list"
+                    font.family: "Courier"
+                    font.pointSize: 12
+                    font.bold: true
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    anchors.topMargin: 10
+                }            
+                Button {
+                    z: 1
+                    width: 80
+                    height: 30
+                    Text {
+                        text: "Add"
+                        font.family: "Courier"
+                        font.pointSize: 12
+                        anchors.centerIn: parent
+                    }
+                    background: Rectangle {
+                        color: parent.down ? Qt.lighter(style.createBackgroundColor, 1.2) :
+                        (parent.hovered ? Qt.lighter(style.createBackgroundColor, 1.2) : style.createBackgroundColor)
+                    }     
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 10
+                    onClicked: {
+                        create_list.close()
+                        listview.model.add_list(list_name.text)
+                    }
+                }
+
+                Drag.active: true
+                MouseArea{
+                    anchors.fill: parent
+                    drag.target: parent
+                }                  
+            }
+        }
+
         Button {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
@@ -33,7 +88,8 @@ Rectangle {
                         (parent.hovered ? Qt.darker(style.primaryColor, 1.4) : style.primaryColor)
             }
             onClicked: {
-                listview.model.add_list()
+                create_list.open()
+                //listview.model.add_list()
             }
         }
     }

@@ -10,6 +10,8 @@ public:
 
     QString get_name() const;
     QString get_description() const;
+signals:
+ 
 private:
     QString name;
     QString description;
