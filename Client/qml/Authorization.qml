@@ -54,6 +54,7 @@ Rectangle {
                     radius: implicitHeight / 2
                     color: "white"
                 }
+                onTextChanged: background.color = "white"
             }
             TextField {
                 id: loginIP
@@ -74,6 +75,7 @@ Rectangle {
                     radius: implicitHeight / 2
                     color: "white"
                 }
+                onTextChanged: background.color = "white"
             }
             TextField {
                 id: loginPort
@@ -109,16 +111,25 @@ Rectangle {
                 Layout.preferredWidth: 200
                 Layout.preferredHeight: 40
                 onClicked: {
-                    var state = mainClient.login(loginUsername.text, loginPassword.text, loginIP.text, loginPort.text)
-                    console.log(Client.success)
-                    console.log(state)
-                    if (state == 0) {
-                        test_text.text = "CONN"
-                    } else {
-                        test_text.text = "FUU"
-                    }
+                    mainClient.login(loginUsername.text, loginPassword.text, loginIP.text, loginPort.text)
                 }
             }                                          
+        }
+    }
+    Connections {
+        target: mainClient
+        function onStatusChanged() {
+            console.log(mainClient.client_status)
+            if (mainClient.client_status == 1) {
+                loader.source = "BoardSelect.qml"
+                mainClient.requestAvaliableBoards()
+            } 
+            if (mainClient.client_status == 2) {
+                loginPassword.background.color = style.deleteBackgroundColor
+            }            
+            if (mainClient.client_status == 4) {
+                loginIP.background.color = style.deleteBackgroundColor
+            }
         }
     }
 }

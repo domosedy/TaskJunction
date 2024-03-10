@@ -1,10 +1,9 @@
 #include "listmodel.hpp"
 #include "card.hpp"
 
-ListModel::ListModel(QObject *parent): QAbstractListModel(parent) {
-    //qDebug() << "Created listmodel!";
+ListModel::ListModel(QObject *parent) : QAbstractListModel(parent) {
+    // qDebug() << "Created listmodel!";
 }
-
 
 int ListModel::rowCount(const QModelIndex &parent) const {
     Q_UNUSED(parent);
@@ -20,11 +19,12 @@ QHash<int, QByteArray> ListModel::roleNames() const {
 }
 
 QVariant ListModel::data(const QModelIndex &index, int role) const {
-    if (!index.isValid() || index.row() > rowCount(index))
+    if (!index.isValid() || index.row() > rowCount(index)) {
         return {};
-    const Card& card = cards.at(index.row());
+    }
+    const Card &card = cards.at(index.row());
 
-    switch(role) {
+    switch (role) {
         case CardRoles::NameRole:
             return {card.get_name()};
         case CardRoles::DescriptionRole:
@@ -34,21 +34,23 @@ QVariant ListModel::data(const QModelIndex &index, int role) const {
     }
 }
 
-void ListModel::add_card(QString& name, QString& description) {
-
-    if (name == "")
+void ListModel::add_card(QString &name, QString &description) {
+    if (name == "") {
         name = "New card";
+    }
 
-    //qDebug() << "Add card!";
+    // qDebug() << "Add card!";
     beginInsertRows(QModelIndex(), cards.size(), cards.size());
     cards.append(Card(name, description));
     endInsertRows();
+
+    emit newCardAdded(cards.back());
 
     emit countChanged();
 }
 
 void ListModel::delete_card(int index) {
-    //qDebug() << "Delete card!" << index;
+    // qDebug() << "Delete card!" << index;
     beginRemoveRows(QModelIndex(), index, index);
     cards.remove(index);
     endRemoveRows();

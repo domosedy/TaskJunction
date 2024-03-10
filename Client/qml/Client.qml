@@ -61,7 +61,8 @@ Rectangle {
                     anchors.bottomMargin: 10
                     onClicked: {
                         create_list.close()
-                        listview.model.add_list(list_name.text)
+                        //listview.model.add_list(list_name.text)
+                        mainClient.create_list(list_name.text)
                     }
                 }
 

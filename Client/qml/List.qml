@@ -85,7 +85,8 @@ Component {
                             Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
                             onClicked: {
                                 create_card.close()
-                                listmodel.add_card(card_name.text,card_description.text)
+                                //listmodel.add_card(card_name.text,card_description.text)
+                                mainClient.create_card(index, card_name.text, card_description.text)
                                 card_description.text = ""
                                 card_name.text = ""
                             }

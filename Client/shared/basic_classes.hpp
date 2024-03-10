@@ -2,7 +2,7 @@
 #define BASIC_HPP_
 
 struct Card_Base {
-    Card_Base(QString name = "card", QString description = "random");
+    Card_Base(const QString& name, const QString& description);
     QString m_name;
     QString m_description;
     uint m_card_id;
@@ -10,7 +10,7 @@ struct Card_Base {
 };
 
 struct List_Base {
-    List_Base(QString name = "card", QString description = "random");
+    List_Base(const QString& name, const QString& description);
     QString m_name;
     QString m_description;
     uint m_list_id;
@@ -18,7 +18,7 @@ struct List_Base {
 };
 
 struct Board_Base {
-    Board_Base(QString name, QString description);
+    Board_Base(const QString& name, const QString& description);
     QString m_name;
     QString m_description;
     uint m_board_id;

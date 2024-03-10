@@ -11,7 +11,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(EXECUTABLE_OUTPUT_PATH ../)
+#set(EXECUTABLE_OUTPUT_PATH ../)
 
 set(CMAKE_CXX_FLAGS "-pedantic-errors -Wall -Wextra -Werror")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fno-omit-frame-pointer -fsanitize=address")
@@ -26,7 +26,6 @@ FetchContent_MakeAvailable(json)
 set(PROJECT_SOURCES
         src/main.cpp
         src/client.cpp
-        src/board.cpp
         src/list.cpp
         src/card.cpp
         src/boardmodel.cpp
@@ -34,12 +33,11 @@ set(PROJECT_SOURCES
         src/json_parser.cpp
         src/qml.qrc
         include/client.hpp
-        include/board.hpp
         include/list.hpp
         include/card.hpp
         include/boardmodel.hpp
         include/listmodel.hpp
-        include/json_parser.hpp
+        shared/json_parser.hpp
 )
 
 add_executable(client
@@ -47,7 +45,7 @@ add_executable(client
 )
 
 
-target_include_directories(client PRIVATE include)
+target_include_directories(client PRIVATE include shared)
 target_link_libraries(client PRIVATE 
     Qt6::Widgets 
     Qt6::Quick
