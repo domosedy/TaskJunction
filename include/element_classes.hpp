@@ -4,10 +4,12 @@
 
 class board {
     unsigned m_board_id;
+    unsigned m_user_id;
     QString m_name;
 
 public:
     explicit board(QVector<QVariant> data);
+
     void print_data() {
         qDebug() << m_board_id << ' ' << m_name;
     }
@@ -42,25 +44,27 @@ public:
 };
 
 board::board(QVector<QVariant> data)
-        : m_board_id(data[0].toInt()), m_name(data[1].toString()) {
+    : m_board_id(data[0].toInt()),
+      m_user_id(data[1].toInt()),
+      m_name(data[2].toString()) {
 }
 
 list::list(QVector<QVariant> data)
-        : m_list_id(data[0].toInt()),
-          m_board_id(data[1].toInt()),
-          m_name(data[2].toString()),
-          m_description(data[3].toString()) {
+    : m_list_id(data[0].toInt()),
+      m_board_id(data[1].toInt()),
+      m_name(data[2].toString()),
+      m_description(data[3].toString()) {
 }
 
 card::card(QVector<QVariant> data)
-        : m_card_id(data[0].toInt()),
-          m_list_id(data[1].toInt()),
-          m_name(data[2].toString()),
-          m_description(data[3].toString()) {
+    : m_card_id(data[0].toInt()),
+      m_list_id(data[1].toInt()),
+      m_name(data[2].toString()),
+      m_description(data[3].toString()) {
 }
 
 tag::tag(QVector<QVariant> data)
-        : m_tag_id(data[0].toInt()), m_name(data[1].toString()) {
+    : m_tag_id(data[0].toInt()), m_name(data[1].toString()) {
 }
 
 #endif  // ELEMENT_CLASSES_HPP_
