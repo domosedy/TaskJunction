@@ -191,24 +191,3 @@ tag db_manager::select_tag(unsigned int id) {
 
 }  // namespace database
 
-int main(int argc, char *argv[]) {
-    if (argc < 5) {
-        qDebug() << "wrong arguments format";
-        return 1;
-    }
-    using namespace database;
-    db_accessor db_accessor(argv[1], argv[2], argv[3], argv[4]);
-    fill_query_name_to_sql_command();
-
-    db_manager::insert_board("board_name");
-    db_manager::insert_list(2, "list_name", "test");
-    db_manager::insert_card(2, "card_name", "test");
-    db_manager::insert_tag("tag_name");
-    db_manager::pin_tag_to_card(2, 2);
-    db_manager::update_command(
-        LIST_TABLE_NAME, "integer", "board_id", LIST_PRIMARY_KEY, "10", 10
-    );
-    board board = db_manager::select_board(2);
-    db_manager::delete_command(LIST_TABLE_NAME, LIST_PRIMARY_KEY, 10);
-    return 0;
-}
