@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include <string>
 #include "json_parser.hpp"
+#include "logging.hpp"
 
 Client::Client(QObject *parent) : QObject(parent) {
     m_socket = new QTcpSocket(this);
@@ -17,37 +18,46 @@ void Client::create_board() {
 }
 
 void Client::write(const QString &data) {
-    QByteArray msg;
-    QDataStream sendStream(&msg, QIODevice::ReadWrite);
-    sendStream << quint16(0) << data;
-
-    sendStream.device()->seek(0);
-    sendStream << quint16(msg.size() - sizeof(quint16));
-    m_socket->write(msg);
+    QByteArray msg = data.toStdString().c_str();
+    QByteArray sz;
+    QDataStream sendStream(&sz, QIODevice::WriteOnly);
+    quint16 size = msg.size();
+    sendStream << size;
+    rDebug() << size;
+    // sendStream << quint16(0) << data;
+    // sendStream << 
+    // sendStream.device()->seek(0);
+    // sendStream << quint16(msg.size() - sizeof(quint16));
+    m_socket->write(sz + msg);
 }
 
 void Client::readData() {
     QDataStream in(m_socket);
     if (in.status() == QDataStream::Ok) {
-        quint16 msg_size = 0;
-        while (true) {
-            if (!msg_size) {
-                if (m_socket->bytesAvailable() <
-                    static_cast<qint64>(sizeof(quint16))) {
-                    break;
-                }
-                in >> msg_size;
-            }
-            qDebug() << msg_size;
-            if (m_socket->bytesAvailable() < msg_size) {
-                break;
-            }
-            QString response;
-            in >> response;
-            qDebug() << response;
-            parse_response(response);
-            break;
-        }
+        //quint16 msg_size = 0;
+        // while (true) {
+        //     if (!msg_size) {
+        //         if (m_socket->bytesAvailable() <
+        //             static_cast<qint64>(sizeof(quint16))) {
+        //             break;
+        //         }
+        //         in >> msg_size;
+        //     }
+        //     qDebug() << msg_size;
+        //     if (m_socket->bytesAvailable() < msg_size) {
+        //         break;
+        //     }
+        //     QString response;
+        //     in >> response;
+        //     qDebug() << response;
+        //     //parse_response(response);
+        //     break;
+        //}
+        QDataStream size_data = m_socket->read(2);
+        quint16 size;
+        size_data >> size;
+        QByteArray data = m_socket->read(size);
+        qDebug() << data.toStdString().c_str();
     } else {
         qDebug() << "Error";
     }

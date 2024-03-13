@@ -37,6 +37,7 @@ set(PROJECT_SOURCES
         include/card.hpp
         include/boardmodel.hpp
         include/listmodel.hpp
+        shared/logging.hpp
         shared/json_parser.hpp
 )
 
