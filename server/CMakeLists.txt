@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(EXECUTABLE_OUTPUT_PATH ../)
-find_package(Qt6 REQUIRED COMPONENTS Core Network)
+find_package(Qt6 REQUIRED COMPONENTS Core Network Sql)
 
 set(FILES include/logging.hpp src/main.cpp)
 add_executable(TestProject ${FILES})
@@ -25,6 +25,9 @@ include/logging.hpp
 include/query.hpp
 include/server.hpp 
 include/datas.hpp
+../database/include/database.hpp
+../database/include/element_classes.hpp
+../database/src/database.cpp
 
 src/client_socket.cpp
 src/data_handler.cpp
@@ -34,7 +37,9 @@ src/server.cpp)
 
 
 target_include_directories(server PUBLIC include)
+target_include_directories(server PUBLIC ../database/include)
 target_link_libraries(server PRIVATE Qt6::Network)
+target_link_libraries(server PRIVATE Qt6::Sql)
 target_link_libraries(server PRIVATE Qt6::Core)
 
 add_executable(json-test

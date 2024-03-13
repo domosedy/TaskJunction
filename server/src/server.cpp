@@ -6,7 +6,7 @@
 #include "query.hpp"
 #include "datas.hpp"
 
-enum class RequestType { ERROR, CREATE, DELETE, UPDATE, LOGIN };
+enum class RequestType { ERROR, CREATE, DELETE, UPDATE, LOGIN, GET_BOARDS_INFO };
 
 // How to emit when my connection is not authorized?
 Server::Server(quint16 port) : port(port) {
@@ -74,6 +74,8 @@ void Server::execute_query(uint user_id, const query_type &query) {
             return RequestType::DELETE;
         } else if constexpr (std::is_same_v<T, login_query>) {
             return RequestType::LOGIN;
+        } else if constexpr (std::is_same_v<T, get_boards_info_query>) {
+            return RequestType::GET_BOARDS_INFO;
         }
         return RequestType::ERROR;
     }, query);
@@ -95,6 +97,7 @@ void Server::execute_query(uint user_id, const query_type &query) {
             id_of_all_connections[socket_id]->set_client_id(returned_value.first);
             result = std::move(returned_value.second);
             break;
+        case RequestType::GET_BOARDS_INFO:
         default:
             result = std::move(ErrorJson{"An error occured"}.to_json());        
     }

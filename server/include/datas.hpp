@@ -52,8 +52,9 @@ struct ErrorJson {
     std::string to_json() const;
 };
 
-struct AllBoardsJson {
-    std::vector<uint> all_boards;
+struct LoginResponse {
+    bool authorized;
+    std::vector<std::pair<uint, std::string>> all_boards;
 
     std::string to_json() const;
 };

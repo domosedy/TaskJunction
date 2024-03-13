@@ -60,8 +60,14 @@ struct login_query {
     }
 };
 
+struct get_boards_info_query {
+    std::size_t id;
+};
 
-using query_type = std::variant<update_query, delete_query, create_query, login_query>;
+
+using query_type = 
+    std::variant<update_query, delete_query, create_query, 
+            login_query, get_boards_info_query>;
 
 
 #endif

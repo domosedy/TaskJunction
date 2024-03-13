@@ -67,18 +67,28 @@ std::string ErrorJson::to_json() const {
     return ss.str();
 }
 
-std::string AllBoardsJson::to_json() const {
+std::string LoginResponse::to_json() const {
     std::stringstream ss;
 
-    ss << "{ \"type\": \"board-list\", \"boards\": [";
+    ss << "{\"type\": \"authorization\", \"response\": \"";
+    if (authorized) {
+        ss << "ok";
+    } else {
+        ss << "wrong";
+    }
+
+    ss << "\", \"boards\": [";
+
     for (std::size_t i = 0; i + 1 < all_boards.size(); ++i) {
-        ss << all_boards[i] << ", ";
+        ss << "{ \"name\": \"" << all_boards[i].second 
+            << "\", \"id\": " << all_boards[i].first << "}, "; 
     }
 
     if (!all_boards.empty()) {
-        ss << all_boards.back();
+        ss << "{ \"name\": \"" << all_boards.back().second 
+            << "\", \"id\": " << all_boards.back().first << "}"; 
     }
 
-    ss << "] }";
+    ss << "]}";
     return ss.str();
 }
