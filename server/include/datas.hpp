@@ -52,4 +52,10 @@ struct ErrorJson {
     std::string to_json() const;
 };
 
+struct AllBoardsJson {
+    std::vector<uint> all_boards;
+
+    std::string to_json() const;
+};
+
 #endif

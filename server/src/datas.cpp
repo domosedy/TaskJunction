@@ -66,3 +66,19 @@ std::string ErrorJson::to_json() const {
 
     return ss.str();
 }
+
+std::string AllBoardsJson::to_json() const {
+    std::stringstream ss;
+
+    ss << "{ \"type\": \"board-list\", \"boards\": [";
+    for (std::size_t i = 0; i + 1 < all_boards.size(); ++i) {
+        ss << all_boards[i] << ", ";
+    }
+
+    if (!all_boards.empty()) {
+        ss << all_boards.back();
+    }
+
+    ss << "] }";
+    return ss.str();
+}

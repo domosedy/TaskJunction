@@ -60,6 +60,7 @@ struct login_query {
     }
 };
 
+
 using query_type = std::variant<update_query, delete_query, create_query, login_query>;
 
 
