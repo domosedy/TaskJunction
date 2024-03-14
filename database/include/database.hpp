@@ -6,103 +6,119 @@
 #include "element_classes.hpp"
 
 namespace database {
-const QString BOARD_TABLE_NAME = "board_signature";
-const QString BOARD_PRIMARY_KEY = "board_id";
-const QString LIST_TABLE_NAME = "list_signature";
-const QString LIST_PRIMARY_KEY = "list_id";
-const QString CARD_TABLE_NAME = "card_signature";
-const QString CARD_PRIMARY_KEY = "card_id";
-const QString TAG_TABLE_NAME = "tag_signature";
-const QString TAG_PRIMARY_KEY = "tag_id";
+    const QString BOARD_TABLE_NAME = "board_signature";
+    const QString BOARD_PRIMARY_KEY = "board_id";
+    const QString LIST_TABLE_NAME = "list_signature";
+    const QString LIST_PRIMARY_KEY = "list_id";
+    const QString CARD_TABLE_NAME = "card_signature";
+    const QString CARD_PRIMARY_KEY = "card_id";
+    const QString TAG_TABLE_NAME = "tag_signature";
+    const QString TAG_PRIMARY_KEY = "tag_id";
 
-const QString QT_DATABASE_DRIVER = "QPSQL";
+    const QString QT_DATABASE_DRIVER = "QPSQL";
 
-class db_accessor {
-    QString m_database_name;
-    QString m_user_name;
-    QString m_host_name;
-    QString m_password;
-    QSqlDatabase m_database = QSqlDatabase::addDatabase(QT_DATABASE_DRIVER);
+    class db_manager {
+        QString m_database_name;
+        QString m_user_name;
+        QString m_host_name;
+        QString m_password;
+        QSqlDatabase m_database = QSqlDatabase::addDatabase(QT_DATABASE_DRIVER);
+        static QVector<QVariant> get_data(const QSqlRecord &record);
+        QSqlRecord select_info_by_id(const QString &query_name, unsigned key_value);
+        QString m_schema = "public";
+    public:
+        db_manager(
+                QString database_name,
+                QString user_name,
+                QString host_name,
+                QString password
+        );
+        void print_all_tables();
+        void clear_all_tables();
+        void drop_all_tables();
 
-public:
-    db_accessor(
-        QString database_name,
-        QString user_name,
-        QString host_name,
-        QString password
-    );
-    void print_all_tables();
-    void clear_all_tables();
-    void drop_all_tables();
-};
+    public:
+        void set_schema(const QString &name);
+        void test_foo();
+        void create_schema(const QString &schema_name);
+        void insert_user(const QString &name);
+        void insert_board(unsigned user_id, const QString &name);
+        void
+        insert_list(int board_id, const QString &name, const QString &description);
+        void
+        insert_card(int list_id, const QString &name, const QString &description);
+        void insert_tag(const QString &name);
+        void pin_tag_to_card(int card_id, int tag_id);
+        void update_command(
+                const QString &table_name,
+                const QString &updating_field_name,
+                const QString &key_field_name,
+                const QString &new_value,
+                unsigned key_value
+        );
+        board select_board(unsigned id);
+        list select_list(unsigned id);
+        card select_card(unsigned id);
+        tag select_tag(unsigned id);
+        void delete_command(
+                const QString &table_name,
+                const QString &key_field_name,
+                unsigned key_value
+        );
+    };
 
-class db_manager {
-private:
-    static QVector<QVariant> get_data(const QSqlRecord &record);
-    static QSqlRecord select_info_by_id(
-        const QString &table_name,
-        const QString &primary_key,
-        unsigned key_value
-    );
+    QMap<QString, QString> query_name_to_sql_command;
 
-public:
-    static void insert_board(const QString &name);
-    static void
-    insert_list(int board_id, const QString &name, const QString &description);
-    static void
-    insert_card(int list_id, const QString &name, const QString &description);
-    static void insert_tag(const QString &name);
-    static void pin_tag_to_card(int card_id, int tag_id);
-    static void update_command(
-        const QString &table_name,
-        const QString &updating_field_type,
-        const QString &updating_field_name,
-        const QString &key_field_name,
-        const QString &new_value,
-        unsigned key_value
-    );
-    static board select_board(unsigned id);
-    static list select_list(unsigned id);
-    static card select_card(unsigned id);
-    static tag select_tag(unsigned id);
-    static void delete_command(
-        const QString &table_name,
-        const QString &key_field_name,
-        unsigned key_value
-    );
-};
+    void fill_query_name_to_sql_command() {
+        query_name_to_sql_command["insert_user"] =
+                "INSERT INTO %1.user_signature VALUES (DEFAULT, :name);";
 
-QMap<QString, QString> query_name_to_sql_command;
+        query_name_to_sql_command["insert_board"] =
+                "INSERT INTO %1.board_signature VALUES (DEFAULT, :user_id, :name);";
 
-void fill_query_name_to_sql_command() {
-    query_name_to_sql_command["insert_board"] = "SELECT insert_board(:name)";
+        query_name_to_sql_command["insert_list"] =
+                "INSERT INTO %1.list_signature VALUES (DEFAULT, :board_id, :name, :description);";
 
-    query_name_to_sql_command["insert_list"] =
-        "SELECT insert_list(:board_id, :name, :description)";
+        query_name_to_sql_command["insert_card"] =
+                "INSERT INTO %1.card_signature VALUES (DEFAULT, :list_id, :name, :description);";
 
-    query_name_to_sql_command["insert_card"] =
-        "SELECT insert_card(:list_id, :name, :description)";
+        query_name_to_sql_command["insert_tag"] =
+                "INSERT INTO %1.tag_signature VALUES (DEFAULT, :name);";
 
-    query_name_to_sql_command["insert_tag"] = "SELECT insert_tag(:name)";
+        query_name_to_sql_command["insert_into_card_to_tags"] =
+                "INSERT INTO %1.card_to_tags VALUES (:card_id, :tag_id);";
 
-    query_name_to_sql_command["insert_into_card_to_tags"] =
-        "SELECT insert_into_card_to_tags(:card_id, :tag_id)";
+        query_name_to_sql_command["update_command"] =
+                "UPDATE %1.%2 SET %3 = :new_value WHERE %4 = "
+                ":key_value;";
 
-    query_name_to_sql_command["create_update_function"] =
-        "CREATE FUNCTION update_%1_%4(%2, integer) RETURNS void AS $$"
-        "UPDATE %1 SET %4 = $1 WHERE %5 = $2;"
-        "$$ LANGUAGE SQL;";
-    query_name_to_sql_command["update_function"] = "SELECT update_%1_%4(?, ?)";
+        query_name_to_sql_command["select_board"] =
+                "SELECT board_id, user_id, name FROM %1.board_signature WHERE board_id = "
+                ":key_value;";
 
-    query_name_to_sql_command["select_info_by_id"] =
-        "SELECT * FROM %1 WHERE %2 = %3;";
+        query_name_to_sql_command["select_list"] =
+                "SELECT list_id, board_id, name, description FROM %1.list_signature WHERE "
+                "list_id = :key_value;";
 
-    query_name_to_sql_command["create_delete_function"] =
-        "CREATE FUNCTION delete_from_%1(integer) RETURNS void AS $$"
-        "DELETE FROM %1 WHERE %2 = $1;"
-        "$$ LANGUAGE SQL;";
-    query_name_to_sql_command["delete_function"] = "SELECT delete_from_%1(?)";
-}
+        query_name_to_sql_command["select_card"] =
+                "SELECT card_id, list_id, name, description FROM %1.card_signature WHERE "
+                "card_id = :key_value;";
+
+        query_name_to_sql_command["select_tag"] =
+                "SELECT tag_id, name FROM %1.tag_signature WHERE tag_id = :key_value;";
+
+        query_name_to_sql_command["delete_command"] =
+                "DELETE FROM %1.%2 WHERE %3 = :key_value;";
+
+        query_name_to_sql_command["create_schema"] =
+                "CREATE SCHEMA %1;"
+                "DO $$DECLARE tbl_record RECORD;"
+                "BEGIN"
+                "FOR tbl_record IN (SELECT %1 FROM pg_tables WHERE schemaname = 'project_template') LOOP"
+                "EXECUTE 'CREATE TABLE %1.' || tbl_record.tablename || ' (LIKE project_template.' || tbl_record.tablename || ' INCLUDING CONSTRAINTS)';"
+                "END LOOP;"
+                "END$$;";
+    }
 
 /*template<class U>
 class abstract_element {

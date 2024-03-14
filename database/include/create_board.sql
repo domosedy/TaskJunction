@@ -1,5 +1,14 @@
+CREATE SCHEMA project_template;
+SET search_path TO project_template;
+
+CREATE TABLE user_signature(
+                               user_id serial PRIMARY KEY,
+                               name    varchar(50)
+);
+
 CREATE TABLE board_signature(
                                 board_id serial PRIMARY KEY,
+                                user_id integer REFERENCES user_signature ON DELETE CASCADE,
                                 name varchar(50)
 );
 
@@ -28,9 +37,14 @@ CREATE TABLE card_to_tags(
                              PRIMARY KEY(card_id, tag_id)
 );
 
-CREATE FUNCTION insert_board(name_ varchar(50)) RETURNS
+CREATE FUNCTION insert_user(name_ varchar(50)) RETURNS
     void AS $$
-INSERT INTO board_signature VALUES (DEFAULT, name_);
+INSERT INTO user_signature VALUES (DEFAULT, name_);
+$$ LANGUAGE SQL;
+
+CREATE FUNCTION insert_board(user_id_ integer, name_ varchar(50)) RETURNS
+    void AS $$
+INSERT INTO board_signature VALUES (DEFAULT, user_id_, name_);
 $$ LANGUAGE SQL;
 
 CREATE FUNCTION insert_list(board_id_ integer, name_ varchar(50),
@@ -53,3 +67,5 @@ CREATE FUNCTION insert_into_card_to_tags(card_id_ integer, tag_id_
     integer) RETURNS void AS $$
 INSERT INTO card_to_tags VALUES (card_id_, tag_id_);
 $$ LANGUAGE SQL;
+
+
