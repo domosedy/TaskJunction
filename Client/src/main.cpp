@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QQmlContext>
 #include <QtQml/QQmlApplicationEngine>
+#include "boardmenu.hpp"
 #include "boardmodel.hpp"
 #include "client.hpp"
 #include "listmodel.hpp"
@@ -21,6 +22,7 @@ int main(int argc, char *argv[]) {
 
     qmlRegisterType<ListModel>("Client", 1, 0, "ClientListModel");
     qmlRegisterType<BoardModel>("Client", 1, 0, "ClientBoardModel");
+    qmlRegisterType<BoardMenu>("Client", 1, 0, "ClientBoardMenu");
     qmlRegisterType<Client>("Client", 1, 0, "Client");
 
     Client *client = new Client();

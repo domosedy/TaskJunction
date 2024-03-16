@@ -122,7 +122,6 @@ Rectangle {
             console.log(mainClient.client_status)
             if (mainClient.client_status == 1) {
                 loader.source = "BoardSelect.qml"
-                mainClient.requestAvaliableBoards()
             } 
             if (mainClient.client_status == 2) {
                 loginPassword.background.color = style.deleteBackgroundColor

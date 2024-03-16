@@ -11,9 +11,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#set(EXECUTABLE_OUTPUT_PATH ../)
-
-set(CMAKE_CXX_FLAGS "-pedantic-errors -Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS "-pedantic-errors -Wall -Wextra -Werror -Wshadow")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fno-omit-frame-pointer -fsanitize=address")
  
 find_package(Qt6 COMPONENTS Qml Quick Widgets Core Gui Network REQUIRED)
@@ -22,29 +20,28 @@ include(FetchContent)
 
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 FetchContent_MakeAvailable(json)
-
+    
 set(PROJECT_SOURCES
         src/main.cpp
         src/client.cpp
-        src/list.cpp
-        src/card.cpp
         src/boardmodel.cpp
         src/listmodel.cpp
         src/json_parser.cpp
+        src/boardmenu.cpp
         src/qml.qrc
         include/client.hpp
-        include/list.hpp
-        include/card.hpp
         include/boardmodel.hpp
         include/listmodel.hpp
+        include/boardmenu.hpp
         shared/logging.hpp
         shared/json_parser.hpp
+        shared/base_classes.hpp
+        shared/base_classes.cpp
 )
 
 add_executable(client
     ${PROJECT_SOURCES}
 )
-
 
 target_include_directories(client PRIVATE include shared)
 target_link_libraries(client PRIVATE 
