@@ -12,6 +12,7 @@ class BoardModel : public QAbstractListModel, public Board {
     Q_OBJECT
     Q_PROPERTY(int count READ get_count NOTIFY countChanged)
 public:
+
     explicit BoardModel(QObject *parent = nullptr);
     BoardModel(QObject *parent, const nlohmann::json &board);
     QHash<int, QByteArray> roleNames() const override;

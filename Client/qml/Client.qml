@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import Client
 import "qrc:"
 
@@ -9,6 +10,62 @@ Rectangle {
     id: main
     visible: true
 
+    Popup {
+        id: create_list
+        width: 210
+        height: 120
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+
+        background: Rectangle {
+            visible: false
+        }
+        contentItem: Rectangle{
+            id: content
+            border.color: style.primaryColor
+            border.width: style.defaultBorderSize
+            TextField {
+                z: 1
+                id: list_name
+                placeholderText: "New list"
+                font.family: "Courier"
+                font.pointSize: 12
+                font.bold: true
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 10
+            }            
+            Button {
+                z: 1
+                height: style.smallButtonSize
+                width: height*2.5
+                Text {
+                    text: "Add"
+                    font.family: "Courier"
+                    font.pointSize: 12
+                    anchors.centerIn: parent
+                }
+                background: Rectangle {
+                    color: parent.down ? Qt.lighter(style.createBackgroundColor, 1.4) :
+                    (parent.hovered ? Qt.lighter(style.createBackgroundColor, 1.2) : style.createBackgroundColor)
+                }     
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 10
+                onClicked: {
+                    create_list.close()
+                    mainClient.create_list(list_name.text)
+                    list_name.text = ""
+                }
+            }      
+
+            Drag.active: true
+            MouseArea{
+                anchors.fill: parent
+                drag.target: parent
+            }                             
+        }     
+    }
+
     Rectangle {
         id: topmenu
         visible:true
@@ -16,83 +73,47 @@ Rectangle {
         height: style.headerHeight
         color: style.primaryColor
         anchors.top: root.top
-        z: 100
-
-        Popup {
-            id: create_list
-            width: 210
-            height: 120
-            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-
-            background: Rectangle {
-                visible: false
-            }
-            contentItem: Rectangle{
-                id: content
-                border.color: style.primaryColor
-                border.width: 5
-                TextField {
-                    z: 1
-                    id: list_name
-                    placeholderText: "New list"
+        z: 1
+        Row {
+            anchors.fill: parent
+            z: 1
+            Button {
+                width: style.smallButtonSize
+                height: width
+                Text {
+                    text: "<"
                     font.family: "Courier"
                     font.pointSize: 12
-                    font.bold: true
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: parent.top
-                    anchors.topMargin: 10
-                }            
-                Button {
-                    z: 1
-                    width: 80
-                    height: 30
-                    Text {
-                        text: "Add"
-                        font.family: "Courier"
-                        font.pointSize: 12
-                        anchors.centerIn: parent
-                    }
-                    background: Rectangle {
-                        color: parent.down ? Qt.lighter(style.createBackgroundColor, 1.2) :
-                        (parent.hovered ? Qt.lighter(style.createBackgroundColor, 1.2) : style.createBackgroundColor)
-                    }     
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 10
-                    onClicked: {
-                        create_list.close()
-                        //listview.model.add_list(list_name.text)
-                        mainClient.create_list(list_name.text)
-                    }
+                    anchors.centerIn: parent
+                    color: "white"
                 }
-
-                Drag.active: true
-                MouseArea{
-                    anchors.fill: parent
-                    drag.target: parent
-                }                  
-            }
+                background: Rectangle {
+                    color: parent.down ? Qt.darker(style.primaryColor, 1.4) :
+                    (parent.hovered ? Qt.darker(style.primaryColor, 1.2) : style.primaryColor)
+                }     
+                onClicked: {
+                    loader.active = false
+                    start_menu.visible = true
+                }
+            }                
+            Button {
+                width: style.smallButtonSize
+                height: width
+                Text {
+                    anchors.centerIn: parent
+                    text: "+"
+                    color: "white"
+                }
+                background: Rectangle {
+                    color: parent.down ? Qt.darker(style.primaryColor, 1.4) :
+                            (parent.hovered ? Qt.darker(style.primaryColor, 1.2) : style.primaryColor)
+                }
+                onClicked: {
+                    create_list.open()
+                }
+            }   
         }
-
-        Button {
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            height: topmenu.height
-            width: height
-            Text {
-                anchors.centerIn: parent
-                text: "+"
-                color: "white"
-            }
-            background: Rectangle {
-                color: parent.down ? Qt.darker(style.primaryColor, 1.4) :
-                        (parent.hovered ? Qt.darker(style.primaryColor, 1.4) : style.primaryColor)
-            }
-            onClicked: {
-                create_list.open()
-                //listview.model.add_list()
-            }
-        }
+         
     }
     Rectangle {
         id: mainarea

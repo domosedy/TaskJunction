@@ -10,4 +10,6 @@ QtObject {
     readonly property int cardWidth: 230
     readonly property int cardHeight: 40
     readonly property int headerHeight: 30
+    readonly property int smallButtonSize: 30
+    readonly property int defaultBorderSize: 1
 }

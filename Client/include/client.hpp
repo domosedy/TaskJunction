@@ -25,7 +25,6 @@ public:
         unable_to_connect
     };
     Q_ENUM(ClientStatus)
-
     enum BoardType { local, remote };
 
     explicit Client(QObject *parent = nullptr);

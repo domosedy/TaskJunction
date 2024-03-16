@@ -15,6 +15,8 @@ Client::Client(QObject *parent) : QObject(parent) {
 }
 
 void Client::create_board() {
+    if (m_current_board)
+        return;
     m_current_board = new BoardModel(this);
     emit boardChanged();
 }
@@ -123,7 +125,7 @@ void Client::create_list(QString &name) {
         write(request);
     }
     if (m_status == ClientStatus::local_mode) {
-        m_current_board->create_list(name);  // call db, then add with id
+        m_current_board->create_list(name);
     }
 }
 
@@ -134,9 +136,7 @@ void Client::create_card(int list_index, QString &name, QString &description) {
         write(request);
     }
     if (m_status == ClientStatus::local_mode) {
-        m_current_board->create_card(
-            list_index, name, description
-        );  // call db, then add with id
+        m_current_board->create_card(list_index, name, description);
     }
 }
 
@@ -168,34 +168,6 @@ void Client::login(
         m_status = ClientStatus::waiting_for_response;
         emit statusChanged();
         write(login_request);
-
-        // m_status = ClientStatus::connected_to_server;
-        //  nlohmann::json boards = nlohmann::json::array(
-        //      {
-        //          {
-        //              {"name", "board_1"},
-        //              {"description", "desc_1"},
-        //              {"id", 1}
-        //          },
-        //          {
-        //              {"name", "board_2"},
-        //              {"description", "desc_2"},
-        //              {"id", 2}
-        //          },
-        //          {
-        //              {"name", "board_3"},
-        //              {"description", "desc_3"},
-        //              {"id", 3}
-        //          },
-        //          {
-        //              {"name", "board_4"},
-        //              {"description", "desc_4"},
-        //              {"id", 4}
-        //          },
-        //      }
-        //  );
-        //  create_board_select_menu(boards);
-
     } else {
         qDebug() << "No server!";
         m_status = ClientStatus::unable_to_connect;

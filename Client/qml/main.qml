@@ -28,7 +28,7 @@ ApplicationWindow {
             Layout.preferredWidth: root.width / 6
             Layout.preferredHeight: root.height / 12
             Text {
-                text: "Sign in"
+                text: "Log in"
                 anchors.centerIn: parent
                 font.family: "Helvetica"
                 font.pointSize: 12
@@ -36,7 +36,8 @@ ApplicationWindow {
             }
             onClicked: {
                 start_menu.visible = false
-                loader.source = "Authorization.qml"   
+                loader.source = "Authorization.qml"
+                loader.active = true
             }            
         }
 
@@ -44,7 +45,7 @@ ApplicationWindow {
             Layout.preferredWidth: root.width / 6
             Layout.preferredHeight: root.height / 12                
             Text {
-                text: "Local mode"
+                text: "Boards"
                 anchors.centerIn: parent
                 font.family: "Helvetica"
                 font.pointSize: 12
@@ -52,9 +53,28 @@ ApplicationWindow {
             }
             onClicked: {
                 start_menu.visible = false
+                loader.active = true
                 loader.source = "Client.qml"   
                 mainClient.create_board()
             }
-        }      
+        } 
+        Button {  
+            Layout.preferredWidth: root.width / 6
+            Layout.preferredHeight: root.height / 12                
+            Text {
+                text: "Exit"
+                anchors.centerIn: parent
+                font.family: "Helvetica"
+                font.pointSize: 12
+                color: "white"
+            }
+            background: Rectangle {
+                color: parent.down ? Qt.darker(style.deleteBackgroundColor, 1.4) :
+                        (parent.hovered ? Qt.darker(style.deleteBackgroundColor, 1.2) : style.deleteBackgroundColor)
+            }            
+            onClicked: {
+                Qt.quit();
+            }
+        }                   
     }
 }

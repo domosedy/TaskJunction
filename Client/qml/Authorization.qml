@@ -6,9 +6,10 @@ import "qrc:"
 
 Rectangle {
     id: auth
+    visible: true
     width: root.width
     height: root.height
-    color: style.primaryColor
+    color: style.boardBackgroundColor
 
     Frame {
         id: login_frame
@@ -17,12 +18,14 @@ Rectangle {
         height: 320 
         background: Rectangle {
             color: style.boardBackgroundColor
-        }
+        }        
+
         ColumnLayout {
             width: parent.width
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: 10
+
             TextField {
                 id: loginUsername
                 placeholderText: "Username"
@@ -97,29 +100,59 @@ Rectangle {
                     color: "white"
                 }
             }
-            Button {
-                Layout.alignment: Qt.AlignHCenter
-                Layout.margins: 20
-                Text {
-                    id: test_text
-                    anchors.centerIn: parent
-                    text: "Log in"
-                    color: "black"
-                    font.pointSize: 24
-                    font.family: "Courier"
+            Rectangle {
+                Layout.preferredHeight: 40 
+                Layout.preferredWidth: parent.width - 20
+                Layout.alignment: Qt.AlignHCenter 
+                color: style.boardBackgroundColor
+                Row {  
+                    anchors.fill: parent
+                    spacing: 10
+                    Button {
+                        width: 40
+                        height: width
+                        background: Rectangle {
+                            color: parent.down ? Qt.darker(style.primaryColor, 1.4) :
+                            (parent.hovered ? Qt.darker(style.primaryColor, 1.2) : style.primaryColor)
+                        }                             
+                        Text {
+                            text: "<"
+                            font.family: "Courier"
+                            font.pointSize: 24
+                            anchors.centerIn: parent
+                            color: "white"
+                        }   
+                        onClicked: {
+                            loader.active = false
+                            start_menu.visible = true
+                        }
+                    }                     
+                    Button {
+                        width: parent.width-50
+                        height: parent.height
+                        background: Rectangle {
+                            color: parent.down ? Qt.darker(style.primaryColor, 1.4) :
+                            (parent.hovered ? Qt.darker(style.primaryColor, 1.2) : style.primaryColor)
+                        }                             
+                        Text {
+                            id: test_text
+                            anchors.centerIn: parent
+                            text: "Log in"
+                            color: "white"
+                            font.pointSize: 24
+                            font.family: "Courier"
+                        }
+                        onClicked: {
+                            mainClient.login(loginUsername.text, loginPassword.text, loginIP.text, loginPort.text)
+                        }
+                    }                                             
                 }
-                Layout.preferredWidth: 200
-                Layout.preferredHeight: 40
-                onClicked: {
-                    mainClient.login(loginUsername.text, loginPassword.text, loginIP.text, loginPort.text)
-                }
-            }                                          
+            }                                         
         }
     }
     Connections {
         target: mainClient
         function onStatusChanged() {
-            console.log(mainClient.client_status)
             if (mainClient.client_status == 1) {
                 loader.source = "BoardSelect.qml"
             } 

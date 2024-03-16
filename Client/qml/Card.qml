@@ -19,6 +19,7 @@ Component {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             anchors.leftMargin: 5
+            clip: true
         }
         MouseArea {
             anchors.fill: parent
@@ -36,7 +37,7 @@ Component {
             contentItem: Rectangle{
                 id: content
                 border.color: style.primaryColor
-                border.width: 5
+                border.width: style.defaultBorderSize
                 Text {
                     id: card_name
                     text: name
@@ -46,6 +47,8 @@ Component {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: parent.top
                     anchors.topMargin: 10
+                    width: parent.width-20
+                    wrapMode: Text.Wrap
                 }
                 Text {
                     text: description
@@ -55,6 +58,8 @@ Component {
                     anchors.top: card_name.bottom
                     anchors.topMargin: 10
                     anchors.leftMargin: 10
+                    width: parent.width-20
+                    wrapMode: Text.Wrap
                 }                
                 Button {
                     z: 1
