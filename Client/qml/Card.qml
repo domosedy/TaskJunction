@@ -90,4 +90,5 @@ Component {
             deleteRequest.connect(listmodel.delete_card);
         }
     }
-}     
+}   
+  
