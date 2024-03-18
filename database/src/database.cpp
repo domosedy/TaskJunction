@@ -73,17 +73,19 @@ void db_manager::clear_all_tables() {
     }
 }
 
-void db_manager::insert_user(const QString &name) {
+bool db_manager::insert_user(const QString &name) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["insert_user"].arg(m_schema));
     query.bindValue(":name", name);
     if (!query.exec()) {
         qDebug() << m_database.lastError()
                  << query_name_to_sql_command["insert_user"].arg(m_schema);
+        return false;
     }
+    return true;
 }
 
-void db_manager::insert_board(unsigned user_id, const QString &name) {
+bool db_manager::insert_board(unsigned user_id, const QString &name) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["insert_board"].arg(m_schema));
     query.bindValue(":user_id", user_id);
@@ -91,10 +93,12 @@ void db_manager::insert_board(unsigned user_id, const QString &name) {
     if (!query.exec()) {
         qDebug() << "insert_board_error" << m_database.lastError()
                  << query_name_to_sql_command["insert_board"].arg(m_schema);
+        return false;
     }
+    return true;
 }
 
-void db_manager::insert_list(
+bool db_manager::insert_list(
     int board_id,
     const QString &name,
     const QString &description
@@ -106,10 +110,12 @@ void db_manager::insert_list(
     query.bindValue(":description", description);
     if (!query.exec()) {
         qDebug() << m_database.lastError();
+        return false;
     }
+    return true;
 }
 
-void db_manager::insert_card(
+bool db_manager::insert_card(
     int list_id,
     const QString &name,
     const QString &description
@@ -121,19 +127,23 @@ void db_manager::insert_card(
     query.bindValue(":description", description);
     if (!query.exec()) {
         qDebug() << m_database.lastError();
+        return false;
     }
+    return true;
 }
 
-void db_manager::insert_tag(const QString &name) {
+bool db_manager::insert_tag(const QString &name) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["insert_tag"].arg(m_schema));
     query.bindValue(":name", name);
     if (!query.exec()) {
         qDebug() << m_database.lastError();
+        return false;
     }
+    return true;
 }
 
-void db_manager::pin_tag_to_card(int card_id, int tag_id) {
+bool db_manager::pin_tag_to_card(int card_id, int tag_id) {
     QSqlQuery query(m_database);
     query.prepare(
         query_name_to_sql_command["insert_into_card_to_tags"].arg(m_schema)
@@ -145,10 +155,12 @@ void db_manager::pin_tag_to_card(int card_id, int tag_id) {
                  << query_name_to_sql_command["insert_into_card_to_tags"].arg(
                         m_schema
                     );
+        return false;
     }
+    return true;
 }
 
-void db_manager::update_command(
+bool db_manager::update_command(
     const QString &table_name,
     const QString &updating_field_name,
     const QString &key_field_name,
@@ -163,10 +175,12 @@ void db_manager::update_command(
     query.bindValue(":key_value", key_value);
     if (!query.exec()) {
         qDebug() << m_database.lastError();
+        return false;
     }
+    return true;
 }
 
-void db_manager::delete_command(
+bool db_manager::delete_command(
     const QString &table_name,
     const QString &key_field_name,
     unsigned int key_value
@@ -178,7 +192,9 @@ void db_manager::delete_command(
     query.bindValue(":key_value", key_value);
     if (!query.exec()) {
         qDebug() << m_database.lastError();
+        return false;
     }
+    return true;
 }
 
 QVector<QVariant> db_manager::get_data(const QSqlRecord &record) {
@@ -206,15 +222,15 @@ board db_manager::select_board(unsigned int id) {
 }
 
 list db_manager::select_list(unsigned int id) {
-    return std::move(list(get_data(select_info_by_id("select_list", id))));
+    return list(get_data(select_info_by_id("select_list", id)));
 }
 
 card db_manager::select_card(unsigned int id) {
-    return std::move(card(get_data(select_info_by_id("select_card", id))));
+    return card(get_data(select_info_by_id("select_card", id)));
 }
 
 tag db_manager::select_tag(unsigned int id) {
-    return std::move(tag(get_data(select_info_by_id("select_tag", id))));
+    return tag(get_data(select_info_by_id("select_tag", id)));
 }
 
 QVector<list> db_manager::get_board_lists(unsigned board_id) {
@@ -235,6 +251,7 @@ QVector<list> db_manager::get_board_lists(unsigned board_id) {
 
 QVector<card> db_manager::get_list_cards(unsigned int list_id) {
     QSqlQuery query(m_database);
+
     query.prepare(query_name_to_sql_command["select_subobject_ids"].arg(
         m_schema, "card_id", "card_signature", "list_id"
     ));
@@ -274,7 +291,7 @@ int main(int argc, char *argv[]) {
     }
     using namespace database;
     db_manager db_manager(argv[1], argv[2], argv[3], argv[4]);
-    //    db_manager.set_schema("test_schema");
+//        db_manager.set_schema("test_schema");
     fill_query_name_to_sql_command();
 //        db_manager.insert_user("username");
 //        db_manager.insert_board(1, "board_name");
@@ -284,8 +301,7 @@ int main(int argc, char *argv[]) {
 //        db_manager.pin_tag_to_card(1, 1);
 
     board board(db_manager.select_board(1));
-    auto lists(std::move(db_manager.get_board_lists(1))
-    );  // SIGSEGV with rvalue
+    auto lists(db_manager.get_board_lists(1));
     for (const auto &list : lists) {
         list.print_data();
     }

@@ -41,16 +41,16 @@ public:
 public:
     void set_schema(const QString &name);
     void test_foo();
-    void create_schema(const QString &schema_name);
-    void insert_user(const QString &name);
-    void insert_board(unsigned user_id, const QString &name);
-    void
+//    void create_schema(const QString &schema_name);
+    bool insert_user(const QString &name);
+    bool insert_board(unsigned user_id, const QString &name);
+    bool
     insert_list(int board_id, const QString &name, const QString &description);
-    void
+    bool
     insert_card(int list_id, const QString &name, const QString &description);
-    void insert_tag(const QString &name);
-    void pin_tag_to_card(int card_id, int tag_id);
-    void update_command(
+    bool insert_tag(const QString &name);
+    bool pin_tag_to_card(int card_id, int tag_id);
+    bool update_command(
         const QString &table_name,
         const QString &updating_field_name,
         const QString &key_field_name,
@@ -61,7 +61,7 @@ public:
     list select_list(unsigned id);
     card select_card(unsigned id);
     tag select_tag(unsigned id);
-    void delete_command(
+    bool delete_command(
         const QString &table_name,
         const QString &key_field_name,
         unsigned key_value
@@ -133,6 +133,8 @@ void fill_query_name_to_sql_command() {
 
     query_name_to_sql_command["select_subobject_ids"] =
         "SELECT %2 FROM %1.%3 WHERE %4 = :id";
+
+    // "SET search_path TO public;";
 }
 
 /*template<class U>
