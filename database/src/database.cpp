@@ -27,10 +27,6 @@ db_manager::db_manager(
     }
 }
 
-void db_manager::set_schema(const QString &name) {
-    m_schema = name;
-}
-
 void db_manager::test_foo() {
     QSqlQuery query(m_database);
     //    query.prepare(query_name_to_sql_command["test_multiple_placeholder"]);
@@ -73,19 +69,35 @@ void db_manager::clear_all_tables() {
     }
 }
 
-bool db_manager::insert_user(const QString &name) {
+void db_manager::set_schema(const QString &name) {
+    m_schema = name;
+}
+
+quint32 db_manager::get_sequence_last_value(const QString &sequence) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["select_last_value"]);
+    query.bindValue(":sequence_name", sequence);
+    if (!query.exec()) {
+        qDebug() << m_database.lastError();
+        return 0;
+    }
+    query.next();
+    return query.value(0).toInt();
+}
+
+quint32 db_manager::insert_user(const QString &name) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["insert_user"].arg(m_schema));
     query.bindValue(":name", name);
     if (!query.exec()) {
         qDebug() << m_database.lastError()
                  << query_name_to_sql_command["insert_user"].arg(m_schema);
-        return false;
+        return 0;
     }
-    return true;
+    return get_sequence_last_value(USER_ID_SEQUENCE);
 }
 
-bool db_manager::insert_board(unsigned user_id, const QString &name) {
+quint32 db_manager::insert_board(quint32 user_id, const QString &name) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["insert_board"].arg(m_schema));
     query.bindValue(":user_id", user_id);
@@ -93,12 +105,12 @@ bool db_manager::insert_board(unsigned user_id, const QString &name) {
     if (!query.exec()) {
         qDebug() << "insert_board_error" << m_database.lastError()
                  << query_name_to_sql_command["insert_board"].arg(m_schema);
-        return false;
+        return 0;
     }
-    return true;
+    return get_sequence_last_value(BOARD_ID_SEQUENCE);
 }
 
-bool db_manager::insert_list(
+quint32 db_manager::insert_list(
     int board_id,
     const QString &name,
     const QString &description
@@ -110,12 +122,12 @@ bool db_manager::insert_list(
     query.bindValue(":description", description);
     if (!query.exec()) {
         qDebug() << m_database.lastError();
-        return false;
+        return 0;
     }
-    return true;
+    return get_sequence_last_value(LIST_ID_SEQUENCE);
 }
 
-bool db_manager::insert_card(
+quint32 db_manager::insert_card(
     int list_id,
     const QString &name,
     const QString &description
@@ -127,20 +139,20 @@ bool db_manager::insert_card(
     query.bindValue(":description", description);
     if (!query.exec()) {
         qDebug() << m_database.lastError();
-        return false;
+        return 0;
     }
-    return true;
+    return get_sequence_last_value(CARD_ID_SEQUENCE);
 }
 
-bool db_manager::insert_tag(const QString &name) {
+quint32 db_manager::insert_tag(const QString &name) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["insert_tag"].arg(m_schema));
     query.bindValue(":name", name);
     if (!query.exec()) {
         qDebug() << m_database.lastError();
-        return false;
+        return 0;
     }
-    return true;
+    return get_sequence_last_value(TAG_ID_SEQUENCE);
 }
 
 bool db_manager::pin_tag_to_card(int card_id, int tag_id) {
@@ -165,7 +177,7 @@ bool db_manager::update_command(
     const QString &updating_field_name,
     const QString &key_field_name,
     const QString &new_value,
-    unsigned key_value
+    quint32 key_value
 ) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["update_command"].arg(
@@ -183,7 +195,7 @@ bool db_manager::update_command(
 bool db_manager::delete_command(
     const QString &table_name,
     const QString &key_field_name,
-    unsigned int key_value
+    quint32 key_value
 ) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["delete_command"].arg(
@@ -206,7 +218,7 @@ QVector<QVariant> db_manager::get_data(const QSqlRecord &record) {
 }
 
 QSqlRecord
-db_manager::select_info_by_id(const QString &query_name, unsigned key_value) {
+db_manager::select_info_by_id(const QString &query_name, quint32 key_value) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command[query_name].arg(m_schema));
     query.bindValue(":key_value", key_value);
@@ -217,23 +229,23 @@ db_manager::select_info_by_id(const QString &query_name, unsigned key_value) {
     return query.record();
 }
 
-board db_manager::select_board(unsigned int id) {
+board db_manager::select_board(quint32 id) {
     return board(get_data(select_info_by_id("select_board", id)));
 }
 
-list db_manager::select_list(unsigned int id) {
+list db_manager::select_list(quint32 id) {
     return list(get_data(select_info_by_id("select_list", id)));
 }
 
-card db_manager::select_card(unsigned int id) {
+card db_manager::select_card(quint32 id) {
     return card(get_data(select_info_by_id("select_card", id)));
 }
 
-tag db_manager::select_tag(unsigned int id) {
+tag db_manager::select_tag(quint32 id) {
     return tag(get_data(select_info_by_id("select_tag", id)));
 }
 
-QVector<list> db_manager::get_board_lists(unsigned board_id) {
+QVector<list> db_manager::get_board_lists(quint32 board_id) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["select_subobject_ids"].arg(
         m_schema, "list_id", "list_signature", "board_id"
@@ -249,7 +261,7 @@ QVector<list> db_manager::get_board_lists(unsigned board_id) {
     return result;
 }
 
-QVector<card> db_manager::get_list_cards(unsigned int list_id) {
+QVector<card> db_manager::get_list_cards(quint32 list_id) {
     QSqlQuery query(m_database);
 
     query.prepare(query_name_to_sql_command["select_subobject_ids"].arg(
@@ -266,7 +278,7 @@ QVector<card> db_manager::get_list_cards(unsigned int list_id) {
     return result;
 }
 
-QVector<tag> db_manager::get_card_tags(unsigned int card_id) {
+QVector<tag> db_manager::get_card_tags(quint32 card_id) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["select_subobject_ids"].arg(
         m_schema, "tag_id", "card_to_tags", "tag_id"
@@ -282,6 +294,12 @@ QVector<tag> db_manager::get_card_tags(unsigned int card_id) {
     return result;
 }
 
+bool db_manager::set_user_id(quint32 user_id) {
+
+    m_current_user_id = user_id;
+    return true;
+}
+
 }  // namespace database
 
 int main(int argc, char *argv[]) {
@@ -293,18 +311,13 @@ int main(int argc, char *argv[]) {
     db_manager db_manager(argv[1], argv[2], argv[3], argv[4]);
 //        db_manager.set_schema("test_schema");
     fill_query_name_to_sql_command();
-//        db_manager.insert_user("username");
+        db_manager.insert_user("username");
 //        db_manager.insert_board(1, "board_name");
 //        db_manager.insert_list(1, "list_name", "test1");
 //        db_manager.insert_card(1, "card_name", "test");
 //        db_manager.insert_tag("tag_name");
 //        db_manager.pin_tag_to_card(1, 1);
 
-    board board(db_manager.select_board(1));
-    auto lists(db_manager.get_board_lists(1));
-    for (const auto &list : lists) {
-        list.print_data();
-    }
 //        db_manager.update_command(
     //        LIST_TABLE_NAME,  "board_id", LIST_PRIMARY_KEY, "10",2
     //    );

@@ -14,6 +14,11 @@ const QString CARD_TABLE_NAME = "card_signature";
 const QString CARD_PRIMARY_KEY = "card_id";
 const QString TAG_TABLE_NAME = "tag_signature";
 const QString TAG_PRIMARY_KEY = "tag_id";
+const QString USER_ID_SEQUENCE = "user_signature_user_id_seq";
+const QString BOARD_ID_SEQUENCE = "board_signature_board_id_seq";
+const QString LIST_ID_SEQUENCE = "list_signature_list_id_seq";
+const QString CARD_ID_SEQUENCE = "card_signature_card_id_seq";
+const QString TAG_ID_SEQUENCE = "tag_signature_tag_id_seq";
 
 const QString QT_DATABASE_DRIVER = "QPSQL";
 
@@ -24,9 +29,9 @@ class db_manager {
     QString m_password;
     QSqlDatabase m_database = QSqlDatabase::addDatabase(QT_DATABASE_DRIVER);
     static QVector<QVariant> get_data(const QSqlRecord &record);
-    QSqlRecord select_info_by_id(const QString &query_name, unsigned key_value);
+    QSqlRecord select_info_by_id(const QString &query_name, quint32 key_value);
     QString m_schema = "public";
-
+    quint32 m_current_user_id;
 public:
     db_manager(
         QString database_name,
@@ -42,33 +47,36 @@ public:
     void set_schema(const QString &name);
     void test_foo();
 //    void create_schema(const QString &schema_name);
-    bool insert_user(const QString &name);
-    bool insert_board(unsigned user_id, const QString &name);
-    bool
+    quint32 insert_user(const QString &name);
+    quint32 insert_board(quint32 user_id, const QString &name);
+    unsigned
     insert_list(int board_id, const QString &name, const QString &description);
-    bool
+    unsigned
     insert_card(int list_id, const QString &name, const QString &description);
-    bool insert_tag(const QString &name);
+    quint32 insert_tag(const QString &name);
     bool pin_tag_to_card(int card_id, int tag_id);
     bool update_command(
         const QString &table_name,
         const QString &updating_field_name,
         const QString &key_field_name,
         const QString &new_value,
-        unsigned key_value
+        quint32 key_value
     );
-    board select_board(unsigned id);
-    list select_list(unsigned id);
-    card select_card(unsigned id);
-    tag select_tag(unsigned id);
+    board select_board(quint32 id);
+    list select_list(quint32 id);
+    card select_card(quint32 id);
+    tag select_tag(quint32 id);
     bool delete_command(
         const QString &table_name,
         const QString &key_field_name,
-        unsigned key_value
+        quint32 key_value
     );
-    QVector<list> get_board_lists(unsigned board_id);
-    QVector<card> get_list_cards(unsigned list_id);
-    QVector<tag> get_card_tags(unsigned card_id);
+    QVector<list> get_board_lists(quint32 board_id);
+    QVector<card> get_list_cards(quint32 list_id);
+    QVector<tag> get_card_tags(quint32 card_id);
+
+    bool set_user_id(quint32 user_id);
+    quint32 get_sequence_last_value(const QString &sequence);
 };
 
 QMap<QString, QString> query_name_to_sql_command;
@@ -134,6 +142,8 @@ void fill_query_name_to_sql_command() {
     query_name_to_sql_command["select_subobject_ids"] =
         "SELECT %2 FROM %1.%3 WHERE %4 = :id";
 
+    query_name_to_sql_command["select_last_value"] =
+            "select currval(:sequence_name);";
     // "SET search_path TO public;";
 }
 
@@ -167,7 +177,7 @@ field_name_to_func = {
         {"name", set_name}
     };
 
-    explicit board(unsigned id) {
+    explicit board(quint32 id) {
     QSqlRecord rec = select_info_by_id("board_signature", "board_id", id);
     for (int i = 0; i < rec.count(); ++i) {
         QSqlField field = rec.field(i);
