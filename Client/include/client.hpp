@@ -18,13 +18,13 @@ class Client : public QObject {
 
 public:
     enum ClientStatus {
-        local_mode,
-        connected_to_server,
-        authentification_failed,
-        waiting_for_response,
-        unable_to_connect
+        Local_mode,
+        Connected_to_server,
+        Authentification_failed,
+        Waiting_for_response,
+        Unable_to_connect
     };
-    Q_ENUM(ClientStatus)
+    Q_ENUMS(ClientStatus)
     enum BoardType { local, remote };
 
     explicit Client(QObject *parent = nullptr);
@@ -44,7 +44,7 @@ signals:
     void boardChanged();
     void menuChanged();
     void statusChanged();
-    void create_card(quint16 list_id, Card &new_Card);
+    void create_card(quint32 list_id, card &new_Card);
 private slots:
     void readData();
     void request_board(int index);
@@ -52,12 +52,12 @@ private slots:
 private:
     QTcpSocket *m_socket = nullptr;
     BoardModel *m_current_board = nullptr;
-    QMap<quint16, BoardModel *> loaded_boards;
+    QMap<quint32, BoardModel *> loaded_boards;
     BoardMenu *m_board_menu = nullptr;
-    ClientStatus m_status = ClientStatus::local_mode;
+    ClientStatus m_status = ClientStatus::Local_mode;
     QString m_server_ip;
-    quint16 m_server_port;
-    quint16 m_user_id;
+    quint32 m_server_port;
+    quint32 m_user_id;
 
     void write(std::string &data);
     void parse_response(const QString &data);

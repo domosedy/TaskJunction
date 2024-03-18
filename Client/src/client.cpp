@@ -3,7 +3,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <string>
-#include "base_classes.hpp"
+#include "element_classes.hpp"
 #include "boardmenu.hpp"
 #include "json_parser.hpp"
 #include "logging.hpp"
@@ -25,7 +25,7 @@ void Client::write(std::string &data) {
     QByteArray msg = data.c_str();
     QByteArray sz;
     QDataStream sendStream(&sz, QIODevice::WriteOnly);
-    quint16 size = msg.size();
+    quint32 size = msg.size();
     sendStream << size;
     rDebug() << size;
     m_socket->write(sz + msg);
@@ -35,7 +35,7 @@ void Client::readData() {
     QDataStream in(m_socket);
     if (in.status() == QDataStream::Ok) {
         QDataStream size_data = m_socket->read(2);
-        quint16 size;
+        quint32 size;
         size_data >> size;
         QByteArray data = m_socket->read(size);
         qDebug() << data.toStdString().c_str();
@@ -63,19 +63,19 @@ void Client::parse_response(const QString &data) {
         if (response["response"] == "ok") {
             nlohmann::json avaliable_boards = response["boards"];
             create_board_select_menu(avaliable_boards);
-            m_status = ClientStatus::connected_to_server;
+            m_status = ClientStatus::Connected_to_server;
             emit statusChanged();
         } else {
-            m_status = ClientStatus::authentification_failed;
+            m_status = ClientStatus::Authentification_failed;
             emit statusChanged();
             qDebug() << "Wrong password!";
         }
     }
     if (response_type == "create-response") {
         // validate
-        // quint16 board_id = response["board-id"];
-        // quint16 list_id = response["list-id"];
-        // quint16 card_id = response["card-id"];
+        // quint32 board_id = response["board-id"];
+        // quint32 list_id = response["list-id"];
+        // quint32 card_id = response["card-id"];
         // if (card_id != 0) {
         //     Card new_card = parser::parse_card(response["object"]);
         //     emit create_card(list_id, new_card);
@@ -98,7 +98,7 @@ void Client::create_board_select_menu(const nlohmann::json &avaliable_boards) {
     for (auto board : avaliable_boards) {
         QString name = QString::fromStdString(board["name"]);
         QString description = QString::fromStdString(board["description"]);
-        quint16 id = board["id"];
+        quint32 id = board["id"];
         m_board_menu->create_board(name, description, id);
     }
     emit statusChanged();
@@ -106,7 +106,7 @@ void Client::create_board_select_menu(const nlohmann::json &avaliable_boards) {
 }
 
 void Client::request_board(int index) {
-    quint16 board_id = m_board_menu->get_id(index);
+    quint32 board_id = m_board_menu->get_id(index);
     // BoardType type = m_board_menu->get_type(index);
     BoardType type = BoardType::remote;
     if (type == BoardType::local) {
@@ -119,23 +119,23 @@ void Client::request_board(int index) {
 }
 
 void Client::create_list(QString &name) {
-    if (m_status == ClientStatus::connected_to_server) {
+    if (m_status == ClientStatus::Connected_to_server) {
         std::string request =
-            parser::create_list_request(m_current_board->get_id(), name);
+            parser::create_list_request(m_current_board->m_board_id, name);
         write(request);
     }
-    if (m_status == ClientStatus::local_mode) {
+    if (m_status == ClientStatus::Local_mode) {
         m_current_board->create_list(name);
     }
 }
 
 void Client::create_card(int list_index, QString &name, QString &description) {
-    if (m_status == ClientStatus::connected_to_server) {
+    if (m_status == ClientStatus::Connected_to_server) {
         std::string request =
             parser::create_card_request(list_index, name, description);
         write(request);
     }
-    if (m_status == ClientStatus::local_mode) {
+    if (m_status == ClientStatus::Local_mode) {
         m_current_board->create_card(list_index, name, description);
     }
 }
@@ -146,7 +146,6 @@ void Client::login(
     QString &server_ip,
     QString &server_port
 ) {
-    qDebug() << server_ip << server_port << username << password;
     if (m_socket->state() != QAbstractSocket::UnconnectedState) {
         if (server_ip == m_server_ip &&
             server_port.toUShort() == m_server_port) {
@@ -156,21 +155,19 @@ void Client::login(
     }
     m_server_ip = server_ip;
     m_server_port = server_port.toUShort();
-    if (m_socket->state() == QAbstractSocket::UnconnectedState ||
-        m_socket->waitForDisconnected(-1)) {
-        qDebug("Disconnected!");
+    if (m_socket->state() != QAbstractSocket::UnconnectedState) {
+        m_socket->waitForDisconnected(-1);
     }
     m_socket->connectToHost(m_server_ip, m_server_port);
     if (m_socket->state() == QAbstractSocket::ConnectedState ||
         m_socket->waitForConnected(-1)) {
         std::string login_request = parser::login_request(username, password);
-        qDebug() << "Connected!";
-        m_status = ClientStatus::waiting_for_response;
+        m_status = ClientStatus::Waiting_for_response;
         emit statusChanged();
         write(login_request);
     } else {
         qDebug() << "No server!";
-        m_status = ClientStatus::unable_to_connect;
+        m_status = ClientStatus::Unable_to_connect;
         emit statusChanged();
     }
 }

@@ -5,16 +5,16 @@
 #include <QMap>
 #include <QVector>
 #include <nlohmann/json.hpp>
-#include "base_classes.hpp"
+#include "element_classes.hpp"
 #include "listmodel.hpp"
 
-class BoardModel : public QAbstractListModel, public Board {
+class BoardModel : public QAbstractListModel, public board {
     Q_OBJECT
     Q_PROPERTY(int count READ get_count NOTIFY countChanged)
 public:
 
     explicit BoardModel(QObject *parent = nullptr);
-    BoardModel(QObject *parent, const nlohmann::json &board);
+    BoardModel(QObject *parent, const nlohmann::json &board_json);
     QHash<int, QByteArray> roleNames() const override;
     int rowCount(const QModelIndex &parent = {}) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole)
@@ -27,11 +27,11 @@ public:
 signals:
     void countChanged();
 private slots:
-    void create_card(quint16 list_id, Card &new_card);
+    void create_card(quint32 list_id, card &new_card);
 
 private:
     QVector<ListModel *> m_lists;
-    QMap<quint16, int> m_index_by_id;
+    QMap<quint32, int> m_index_by_id;
 
     enum ListRoles { NameRole = Qt::UserRole + 1, DescriptionRole, ModelRole };
 };

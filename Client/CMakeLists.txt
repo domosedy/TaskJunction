@@ -14,7 +14,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-pedantic-errors -Wall -Wextra -Werror -Wshadow")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fno-omit-frame-pointer -fsanitize=address")
  
-find_package(Qt6 COMPONENTS Qml Quick Widgets Core Gui Network REQUIRED)
+find_package(Qt6 COMPONENTS Qml Quick Widgets Core Gui Network Sql REQUIRED)
+
 
 include(FetchContent)
 
@@ -35,20 +36,25 @@ set(PROJECT_SOURCES
         include/boardmenu.hpp
         shared/logging.hpp
         shared/json_parser.hpp
-        shared/base_classes.hpp
-        shared/base_classes.cpp
+        #shared/base_classes.hpp
+        #shared/base_classes.cpp
+        ../shared/include/element_classes.hpp
+        ../shared/include/hashes.hpp
+        ../shared/src/element_classes.cpp
+        ../shared/src/hashes.cpp
 )
 
 add_executable(client
     ${PROJECT_SOURCES}
 )
 
-target_include_directories(client PRIVATE include shared)
+target_include_directories(client PRIVATE include shared ../shared/include)
 target_link_libraries(client PRIVATE 
     Qt6::Widgets 
     Qt6::Quick
     Qt6::Core
     Qt6::Gui
     Qt6::Network 
+    Qt6::Sql
     nlohmann_json::nlohmann_json
 )

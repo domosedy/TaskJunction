@@ -153,13 +153,13 @@ Rectangle {
     Connections {
         target: mainClient
         function onStatusChanged() {
-            if (mainClient.client_status == 1) {
+            if (mainClient.client_status == Client.Connected_to_server) {
                 loader.source = "BoardSelect.qml"
             } 
-            if (mainClient.client_status == 2) {
+            if (mainClient.client_status == Client.Authentification_failed) {
                 loginPassword.background.color = style.deleteBackgroundColor
             }            
-            if (mainClient.client_status == 4) {
+            if (mainClient.client_status == Client.Unable_to_connect) {
                 loginIP.background.color = style.deleteBackgroundColor
             }
         }

@@ -1,26 +1,23 @@
 #include "boardmodel.hpp"
 #include <QVariant>
 #include <nlohmann/json.hpp>
-#include "base_classes.hpp"
+#include "element_classes.hpp"
 #include "listmodel.hpp"
 
-namespace {
-using json = nlohmann::json;
-}
 
 BoardModel::BoardModel(QObject *parent) : QAbstractListModel(parent) {
     connect(
-        parent, SIGNAL(create_card(quint16, Card &)), this,
-        SLOT(create_card(quint16, Card &))
+        parent, SIGNAL(create_card(quint32, card &)), this,
+        SLOT(create_card(quint32, card &))
     );
 }
 
-BoardModel::BoardModel(QObject *parent, const json &board)
+BoardModel::BoardModel(QObject *parent, const nlohmann::json &board_json)
     : BoardModel(parent) {
-    m_id = board["id"];
-    m_name = QString::fromStdString(board["name"]);
-    m_description = QString::fromStdString(board["description"]);
-    const json &lists = board["lists"];
+    m_board_id = board_json["id"];
+    m_name = QString::fromStdString(board_json["name"]);
+    m_description = QString::fromStdString(board_json["description"]);
+    const nlohmann::json &lists = board_json["lists"];
     for (const auto &list : lists) {
         m_lists.push_back(new ListModel(this, list));
     }
@@ -50,9 +47,9 @@ QVariant BoardModel::data(const QModelIndex &index, int role) const {
 
     switch (role) {
         case ListRoles::NameRole:
-            return {list->get_name()};
+            return {list->m_name};
         case ListRoles::DescriptionRole:
-            return {list->get_description()};
+            return {list->m_description};
         case ListRoles::ModelRole:
             return QVariant::fromValue<QObject *>(list);
         default:
@@ -88,7 +85,7 @@ void BoardModel::create_card(
     m_lists[list_index]->create_card(name, description);
 }
 
-void BoardModel::create_card(quint16 list_id, Card &new_card) {
+void BoardModel::create_card(quint32 list_id, card &new_card) {
     int index = m_index_by_id.value(list_id, -1);
     if (index == -1) {
         qDebug() << "Wrong list";

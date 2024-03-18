@@ -1,20 +1,20 @@
 #include "listmodel.hpp"
 #include <QString>
-#include "base_classes.hpp"
+#include "element_classes.hpp"
 
 ListModel::ListModel(QObject *parent) : QAbstractListModel(parent) {
 }
 
-ListModel::ListModel(QObject *parent, const nlohmann::json &list)
+ListModel::ListModel(QObject *parent, const nlohmann::json &list_json)
     : QAbstractListModel(parent) {
-    m_id = list["id"];
-    m_name = QString::fromStdString(list["name"]);
-    m_description = QString::fromStdString(list["description"]);
-    const nlohmann::json &cards = list["lists"];
+    m_list_id = list_json["id"];
+    m_name = QString::fromStdString(list_json["name"]);
+    m_description = QString::fromStdString(list_json["description"]);
+    const nlohmann::json &cards = list_json["lists"];
     for (const auto &card : cards) {
         QString card_name = QString::fromStdString(card["name"]);
         QString card_description = QString::fromStdString(card["description"]);
-        quint16 card_id = card["id"];
+        quint32 card_id = card["id"];
         m_cards.emplace_back(card_name, card_description, card_id);
     }
 }
@@ -23,9 +23,10 @@ ListModel::ListModel(
     QObject *parent,
     QString name,
     QString description,
-    quint16 id
+    quint32 id,
+    quint32 board_id
 )
-    : QAbstractListModel(parent), List(name, description, id) {
+    : QAbstractListModel(parent), list(name, description, id, board_id) {
 }
 
 int ListModel::rowCount(const QModelIndex &parent) const {
@@ -47,13 +48,13 @@ QVariant ListModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || index.row() > rowCount(index)) {
         return {};
     }
-    const Card &card = m_cards.at(index.row());
+    const card &card = m_cards.at(index.row());
 
     switch (role) {
         case CardRoles::NameRole:
-            return {card.get_name()};
+            return {card.m_name};
         case CardRoles::DescriptionRole:
-            return {card.get_description()};
+            return {card.m_description};
         default:
             return {};
     }
@@ -65,13 +66,13 @@ void ListModel::create_card(QString &name, QString &description) {
     }
 
     beginInsertRows(QModelIndex(), m_cards.size(), m_cards.size());
-    m_cards.append(Card(name, description));
+    m_cards.append(card(name, description));
     endInsertRows();
 
     emit countChanged();
 }
 
-void ListModel::create_card(Card &new_card) {
+void ListModel::create_card(card &new_card) {
     beginInsertRows(QModelIndex(), m_cards.size(), m_cards.size());
     m_cards.append(new_card);
     endInsertRows();

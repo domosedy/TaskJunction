@@ -3,7 +3,7 @@
 
 #include <QAbstractListModel>
 #include <QVector>
-#include "base_classes.hpp"
+#include "element_classes.hpp"
 
 class BoardMenu : public QAbstractListModel {
     Q_OBJECT
@@ -15,14 +15,14 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole)
         const override;
     int get_count();
-    void create_board(QString &name, QString &description, quint16 id);
-    quint16 get_id(int board_index) const;
+    void create_board(QString &name, QString &description, quint32 id);
+    quint32 get_id(int board_index) const;
 signals:
     void countChanged();
     void request_board(int index);
 
 private:
-    QVector<Board> boards;
+    QVector<board> boards;
 
     enum BoardRoles { NameRole = Qt::UserRole + 1, DescriptionRole };
 };
