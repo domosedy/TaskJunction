@@ -5,6 +5,10 @@ board::board(QVector<QVariant> data)
         : m_board_id(data[0].toInt()), m_name(data[1].toString()) {
 }
 
+board::board(QString name, QString description, quint32 id)
+    :  m_board_id(id), m_name(std::move(name)), m_description(std::move(description)) {
+}
+
 list::list(QVector<QVariant> data)
         : m_list_id(data[0].toInt()),
           m_board_id(data[1].toInt()),
@@ -12,11 +16,19 @@ list::list(QVector<QVariant> data)
           m_description(data[3].toString()) {
 }
 
+list::list(QString name, QString description, quint32 id, quint32 board_id)
+    : m_list_id(id), m_board_id(board_id),  m_name(std::move(name)), m_description(std::move(description)) {
+}
+
 card::card(QVector<QVariant> data)
         : m_card_id(data[0].toInt()),
           m_list_id(data[1].toInt()),
           m_name(data[2].toString()),
           m_description(data[3].toString()) {
+}
+
+card::card(QString name, QString description, quint32 id, quint32 list_id)
+    : m_card_id(id), m_list_id(list_id), m_name(std::move(name)), m_description(std::move(description)) {
 }
 
 tag::tag(QVector<QVariant> data)

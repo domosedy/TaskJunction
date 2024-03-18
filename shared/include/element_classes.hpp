@@ -32,6 +32,7 @@ struct card {
 
     card() = default;
     explicit card(QVector<QVariant> data);
+    card(QString name, QString description, quint32 id = 0, quint32 list_id = 0);
     std::string to_json() const;
 };
 
@@ -44,16 +45,19 @@ struct list {
 
     list() = default;
     explicit list(QVector<QVariant> data);
+    list(QString name, QString description, quint32 id = 0, quint32 board_id = 0);
     std::string to_json() const;
 };
 
 struct board {
     quint32 m_board_id;
     QString m_name;
+    QString m_description;
     QVector<list> m_lists;
 
     board() = default;
     explicit board(QVector<QVariant> data);
+    board(QString name, QString description, quint32 id = 0);
     std::string to_json() const;
 };
 
