@@ -20,3 +20,12 @@ src/test_json.cpp)
 
 target_include_directories(json-test PRIVATE include)
 target_link_libraries(json-test PRIVATE Qt6::Core)
+
+add_executable(hash-test
+include/hashes.hpp
+
+src/hashes.cpp
+src/test_hashes.cpp)
+
+target_include_directories(hash-test PRIVATE include)
+target_link_libraries(hash-test PRIVATE Qt6::Core)
