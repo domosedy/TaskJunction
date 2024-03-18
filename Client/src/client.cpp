@@ -124,7 +124,7 @@ void Client::create_list(QString &name) {
             parser::create_list_request(m_current_board->m_board_id, name);
         write(request);
     }
-    if (m_status == ClientStatus::Local_mode) {
+    else {
         m_current_board->create_list(name);
     }
 }
