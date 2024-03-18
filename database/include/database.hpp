@@ -31,7 +31,7 @@ class db_manager {
     static QVector<QVariant> get_data(const QSqlRecord &record);
     QSqlRecord select_info_by_id(const QString &query_name, quint32 key_value);
     QString m_schema = "public";
-    quint32 m_current_user_id;
+
 public:
     db_manager(
         QString database_name,
@@ -43,16 +43,13 @@ public:
     void clear_all_tables();
     void drop_all_tables();
 
-public:
     void set_schema(const QString &name);
     void test_foo();
 //    void create_schema(const QString &schema_name);
     quint32 insert_user(const QString &name);
-    quint32 insert_board(quint32 user_id, const QString &name);
-    unsigned
-    insert_list(int board_id, const QString &name, const QString &description);
-    unsigned
-    insert_card(int list_id, const QString &name, const QString &description);
+    quint32 insert_board(quint32 user_id, const QString &name, const QString &description);
+    quint32 insert_list(int board_id, const QString &name, const QString &description);
+    quint32 insert_card(int list_id, const QString &name, const QString &description);
     quint32 insert_tag(const QString &name);
     bool pin_tag_to_card(int card_id, int tag_id);
     bool update_command(
@@ -75,7 +72,7 @@ public:
     QVector<card> get_list_cards(quint32 list_id);
     QVector<tag> get_card_tags(quint32 card_id);
 
-    bool set_user_id(quint32 user_id);
+    bool check_user_rights(quint32 user_id, quint32 board_id);
     quint32 get_sequence_last_value(const QString &sequence);
 };
 
@@ -86,7 +83,8 @@ void fill_query_name_to_sql_command() {
         "INSERT INTO %1.user_signature VALUES (DEFAULT, :name);";
 
     query_name_to_sql_command["insert_board"] =
-        "INSERT INTO %1.board_signature VALUES (DEFAULT, :user_id, :name);";
+        "INSERT INTO %1.board_signature VALUES (DEFAULT, :board_id, :name, "
+        ":description);";
 
     query_name_to_sql_command["insert_list"] =
         "INSERT INTO %1.list_signature VALUES (DEFAULT, :board_id, :name, "
@@ -107,7 +105,7 @@ void fill_query_name_to_sql_command() {
         ":key_value;";
 
     query_name_to_sql_command["select_board"] =
-        "SELECT board_id, user_id, name FROM %1.board_signature WHERE board_id "
+        "SELECT board_id, user_id, name, description FROM %1.board_signature WHERE board_id "
         "= "
         ":key_value;";
 
@@ -144,6 +142,9 @@ void fill_query_name_to_sql_command() {
 
     query_name_to_sql_command["select_last_value"] =
             "select currval(:sequence_name);";
+
+    query_name_to_sql_command["check_user_rights"] =
+            "SELECT exists (SELECT * FROM %1.board_signature WHERE board_id = :board_id AND user_id = :user_id LIMIT 1);";
     // "SET search_path TO public;";
 }
 

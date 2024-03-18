@@ -9,7 +9,8 @@ name    varchar(50)
 CREATE TABLE board_signature(
 board_id serial PRIMARY KEY,
 user_id integer REFERENCES user_signature ON DELETE CASCADE,
-name varchar(50)
+name varchar(50),
+description text
 );
 
 CREATE TABLE list_signature(

@@ -74,6 +74,7 @@ void db_manager::set_schema(const QString &name) {
 }
 
 quint32 db_manager::get_sequence_last_value(const QString &sequence) {
+    //  TODO: cannot explicitly set a schema
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["select_last_value"]);
     query.bindValue(":sequence_name", sequence);
@@ -83,6 +84,19 @@ quint32 db_manager::get_sequence_last_value(const QString &sequence) {
     }
     query.next();
     return query.value(0).toInt();
+}
+
+bool db_manager::check_user_rights(quint32 user_id, quint32 board_id) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["check_user_rights"].arg(m_schema));
+    query.bindValue(":user_id", user_id);
+    query.bindValue(":board_id", board_id);
+    if (!query.exec()) {
+        qDebug() << m_database.lastError();
+        return false;
+    }
+    query.next();
+    return query.value(0).toBool();
 }
 
 quint32 db_manager::insert_user(const QString &name) {
@@ -97,11 +111,12 @@ quint32 db_manager::insert_user(const QString &name) {
     return get_sequence_last_value(USER_ID_SEQUENCE);
 }
 
-quint32 db_manager::insert_board(quint32 user_id, const QString &name) {
+quint32 db_manager::insert_board(quint32 user_id, const QString &name, const QString &description) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["insert_board"].arg(m_schema));
     query.bindValue(":user_id", user_id);
     query.bindValue(":name", name);
+    query.bindValue(":description", description);
     if (!query.exec()) {
         qDebug() << "insert_board_error" << m_database.lastError()
                  << query_name_to_sql_command["insert_board"].arg(m_schema);
@@ -294,12 +309,6 @@ QVector<tag> db_manager::get_card_tags(quint32 card_id) {
     return result;
 }
 
-bool db_manager::set_user_id(quint32 user_id) {
-
-    m_current_user_id = user_id;
-    return true;
-}
-
 }  // namespace database
 
 int main(int argc, char *argv[]) {
@@ -311,16 +320,21 @@ int main(int argc, char *argv[]) {
     db_manager db_manager(argv[1], argv[2], argv[3], argv[4]);
 //        db_manager.set_schema("test_schema");
     fill_query_name_to_sql_command();
-        db_manager.insert_user("username");
-//        db_manager.insert_board(1, "board_name");
-//        db_manager.insert_list(1, "list_name", "test1");
+    db_manager.insert_user("username");
+//    std::cout << std::boolalpha << db_manager.check_user_rights(2, 2);
+        db_manager.insert_board(1, "board_name", "description");
+        db_manager.insert_list(1, "list_name", "test3");
 //        db_manager.insert_card(1, "card_name", "test");
 //        db_manager.insert_tag("tag_name");
 //        db_manager.pin_tag_to_card(1, 1);
-
+    board board(db_manager.select_board(1));
+    auto lists(db_manager.get_board_lists(1));
+    for (const auto &list : lists) {
+        list.print_data();
+    }
 //        db_manager.update_command(
-    //        LIST_TABLE_NAME,  "board_id", LIST_PRIMARY_KEY, "10",2
-    //    );
+//            LIST_TABLE_NAME,  "board_id", LIST_PRIMARY_KEY, "10",2
+//        );
     //    board board = db_manager.select_board(1);
     //    db_manager.delete_command(LIST_TABLE_NAME, LIST_PRIMARY_KEY, 3);
     return 0;
