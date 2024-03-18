@@ -28,7 +28,7 @@ requires has_to_json_method<T>
 static std::string array_to_json(const QVector<T> &data) {
     std::stringstream ss;
 
-    for (std::size_t i = 0; i + 1 < data.size(); ++i) {
+    for (qsizetype i = 0; i + 1 < data.size(); ++i) {
         ss << data[i].to_json() << ", ";
     }
 
@@ -102,7 +102,7 @@ std::string login::to_json() const {
 
     ss << "\", \"boards\": [";
 
-    for (std::size_t i = 0; i + 1 < m_boards.size(); ++i) {
+    for (qsizetype i = 0; i + 1 < m_boards.size(); ++i) {
         ss << "{ \"name\": \"" << m_boards[i].second.toStdString()
             << "\", \"id\": " << m_boards[i].first << "}, "; 
     }

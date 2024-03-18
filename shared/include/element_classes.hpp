@@ -15,7 +15,7 @@ requires (T t) {
 };
 
 struct tag {
-    unsigned m_tag_id;
+    quint32 m_tag_id;
     QString m_name;
 
     tag() = default;
@@ -24,8 +24,8 @@ struct tag {
 };
 
 struct card {
-    unsigned m_card_id;
-    unsigned m_list_id;
+    quint32 m_card_id;
+    quint32 m_list_id;
     QString m_name;
     QString m_description;
     QVector<tag> m_tags;
@@ -36,8 +36,8 @@ struct card {
 };
 
 struct list {
-    unsigned m_list_id;
-    unsigned m_board_id;
+    quint32 m_list_id;
+    quint32 m_board_id;
     QString m_name;
     QString m_description;
     QVector<card> m_cards;
@@ -48,7 +48,7 @@ struct list {
 };
 
 struct board {
-    unsigned m_board_id;
+    quint32 m_board_id;
     QString m_name;
     QVector<list> m_lists;
 
@@ -59,7 +59,7 @@ struct board {
 
 struct login {
     bool m_response;
-    QVector<std::pair<unsigned, QString>> m_boards;
+    QVector<std::pair<quint32, QString>> m_boards;
 
     std::string to_json() const;
 };
