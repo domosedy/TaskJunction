@@ -1,35 +1,36 @@
 #ifndef ELEMENT_CLASSES_HPP_
 #define ELEMENT_CLASSES_HPP_
 #include <QtCore>
+#include <utility>
 
 class tag {
-    unsigned m_tag_id;
+    quint32 m_tag_id;
     QString m_name;
 
 public:
-    explicit tag(QVector<QVariant> data);
+    explicit tag(quint32 tag_id, QString name);
 };
 
 class card {
-    unsigned m_card_id;
-    unsigned m_list_id;
+    quint32 m_card_id;
+    quint32 m_list_id;
     QString m_name;
     QString m_description;
     QVector<tag> m_tags;
 
 public:
-    explicit card(QVector<QVariant> data);
+    explicit card(quint32 card_id, quint32 list_id, QString name, QString description);
 };
 
 class list {
-    unsigned m_list_id;
-    unsigned m_board_id;
+    quint32 m_list_id;
+    quint32 m_board_id;
     QString m_name;
     QString m_description;
     QVector<card> m_cards;
 
 public:
-    explicit list(QVector<QVariant> data);
+    explicit list(quint32 list_id, quint32 board_id, QString name, QString description);
 
     void print_data() const {
         qDebug() << m_list_id << m_board_id << m_name << m_description;
@@ -37,16 +38,29 @@ public:
 };
 
 class board {
-    unsigned m_board_id;
-    unsigned m_user_id;
+    quint32 m_board_id;
+    quint32 m_user_id;
     QString m_name;
+    QString m_description;
     QVector<list> m_lists;
 
 public:
-    explicit board(QVector<QVariant> data);
+    explicit board(quint32 board_id, quint32 user_id, QString name, QString description);
 
     void print_data() const {
         qDebug() << m_board_id << ' ' << m_name;
+    }
+};
+
+class user {
+    quint32 m_user_id;
+    QString m_name;
+
+public:
+    explicit user(quint32 user_id, QString name);
+
+    void print_data() const {
+        qDebug() << m_user_id << m_name;
     }
 };
 
@@ -67,28 +81,33 @@ public:
 //    void get_subobjects() override;
 //};
 
-board::board(QVector<QVariant> data)
-    : m_board_id(data[0].toInt()),
-      m_user_id(data[1].toInt()),
-      m_name(data[2].toString()) {
+user::user(quint32 user_id, QString name) : m_user_id(user_id), m_name(std::move(name)) {
 }
 
-list::list(QVector<QVariant> data)
-    : m_list_id(data[0].toInt()),
-      m_board_id(data[1].toInt()),
-      m_name(data[2].toString()),
-      m_description(data[3].toString()) {
+
+
+board::board(quint32 board_id, quint32 user_id, QString name, QString description)
+    : m_board_id(board_id),
+      m_user_id(user_id),
+      m_name(std::move(name)),
+      m_description(std::move(description)) {
 }
 
-card::card(QVector<QVariant> data)
-    : m_card_id(data[0].toInt()),
-      m_list_id(data[1].toInt()),
-      m_name(data[2].toString()),
-      m_description(data[3].toString()) {
+list::list(quint32 list_id, quint32 board_id, QString name, QString description)
+        : m_list_id(list_id),
+          m_board_id(board_id),
+          m_name(std::move(name)),
+          m_description(std::move(description)) {
 }
 
-tag::tag(QVector<QVariant> data)
-    : m_tag_id(data[0].toInt()), m_name(data[1].toString()) {
+card::card(quint32 card_id, quint32 list_id, QString name, QString description)
+        : m_card_id(card_id),
+          m_list_id(list_id),
+          m_name(std::move(name)),
+          m_description(std::move(description)) {
+}
+
+tag::tag(quint32 tag_id, QString name) : m_tag_id(tag_id), m_name(std::move(name)) {
 }
 
 #endif  // ELEMENT_CLASSES_HPP_

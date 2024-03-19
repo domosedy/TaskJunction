@@ -32,6 +32,8 @@ class db_manager {
     QSqlRecord select_info_by_id(const QString &query_name, quint32 key_value);
     QString m_schema = "public";
 
+public: static void fill_query_name_to_sql_command();
+public: static QMap<QString, QString> query_name_to_sql_command;
 public:
     db_manager(
         QString database_name,
@@ -59,6 +61,7 @@ public:
         const QString &new_value,
         quint32 key_value
     );
+    user select_user(quint32 id);
     board select_board(quint32 id);
     list select_list(quint32 id);
     card select_card(quint32 id);
@@ -68,6 +71,7 @@ public:
         const QString &key_field_name,
         quint32 key_value
     );
+    QVector<board> get_user_boards(quint32 user_id);
     QVector<list> get_board_lists(quint32 board_id);
     QVector<card> get_list_cards(quint32 list_id);
     QVector<tag> get_card_tags(quint32 card_id);
@@ -76,77 +80,7 @@ public:
     quint32 get_sequence_last_value(const QString &sequence);
 };
 
-QMap<QString, QString> query_name_to_sql_command;
-
-void fill_query_name_to_sql_command() {
-    query_name_to_sql_command["insert_user"] =
-        "INSERT INTO %1.user_signature VALUES (DEFAULT, :name);";
-
-    query_name_to_sql_command["insert_board"] =
-        "INSERT INTO %1.board_signature VALUES (DEFAULT, :board_id, :name, "
-        ":description);";
-
-    query_name_to_sql_command["insert_list"] =
-        "INSERT INTO %1.list_signature VALUES (DEFAULT, :board_id, :name, "
-        ":description);";
-
-    query_name_to_sql_command["insert_card"] =
-        "INSERT INTO %1.card_signature VALUES (DEFAULT, :list_id, :name, "
-        ":description);";
-
-    query_name_to_sql_command["insert_tag"] =
-        "INSERT INTO %1.tag_signature VALUES (DEFAULT, :name);";
-
-    query_name_to_sql_command["insert_into_card_to_tags"] =
-        "INSERT INTO %1.card_to_tags VALUES (:card_id, :tag_id);";
-
-    query_name_to_sql_command["update_command"] =
-        "UPDATE %1.%2 SET %3 = :new_value WHERE %4 = "
-        ":key_value;";
-
-    query_name_to_sql_command["select_board"] =
-        "SELECT board_id, user_id, name, description FROM %1.board_signature WHERE board_id "
-        "= "
-        ":key_value;";
-
-    query_name_to_sql_command["select_list"] =
-        "SELECT list_id, board_id, name, description FROM %1.list_signature "
-        "WHERE "
-        "list_id = :key_value;";
-
-    query_name_to_sql_command["select_card"] =
-        "SELECT card_id, list_id, name, description FROM %1.card_signature "
-        "WHERE "
-        "card_id = :key_value;";
-
-    query_name_to_sql_command["select_tag"] =
-        "SELECT tag_id, name FROM %1.tag_signature WHERE tag_id = :key_value;";
-
-    query_name_to_sql_command["delete_command"] =
-        "DELETE FROM %1.%2 WHERE %3 = :key_value;";
-
-    query_name_to_sql_command["create_schema"] =
-        "CREATE SCHEMA %1;"
-        "DO $$DECLARE tbl_record RECORD;"
-        "BEGIN"
-        "FOR tbl_record IN (SELECT %1 FROM pg_tables WHERE schemaname = "
-        "'project_template') LOOP"
-        "EXECUTE 'CREATE TABLE %1.' || tbl_record.tablename || ' (LIKE "
-        "project_template.' || tbl_record.tablename || ' INCLUDING "
-        "CONSTRAINTS)';"
-        "END LOOP;"
-        "END$$;";
-
-    query_name_to_sql_command["select_subobject_ids"] =
-        "SELECT %2 FROM %1.%3 WHERE %4 = :id";
-
-    query_name_to_sql_command["select_last_value"] =
-            "select currval(:sequence_name);";
-
-    query_name_to_sql_command["check_user_rights"] =
-            "SELECT exists (SELECT * FROM %1.board_signature WHERE board_id = :board_id AND user_id = :user_id LIMIT 1);";
-    // "SET search_path TO public;";
-}
+//QMap<QString, QString> query_name_to_sql_command;
 
 /*template<class U>
 class abstract_element {
