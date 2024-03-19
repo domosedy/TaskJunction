@@ -32,6 +32,8 @@ class db_manager {
     QSqlRecord select_info_by_id(const QString &query_name, quint32 key_value);
     QString m_schema = "public";
 
+public: static void fill_query_name_to_sql_command();
+public: static QMap<QString, QString> query_name_to_sql_command;
 public:
     db_manager(
         QString database_name,
@@ -59,6 +61,7 @@ public:
         const QString &new_value,
         quint32 key_value
     );
+    user select_user(quint32 id);
     board select_board(quint32 id);
     list select_list(quint32 id);
     card select_card(quint32 id);
@@ -68,16 +71,56 @@ public:
         const QString &key_field_name,
         quint32 key_value
     );
+    QVector<board> get_user_boards(quint32 user_id);
     QVector<list> get_board_lists(quint32 board_id);
     QVector<card> get_list_cards(quint32 list_id);
     QVector<tag> get_card_tags(quint32 card_id);
 
     bool check_user_rights(quint32 user_id, quint32 board_id);
     quint32 get_sequence_last_value(const QString &sequence);
-
-    void fill_query_name_to_sql_command();
-    QMap<QString, QString> query_name_to_sql_command;
 };
+
+//QMap<QString, QString> query_name_to_sql_command;
+
+/*template<class U>
+class abstract_element {
+private:
+    template<class T>
+    std::function<void (T&, QVariant)> set_board_id = [&](T& object, const
+QVariant &value){ object.board_id = value.toInt();
+    };
+    template<class T>
+    std::function<void (T&, QVariant)> set_list_id = [&](T& object, const
+QVariant &value){ object.list_id = value.toInt();
+    };
+    template<class T>
+    std::function<void (T&, QVariant)> set_card_id = [&](T& object, const
+QVariant &value){ object.card_id = value.toInt();
+    };
+    template<class T>
+    std::function<void (T&, QVariant)> set_name = [&](T& object, const QVariant
+&value){ object.name = value.toString();
+    };
+    template<class T>
+    std::function<void (T&, QVariant)> set_description = [&](T& object, const
+QVariant &value){ object.description = value.toString();
+    };
+public:
+    std::map<QString, std::function<void (T& object, const QVariant &value)>>
+field_name_to_func = {
+        {"board_id", set_board_id},
+        {"name", set_name}
+    };
+
+    explicit board(quint32 id) {
+    QSqlRecord rec = select_info_by_id("board_signature", "board_id", id);
+    for (int i = 0; i < rec.count(); ++i) {
+        QSqlField field = rec.field(i);
+        abstract_element<board> ae;
+        ae.field_name_to_func[field.name()](*this, field.value());
+    }
+};
+}; */
 
 }  // namespace database
 
