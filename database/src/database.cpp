@@ -31,11 +31,13 @@ db_manager::db_manager(
 QMap<QString, QString> db_manager::query_name_to_sql_command;
 
 void db_manager::fill_query_name_to_sql_command() {
-        query_name_to_sql_command["insert_user"] =
-                "INSERT INTO %1.user_signature VALUES (DEFAULT, :name);";
+    query_name_to_sql_command["insert_user_data"] =
+            "INSERT INTO %1.user_authorization_data VALUES (:login, :password);";
+    query_name_to_sql_command["insert_user_signature"] =
+                "INSERT INTO %1.user_signature VALUES (DEFAULT, :login);";
 
     query_name_to_sql_command["insert_board"] =
-                "INSERT INTO %1.board_signature VALUES (DEFAULT, :board_id, :name, "
+                "INSERT INTO %1.board_signature VALUES (DEFAULT, :user_id, :name, "
                 ":description);";
 
     query_name_to_sql_command["insert_list"] =
@@ -100,6 +102,15 @@ void db_manager::fill_query_name_to_sql_command() {
 
     query_name_to_sql_command["check_user_rights"] =
                 "SELECT exists (SELECT * FROM %1.board_signature WHERE board_id = :board_id AND user_id = :user_id LIMIT 1);";
+
+    query_name_to_sql_command["check_user_existence"] =
+            "SELECT exists (SELECT * FROM %1.user_authorization_data WHERE login = :login LIMIT 1);";
+
+    query_name_to_sql_command["check_user_password"] =
+            "SELECT exists (SELECT * FROM %1.user_authorization_data WHERE login = :login AND password = :password LIMIT 1);";
+
+    query_name_to_sql_command["get_user_id_by_name"] =
+            "SELECT user_id FROM %1.user_signature WHERE name = :name;";
         // "SET search_path TO public;";
     }
 
@@ -162,6 +173,40 @@ quint32 db_manager::get_sequence_last_value(const QString &sequence) {
     return query.value(0).toInt();
 }
 
+quint32 db_manager::get_user_id_by_name(const QString &name) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["get_user_id_by_name"].arg(m_schema));
+    if (!query.exec()) {
+        qDebug() << m_database.lastError();
+        return 0;
+    }
+    query.next();
+    return query.value(0).toInt();
+}
+
+bool db_manager::check_user_password(const QString &login, const QString &password) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["check_user_password"].arg(m_schema));
+}
+
+quint32 db_manager::authorize_user(const QString &login, const QString &password) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["check_user_existence"].arg(m_schema));
+    query.bindValue(":login", login);
+    if (!query.exec()) {
+        qDebug() << m_database.lastError();
+        return 0;
+    }
+    query.next();
+    if (query.value(0).toBool()) {
+        if (check_user_password(login, password)) {
+            return get_user_id_by_name(login);
+        }
+        return 0;
+    }
+    return insert_user(login, password);
+}
+
 bool db_manager::check_user_rights(quint32 user_id, quint32 board_id) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["check_user_rights"].arg(m_schema));
@@ -175,10 +220,18 @@ bool db_manager::check_user_rights(quint32 user_id, quint32 board_id) {
     return query.value(0).toBool();
 }
 
-quint32 db_manager::insert_user(const QString &name) {
+quint32 db_manager::insert_user(const QString &login, const QString &password) {
     QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["insert_user"].arg(m_schema));
-    query.bindValue(":name", name);
+    query.prepare(query_name_to_sql_command["insert_user_data"].arg(m_schema));
+    query.bindValue(":login", login);
+    query.bindValue(":password", password);
+    if (!query.exec()) {
+        qDebug() << m_database.lastError()
+                 << query_name_to_sql_command["insert_user"].arg(m_schema);
+        return 0;
+    }
+    query.prepare(query_name_to_sql_command["insert_user_signature"].arg(m_schema));
+    query.bindValue(":login", login);
     if (!query.exec()) {
         qDebug() << m_database.lastError()
                  << query_name_to_sql_command["insert_user"].arg(m_schema);
@@ -440,9 +493,11 @@ int main(int argc, char *argv[]) {
 //    fill_query_name_to_sql_command();
 //    db_manager.insert_user("username");
 //    std::cout << std::boolalpha << db_manager.check_user_rights(2, 2);
-//        db_manager.insert_board(1, "board_name", "description");
-//        db_manager.insert_list(1, "list_name", "test3");
-//        db_manager.insert_card(1, "card_name", "test");
+
+//    db_manager.authorize_user("username2", "password2");
+//    db_manager.insert_board(1, "board_name", "description");
+//    db_manager.insert_list(4, "list_name", "test3");
+//    db_manager.insert_card(2, "card_name", "test");
 //        db_manager.insert_tag("tag_name");
 //        db_manager.pin_tag_to_card(1, 1);
 //    board board(db_manager.select_board(1));
@@ -457,5 +512,8 @@ int main(int argc, char *argv[]) {
 //    user.print_data();
     //    board board = db_manager.select_board(1);
     //    db_manager.delete_command(LIST_TABLE_NAME, LIST_PRIMARY_KEY, 3);
+//    db_manager.delete_command("list_signature", "list_id", 4);
+//    db_manager.delete_command("user_signature", "user_id", 1);
+
     return 0;
 }
