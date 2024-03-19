@@ -1,6 +1,3 @@
-CREATE SCHEMA project_template;
-SET search_path TO project_template;
-
 CREATE TABLE user_signature(
 user_id serial PRIMARY KEY,
 name    varchar(50)

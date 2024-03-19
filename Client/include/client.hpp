@@ -8,6 +8,7 @@
 #include <string>
 #include "boardmenu.hpp"
 #include "boardmodel.hpp"
+#include "database.hpp"
 
 class Client : public QObject {
     Q_OBJECT
@@ -50,6 +51,7 @@ private slots:
     void request_board(int index);
 
 private:
+    database::db_manager db;
     QTcpSocket *m_socket = nullptr;
     BoardModel *m_current_board = nullptr;
     QMap<quint32, BoardModel *> loaded_boards;

@@ -40,13 +40,15 @@ set(PROJECT_SOURCES
         ../shared/include/hashes.hpp
         ../shared/src/element_classes.cpp
         ../shared/src/hashes.cpp
+        ../database/include/database.hpp
+        ../database/src/database.cpp
 )
 
 add_executable(client
     ${PROJECT_SOURCES}
 )
 
-target_include_directories(client PRIVATE include shared ../shared/include)
+target_include_directories(client PRIVATE include shared ../shared/include ../database/include)
 target_link_libraries(client PRIVATE 
     Qt6::Widgets 
     Qt6::Quick

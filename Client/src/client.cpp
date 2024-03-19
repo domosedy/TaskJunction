@@ -7,8 +7,9 @@
 #include "boardmenu.hpp"
 #include "json_parser.hpp"
 #include "logging.hpp"
+#include "database.hpp"
 
-Client::Client(QObject *parent) : QObject(parent) {
+Client::Client(QObject *parent) : QObject(parent), db(database::db_manager("testdb", "test", "localhost", "1")) {
     m_socket = new QTcpSocket(this);
 
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(readData()));
