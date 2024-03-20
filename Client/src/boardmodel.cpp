@@ -4,7 +4,6 @@
 #include "element_classes.hpp"
 #include "listmodel.hpp"
 
-
 BoardModel::BoardModel(QObject *parent) : QAbstractListModel(parent) {
     connect(
         parent, SIGNAL(create_card(quint32, card &)), this,
@@ -19,6 +18,16 @@ BoardModel::BoardModel(QObject *parent, const nlohmann::json &board_json)
     m_description = QString::fromStdString(board_json["description"]);
     const nlohmann::json &lists = board_json["lists"];
     for (const auto &list : lists) {
+        m_lists.push_back(new ListModel(this, list));
+    }
+}
+
+BoardModel::BoardModel(QObject *parent, const board &board_base)
+    : BoardModel(parent) {
+    m_board_id = board_base.m_board_id;
+    m_name = board_base.m_name;
+    m_description = board_base.m_description;
+    for (const auto &list : board_base.m_lists) {
         m_lists.push_back(new ListModel(this, list));
     }
 }
@@ -68,6 +77,14 @@ void BoardModel::create_list(QString &name) {
     emit countChanged();
 }
 
+void BoardModel::create_list(const list &list_base) {
+    beginInsertRows(QModelIndex(), m_lists.size(), m_lists.size());
+    m_lists.append(new ListModel(this, list_base));
+    endInsertRows();
+
+    emit countChanged();
+}
+
 void BoardModel::delete_list(int index) {
     beginRemoveRows(QModelIndex(), index, index);
     delete m_lists[index];
@@ -75,6 +92,10 @@ void BoardModel::delete_list(int index) {
     endRemoveRows();
 
     emit countChanged();
+}
+
+void BoardModel::delete_card(const int list_index, const int card_index) {
+    m_lists[list_index]->delete_card(card_index);
 }
 
 void BoardModel::create_card(
@@ -85,15 +106,19 @@ void BoardModel::create_card(
     m_lists[list_index]->create_card(name, description);
 }
 
-void BoardModel::create_card(quint32 list_id, card &new_card) {
-    int index = m_index_by_id.value(list_id, -1);
-    if (index == -1) {
-        qDebug() << "Wrong list";
-        return;
-    }
+void BoardModel::create_card(int index, const card &new_card) {
     m_lists[index]->create_card(new_card);
 }
 
 int BoardModel::get_count() const {
     return m_lists.count();
+}
+
+quint32 BoardModel::get_list_id(const int index) const {
+    return m_lists[index]->m_list_id;
+}
+
+quint32 BoardModel::get_card_id(const int list_index, const int card_index)
+    const {
+    return m_lists[list_index]->get_card_id(card_index);
 }

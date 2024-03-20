@@ -7,11 +7,11 @@ import "qrc:"
 
 Rectangle {
 
-    id: main
+    id: board
     visible: true
 
     Popup {
-        id: create_list
+        id: createListPopup
         width: 210
         height: 120
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
@@ -25,7 +25,7 @@ Rectangle {
             border.width: style.defaultBorderSize
             TextField {
                 z: 1
-                id: list_name
+                id: listName
                 placeholderText: "New list"
                 font.family: "Courier"
                 font.pointSize: 12
@@ -52,9 +52,9 @@ Rectangle {
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 10
                 onClicked: {
-                    create_list.close()
-                    mainClient.create_list(list_name.text)
-                    list_name.text = ""
+                    createListPopup.close()
+                    mainClient.create_list(listName.text)
+                    listName.text = ""
                 }
             }      
 
@@ -67,7 +67,7 @@ Rectangle {
     }
 
     Rectangle {
-        id: topmenu
+        id: boardMenuBar
         visible:true
         width: root.width
         height: style.headerHeight
@@ -109,7 +109,7 @@ Rectangle {
                             (parent.hovered ? Qt.darker(style.primaryColor, 1.2) : style.primaryColor)
                 }
                 onClicked: {
-                    create_list.open()
+                    createListPopup.open()
                 }
             }   
         }
@@ -118,8 +118,8 @@ Rectangle {
     Rectangle {
         id: mainarea
         width: root.width
-        height: root.height-topmenu.height
-        y: topmenu.height
+        height: root.height-boardMenuBar.height
+        y: boardMenuBar.height
         color: style.boardBackgroundColor
 
 

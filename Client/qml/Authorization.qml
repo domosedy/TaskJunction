@@ -152,14 +152,14 @@ Rectangle {
     }
     Connections {
         target: mainClient
-        function onStatusChanged() {
-            if (mainClient.client_status == Client.Connected_to_server) {
+        function onConnectionStatusChanged() {
+            if (mainClient.connection_status == Client.Authorized) {
                 loader.source = "BoardSelect.qml"
             } 
-            if (mainClient.client_status == Client.Authentification_failed) {
+            if (mainClient.connection_status == Client.Authentification_failed) {
                 loginPassword.background.color = style.deleteBackgroundColor
             }            
-            if (mainClient.client_status == Client.Unable_to_connect) {
+            if (mainClient.connection_status == Client.Unable_to_connect) {
                 loginIP.background.color = style.deleteBackgroundColor
             }
         }

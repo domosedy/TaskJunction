@@ -80,7 +80,8 @@ Component {
                     anchors.bottomMargin: 10
                     onClicked: {
                         card_window.close()
-                        deleteRequest(index)
+                        //deleteRequest(index)
+                        mainClient.deleteCard(listMain.index, index) // TODO: test if it works as expected
                     }
                 }
 

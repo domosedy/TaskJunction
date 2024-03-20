@@ -1,12 +1,15 @@
 #include "element_classes.hpp"
 #include <sstream>
 
+user::user(quint32 user_id, QString name) : m_user_id(user_id), m_name(std::move(name)) {
+}
+
 board::board(QVector<QVariant> data)
         : m_board_id(data[0].toInt()), m_name(data[1].toString()) {
 }
 
-board::board(QString name, QString description, quint32 id)
-    :  m_board_id(id), m_name(std::move(name)), m_description(std::move(description)) {
+board::board(QString name, QString description, quint32 id, quint32 user_id)
+    :  m_board_id(id), m_user_id(user_id), m_name(std::move(name)), m_description(std::move(description)) {
 }
 
 list::list(QVector<QVariant> data)
@@ -34,6 +37,8 @@ card::card(QString name, QString description, quint32 id, quint32 list_id)
 tag::tag(QVector<QVariant> data)
         : m_tag_id(data[0].toInt()), m_name(data[1].toString()) {
 }
+
+tag::tag(QString name, quint32 id): m_tag_id(id), m_name(std::move(name)) {}
 
 template<typename T> 
 requires has_to_json_method<T>

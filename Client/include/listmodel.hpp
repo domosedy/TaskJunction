@@ -13,6 +13,7 @@ class ListModel : public QAbstractListModel, public list {
 public:
     explicit ListModel(QObject *parent = nullptr);
     ListModel(QObject *parent, const nlohmann::json &list_json);
+    ListModel(QObject *parent, const list &list_base);
     ListModel(
         QObject *parent,
         QString name,
@@ -26,8 +27,9 @@ public:
         const override;
     Q_INVOKABLE void create_card(QString &name, QString &description);
     Q_INVOKABLE void delete_card(int index);
-    void create_card(card &new_card);
+    void create_card(const card &new_card);
     int get_count();
+    quint32 get_card_id(const int index) const;
 signals:
     void countChanged();
 

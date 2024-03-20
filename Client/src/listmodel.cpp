@@ -19,6 +19,15 @@ ListModel::ListModel(QObject *parent, const nlohmann::json &list_json)
     }
 }
 
+ListModel::ListModel(QObject *parent, const list &list_base)
+    : QAbstractListModel(parent) {
+    m_list_id = list_base.m_list_id;
+    m_board_id = list_base.m_board_id;
+    m_name = list_base.m_name;
+    m_description = list_base.m_description;
+    m_cards = list_base.m_cards;
+}
+
 ListModel::ListModel(
     QObject *parent,
     QString name,
@@ -72,7 +81,7 @@ void ListModel::create_card(QString &name, QString &description) {
     emit countChanged();
 }
 
-void ListModel::create_card(card &new_card) {
+void ListModel::create_card(const card &new_card) {
     beginInsertRows(QModelIndex(), m_cards.size(), m_cards.size());
     m_cards.append(new_card);
     endInsertRows();
@@ -90,4 +99,8 @@ void ListModel::delete_card(int index) {
 
 int ListModel::get_count() {
     return m_cards.count();
+}
+
+quint32 ListModel::get_card_id(const int index) const {
+    return m_cards[index].m_card_id;
 }

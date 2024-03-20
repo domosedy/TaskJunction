@@ -43,6 +43,14 @@ void BoardMenu::create_board(QString &name, QString &description, quint32 id) {
     emit countChanged();
 }
 
+void BoardMenu::add_board(const board &board) {
+    beginInsertRows(QModelIndex(), boards.size(), boards.size());
+    boards.append(board);
+    endInsertRows();
+
+    emit countChanged();
+}
+
 quint32 BoardMenu::get_id(int board_index) const {
     return boards[board_index].m_board_id;
 }

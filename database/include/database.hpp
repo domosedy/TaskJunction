@@ -31,9 +31,16 @@ class db_manager {
     static QVector<QVariant> get_data(const QSqlRecord &record);
     QSqlRecord select_info_by_id(const QString &query_name, quint32 key_value);
     QString m_schema = "public";
+    bool check_user_password(const QString &login, const QString &password);
+    quint32 get_user_id_by_name(const QString &name);
+    quint32 insert_user(const QString &login, const QString &password);
 
-public: static void fill_query_name_to_sql_command();
-public: static QMap<QString, QString> query_name_to_sql_command;
+public:
+    static void fill_query_name_to_sql_command();
+
+public:
+    static QMap<QString, QString> query_name_to_sql_command;
+
 public:
     db_manager(
         QString database_name,
@@ -47,11 +54,16 @@ public:
 
     void set_schema(const QString &name);
     void test_foo();
-//    void create_schema(const QString &schema_name);
-    quint32 insert_user(const QString &name);
-    quint32 insert_board(quint32 user_id, const QString &name, const QString &description);
-    quint32 insert_list(int board_id, const QString &name, const QString &description);
-    quint32 insert_card(int list_id, const QString &name, const QString &description);
+    //    void create_schema(const QString &schema_name);
+    quint32 insert_board(
+        quint32 user_id,
+        const QString &name,
+        const QString &description
+    );
+    quint32
+    insert_list(int board_id, const QString &name, const QString &description);
+    quint32
+    insert_card(int list_id, const QString &name, const QString &description);
     quint32 insert_tag(const QString &name);
     bool pin_tag_to_card(int card_id, int tag_id);
     bool update_command(
@@ -78,49 +90,9 @@ public:
 
     bool check_user_rights(quint32 user_id, quint32 board_id);
     quint32 get_sequence_last_value(const QString &sequence);
+
+    quint32 authorize_user(const QString &login, const QString &password);
 };
-
-//QMap<QString, QString> query_name_to_sql_command;
-
-/*template<class U>
-class abstract_element {
-private:
-    template<class T>
-    std::function<void (T&, QVariant)> set_board_id = [&](T& object, const
-QVariant &value){ object.board_id = value.toInt();
-    };
-    template<class T>
-    std::function<void (T&, QVariant)> set_list_id = [&](T& object, const
-QVariant &value){ object.list_id = value.toInt();
-    };
-    template<class T>
-    std::function<void (T&, QVariant)> set_card_id = [&](T& object, const
-QVariant &value){ object.card_id = value.toInt();
-    };
-    template<class T>
-    std::function<void (T&, QVariant)> set_name = [&](T& object, const QVariant
-&value){ object.name = value.toString();
-    };
-    template<class T>
-    std::function<void (T&, QVariant)> set_description = [&](T& object, const
-QVariant &value){ object.description = value.toString();
-    };
-public:
-    std::map<QString, std::function<void (T& object, const QVariant &value)>>
-field_name_to_func = {
-        {"board_id", set_board_id},
-        {"name", set_name}
-    };
-
-    explicit board(quint32 id) {
-    QSqlRecord rec = select_info_by_id("board_signature", "board_id", id);
-    for (int i = 0; i < rec.count(); ++i) {
-        QSqlField field = rec.field(i);
-        abstract_element<board> ae;
-        ae.field_name_to_func[field.name()](*this, field.value());
-    }
-};
-}; */
 
 }  // namespace database
 

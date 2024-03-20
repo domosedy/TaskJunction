@@ -28,7 +28,7 @@ ApplicationWindow {
             Layout.preferredWidth: root.width / 6
             Layout.preferredHeight: root.height / 12
             Text {
-                text: "Log in"
+                text: "Remote"
                 anchors.centerIn: parent
                 font.family: "Helvetica"
                 font.pointSize: 12
@@ -36,7 +36,13 @@ ApplicationWindow {
             }
             onClicked: {
                 start_menu.visible = false
-                loader.source = "Authorization.qml"
+                if (!mainClient.is_authorized) {
+                    loader.source = "Authorization.qml"
+                }
+                else {
+                    mainClient.prepare_remote_board_select_menu();
+                    loader.source = "BoardSelect.qml"
+                }
                 loader.active = true
             }            
         }
@@ -45,17 +51,17 @@ ApplicationWindow {
             Layout.preferredWidth: root.width / 6
             Layout.preferredHeight: root.height / 12                
             Text {
-                text: "Boards"
+                text: "Local"
                 anchors.centerIn: parent
                 font.family: "Helvetica"
                 font.pointSize: 12
                 color: "#514e92"
             }
             onClicked: {
-                start_menu.visible = false
+                start_menu.visible = false   
+                mainClient.prepare_local_board_select_menu()
+                loader.source = "BoardSelect.qml"
                 loader.active = true
-                loader.source = "Client.qml"   
-                mainClient.create_board()
             }
         } 
         Button {  

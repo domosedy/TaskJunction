@@ -1,7 +1,7 @@
 <RCC>
     <qresource>
         <file alias="main.qml">../qml/main.qml</file>
-        <file alias="Client.qml">../qml/Client.qml</file>
+        <file alias="Board.qml">../qml/Board.qml</file>
         <file alias="Card.qml">../qml/Card.qml</file>
         <file alias="List.qml">../qml/List.qml</file>
         <file alias="Style.qml">../qml/Style.qml</file> 

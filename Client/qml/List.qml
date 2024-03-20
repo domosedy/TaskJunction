@@ -132,7 +132,7 @@ Component {
                                 (parent.hovered ? Qt.darker(style.primaryColor, 1.4) : style.primaryColor)
                     }            
                     anchors.verticalCenter: parent.verticalCenter
-                    onClicked: deleteRequest(index)
+                    onClicked: mainClient.deleteList(index)
                 }  
             }          
         }
@@ -155,9 +155,6 @@ Component {
                 spacing: 5
                 delegate: Card {}               
             }             
-        }
-        Component.onCompleted: {
-            deleteRequest.connect(listview.model.delete_list);
         }
     }
 }

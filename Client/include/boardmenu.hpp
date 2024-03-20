@@ -16,10 +16,12 @@ public:
         const override;
     int get_count();
     void create_board(QString &name, QString &description, quint32 id);
+    void add_board(const board &board);
     quint32 get_id(int board_index) const;
 signals:
     void countChanged();
     void request_board(int index);
+    void load_board(int index);
 
 private:
     QVector<board> boards;

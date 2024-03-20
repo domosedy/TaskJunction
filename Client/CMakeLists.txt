@@ -27,7 +27,6 @@ set(PROJECT_SOURCES
         src/client.cpp
         src/boardmodel.cpp
         src/listmodel.cpp
-        src/json_parser.cpp
         src/boardmenu.cpp
         src/qml.qrc
         include/client.hpp
