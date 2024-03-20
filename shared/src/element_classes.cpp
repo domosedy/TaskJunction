@@ -88,12 +88,12 @@ std::string board::to_json() const {
 }
 
 
-// std::string ErrorJson::to_json() const {
-//     std::stringstream ss;
-//     ss << "{ \"type\": \"error\", \"msg\": \"" << error_message << "\" }";
+std::string error::to_json() const {
+    std::stringstream ss;
+    ss << "{ \"type\": \"error\", \"msg\": \"" << error_message << "\" }";
 
-//     return ss.str();
-// }
+    return ss.str();
+}
 
 std::string login::to_json() const {
     std::stringstream ss;
@@ -107,15 +107,7 @@ std::string login::to_json() const {
 
     ss << "\", \"boards\": [";
 
-    for (qsizetype i = 0; i + 1 < m_boards.size(); ++i) {
-        ss << "{ \"name\": \"" << m_boards[i].second.toStdString()
-            << "\", \"id\": " << m_boards[i].first << "}, "; 
-    }
-
-    if (!m_boards.empty()) {
-        ss << "{ \"name\": \"" << m_boards.back().second .toStdString()
-            << "\", \"id\": " << m_boards.back().first << "}"; 
-    }
+    ss << array_to_json(m_boards);
 
     ss << "]}";
     return ss.str();

@@ -67,8 +67,9 @@ static std::optional<create_query> parseCreateQuery(const json &json_data) {
     auto parent_id = get_int_field_data(json_data, "parent-id");
     auto value_type = get_string_field_data(json_data, "type");
     auto value_name = get_string_field_data(json_data, "name");
+    auto value_description = get_string_field_data(json_data, "description");
     
-    if (!parent_id.has_value() || !value_type.has_value() || !value_name.has_value()) {
+    if (!parent_id.has_value() || !value_type.has_value() || !value_name.has_value() || !value_description.has_value()) {
         return std::nullopt;
     }
 
@@ -87,13 +88,7 @@ static std::optional<login_query> parseLoginQuery(const json &json_data) {
 }
 
 static std::optional<get_boards_info_query> parseGetQuery(const json &parsedData) {
-    auto id = get_int_field_data(parsedData, "id");
-
-    if (!id.has_value()) {
-        return std::nullopt;
-    }
-
-    return get_boards_info_query{id.value()};
+    return get_boards_info_query{};
 }
 
 std::optional<query_type> parseData(const QString &data) {
@@ -101,6 +96,7 @@ std::optional<query_type> parseData(const QString &data) {
     try {
         parsedData = json::parse(data.toStdString());
     } catch (...) {
+        rDebug() << "Bebra";
         return std::nullopt;
     }
 

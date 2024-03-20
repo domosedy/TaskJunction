@@ -427,31 +427,3 @@ QVector<tag> db_manager::get_card_tags(quint32 card_id) {
 }
 
 }  // namespace database
-
-// int main(int argc, char *argv[]) {
-//     using namespace database;
-//     db_manager db_manag(argv[1], argv[2], argv[3], "");
-//     db_manager::fill_query_name_to_sql_command();
-//     // db_manag.set_schema("test_schema");
-// //    fill_query_name_to_sql_command();
-//     db_manag.print_all_tables();
-//    std::cout << std::boolalpha << db_manag.check_user_rights(2, 2);
-//        db_manag.insert_board(1, "board_name", "description");
-//        db_manag.insert_list(1, "list_name", "test3");
-//        db_manag.insert_card(1, "card_name", "test");
-//        db_manag.insert_tag("tag_name");
-//        db_manag.pin_tag_to_card(1, 1);
-//    board bord(db_manag.select_board(1));
-//    auto lists(db_manag.get_board_lists(1));
-//    for (const auto &list : lists) {
-//        list.print_data();
-//    }
-//        db_manag.update_command(
-//            LIST_TABLE_NAME,  "board_id", LIST_PRIMARY_KEY, "10",2
-//        );
-//    user usr = db_manag.select_user(10);
-//    usr.print_data();
-//        board boad = db_manag.select_board(1);
-//        db_manag.delete_command(LIST_TABLE_NAME, LIST_PRIMARY_KEY, 3);
-//     return 0;
-// }

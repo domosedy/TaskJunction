@@ -17,18 +17,18 @@ void ClientSocket::sendData(const QByteArray &data) {
 }
 
 void ClientSocket::readData() {
-    QDataStream size_data = socket->read(2);
+    QDataStream size_data = socket->readLine();
     quint16 size;
 
     size_data >> size;
     rDebug() << "readed size " << size;
 
-    QByteArray data = socket->read(size);
+    QByteArray data = socket->readLine();
     
     QString json_request = data.toStdString().c_str();
 
-    rDebug() << "Received from " << socket->peerAddress().toString() << size
-                << " " << json_request;
+    rDebug() << "Received from " << socket->peerAddress().toString() 
+            << " " << json_request;
 
     auto value = parseData(json_request);
 

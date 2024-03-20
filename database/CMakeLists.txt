@@ -6,14 +6,15 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Network Sql)
 find_package(PostgreSQL REQUIRED)
 
-add_executable(database src/database.cpp)
+add_executable(database ../shared/src/element_classes.cpp src/database.cpp)
 
+target_include_directories(database PUBLIC ../shared/include)
 target_include_directories(database PUBLIC include)
 target_link_libraries(database PRIVATE Qt6::Network)
 target_link_libraries(database PRIVATE Qt6::Core)

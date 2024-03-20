@@ -52,6 +52,7 @@ struct list {
 
 struct board {
     quint32 m_board_id;
+    quint32 m_user_id;
     QString m_name;
     QString m_description;
     QVector<list> m_lists;
@@ -64,7 +65,7 @@ struct board {
 
 struct login {
     bool m_response;
-    QVector<std::pair<quint32, QString>> m_boards;
+    QVector<board> m_boards;
 
     std::string to_json() const;
 };
@@ -78,6 +79,12 @@ struct user {
     void print_data() const {
         qDebug() << m_user_id << m_name;
     }
+};
+
+struct error {
+    std::string error_message;
+
+    std::string to_json() const;
 };
 
 #endif  // ELEMENT_CLASSES_HPP_
