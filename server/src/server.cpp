@@ -159,10 +159,13 @@ QString Server::execute_create_query(const create_query &query, quint32 user_id)
 }
 
 std::pair<QString, quint32> Server::execute_login_query(const login_query &query) {
-    auto id = db.insert_user(query.user_name.c_str());
-    login response{true};
+    auto id = db.authorize_user(query.user_name.c_str(), query.password.c_str());
+    login response{id != 0};
+
     rDebug() << "user id is: " << id;
-    response.m_boards = db.get_user_boards(id);
+    if (response.m_response) {
+        response.m_boards = db.get_user_boards(id);
+    }
 
     return {response.to_json().c_str(), id};
 }

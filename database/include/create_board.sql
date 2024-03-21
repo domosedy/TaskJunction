@@ -1,6 +1,11 @@
+CREATE TABLE user_authorization_data(
+login varchar(50) PRIMARY KEY,
+password text
+);
+
 CREATE TABLE user_signature(
 user_id serial PRIMARY KEY,
-name    varchar(50)
+name    varchar(50) REFERENCES user_authorization_data ON DELETE CASCADE
 );
 
 CREATE TABLE board_signature(
