@@ -112,7 +112,6 @@ QString Server::execute_update_query(const update_query &query) {
     auto result = db.update_command(
                     (query.updated_type + "_signature").c_str(),
                     query.value_name.c_str(),
-                    (query.updated_type + "_id").c_str(),
                     query.new_value.c_str(),
                     query.value_id);
 
@@ -123,7 +122,6 @@ QString Server::execute_update_query(const update_query &query) {
 QString Server::execute_delete_query(const delete_query &query) {
     auto result = db.delete_command(
                     (query.value_type + "_signature").c_str(),
-                    (query.value_type + "_id").c_str(),
                     query.value_id);
 
     return result ? error{"Ok"}.to_json().c_str() :
@@ -137,7 +135,12 @@ QString Server::execute_create_query(const create_query &query, quint32 user_id)
 
     bool result = true;
     rDebug() << user_id;
+    rDebug() << query.value_type;
     if (query.value_type == "board") {
+        rDebug() << "Hello from board";
+        rDebug() << query.value_name;
+        rDebug() << query.value_description;
+
         result = db.insert_board(
             user_id, 
             query.value_name.c_str(), 
@@ -165,6 +168,7 @@ std::pair<QString, quint32> Server::execute_login_query(const login_query &query
     rDebug() << "user id is: " << id;
     if (response.m_response) {
         response.m_boards = db.get_user_boards(id);
+        rDebug() << response.m_boards.size();
     }
 
     return {response.to_json().c_str(), id};
