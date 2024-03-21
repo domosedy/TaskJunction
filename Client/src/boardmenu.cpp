@@ -37,7 +37,7 @@ QVariant BoardMenu::data(const QModelIndex &index, int role) const {
 
 void BoardMenu::create_board(QString &name, QString &description, quint32 id) {
     beginInsertRows(QModelIndex(), boards.size(), boards.size());
-    boards.append(board(name, description, id));
+    boards.append(board(id,0,name, description));
     endInsertRows();
 
     emit countChanged();

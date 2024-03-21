@@ -8,7 +8,7 @@ Component {
     id: card
     Rectangle {
         id: card_main
-        signal deleteRequest(int index)
+        signal deleteRequest(card_index : int)
         color: "white"
         width: style.cardWidth
         height: style.cardHeight
@@ -81,7 +81,7 @@ Component {
                     onClicked: {
                         card_window.close()
                         //deleteRequest(index)
-                        mainClient.delete_card(listMain.index, index) // TODO: test if it works as expected
+                        listMain.deleteTriggered(index)
                     }
                 }
 
@@ -93,7 +93,7 @@ Component {
             }
         }
         Component.onCompleted: {
-            deleteRequest.connect(listmodel.delete_card);
+            deleteRequest.connect(listMain.deleteTriggered)
         }
     }
 }   

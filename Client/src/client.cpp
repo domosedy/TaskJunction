@@ -132,7 +132,7 @@ void Client::prepare_remote_board_select_menu(
 void Client::request_board(int index) {
     quint32 board_id = m_board_menu->get_id(index);
     if (m_mode == ClientMode::Local) {
-        const board &requested_board = db.select_board(board_id);
+        const board &requested_board = db.get_full_board(board_id);
         m_current_board = new BoardModel(this, requested_board);
         emit boardChanged();
     } else {
@@ -193,7 +193,7 @@ void Client::delete_list(int list_index) {
     quint32 list_id = m_current_board->get_list_id(list_index);
     if (m_mode == ClientMode::Local) {
         // db.delete_list(list_id);  // TODO: update when will be correct db api
-        db.delete_command("list_signature", "id", list_id);
+        db.delete_command("list_signature", list_id);
     } else {
         std::string request = parser::delete_request(list_id, "list");
         write(request);
@@ -206,7 +206,7 @@ void Client::delete_card(int list_index, int card_index) {
     quint32 card_id = m_current_board->get_card_id(list_index, card_index);
     if (m_mode == ClientMode::Local) {
         // db.delete_card(card_id);  // TODO: update when will be correct db api
-        db.delete_command("card_signature", "id", card_id);
+        db.delete_command("card_signature", card_id);
     } else {
         std::string request = parser::delete_request(card_id, "card");
         write(request);

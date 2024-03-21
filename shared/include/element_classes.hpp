@@ -19,8 +19,7 @@ struct tag {
     QString m_name;
 
     tag() = default;
-    explicit tag(QVector<QVariant> data);
-    tag(QString name, quint32 id = 0);
+    explicit tag(quint32 tag_id, QString name);
     std::string to_json() const;
 };
 
@@ -32,7 +31,7 @@ struct card {
     QVector<tag> m_tags;
 
     card() = default;
-    explicit card(QVector<QVariant> data);
+    explicit card(quint32 card_id, quint32 list_id, QString name, QString description);
     card(QString name, QString description, quint32 id = 0, quint32 list_id = 0);
     std::string to_json() const;
 };
@@ -45,7 +44,8 @@ struct list {
     QVector<card> m_cards;
 
     list() = default;
-    explicit list(QVector<QVariant> data);
+    explicit list(quint32 list_id, quint32 board_id, QString name, QString description);
+
     list(QString name, QString description, quint32 id = 0, quint32 board_id = 0);
     std::string to_json() const;
 };
@@ -58,14 +58,14 @@ struct board {
     QVector<list> m_lists;
 
     board() = default;
-    explicit board(QVector<QVariant> data);
-    board(QString name, QString description, quint32 id = 0, quint32 user_id = 0);
+    explicit board(quint32 board_id, quint32 user_id, QString name, QString description);
+    board(QString name, QString description, quint32 id = 0);
     std::string to_json() const;
 };
 
 struct login {
     bool m_response;
-    QVector<std::pair<quint32, QString>> m_boards;
+    QVector<board> m_boards;
 
     std::string to_json() const;
 };
@@ -79,6 +79,12 @@ struct user {
     void print_data() const {
         qDebug() << m_user_id << m_name;
     }
+};
+
+struct error {
+    std::string error_message;
+
+    std::string to_json() const;
 };
 
 #endif  // ELEMENT_CLASSES_HPP_

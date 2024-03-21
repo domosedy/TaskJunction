@@ -15,7 +15,7 @@ ListModel::ListModel(QObject *parent, const nlohmann::json &list_json)
         QString card_name = QString::fromStdString(card["name"]);
         QString card_description = QString::fromStdString(card["description"]);
         quint32 card_id = card["id"];
-        m_cards.emplace_back(card_name, card_description, card_id);
+        m_cards.emplace_back(card_id, 0, card_name, card_description);
     }
 }
 
@@ -35,7 +35,7 @@ ListModel::ListModel(
     quint32 id,
     quint32 board_id
 )
-    : QAbstractListModel(parent), list(name, description, id, board_id) {
+    : QAbstractListModel(parent), list(id, board_id, name, description) {
 }
 
 int ListModel::rowCount(const QModelIndex &parent) const {
@@ -75,7 +75,7 @@ void ListModel::create_card(QString &name, QString &description) {
     }
 
     beginInsertRows(QModelIndex(), m_cards.size(), m_cards.size());
-    m_cards.append(card(name, description));
+    m_cards.append(card(0,0,name, description));
     endInsertRows();
 
     emit countChanged();

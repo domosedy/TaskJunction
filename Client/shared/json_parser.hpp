@@ -72,7 +72,7 @@ inline board parse_board(const json &object) {
     QString name = QString::fromStdString(object["name"]);
     QString description = QString::fromStdString(object["description"]);
     quint32 id = object["id"];
-    return board(name, description, id);
+    return board(id, 0, name, description);
 }
 
 // inline Card parse_card(const json& card) {

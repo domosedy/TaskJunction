@@ -12,7 +12,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt6 REQUIRED COMPONENTS Core Network Sql)
 find_package(PostgreSQL REQUIRED)
 
-add_executable(database database.cpp)
+add_executable(database src/database.cpp
+        src/database_main.cpp
+        include/element_classes.hpp
+        src/element_classes.cpp)
 
 target_include_directories(database PUBLIC include)
 target_link_libraries(database PRIVATE Qt6::Network)

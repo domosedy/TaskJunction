@@ -7,11 +7,14 @@ import "qrc:"
 Component {
     Rectangle {
         id: listMain 
-        signal deleteRequest(int index)
         y: 20 
         width: style.listWidth
         height: Math.max(90, Math.min((listmodel.count+1) * 45,mainarea.height-40))
         color: style.listBackgroundColor
+        signal deleteTriggered(card_index : int)
+        onDeleteTriggered: (card_index) => {
+            mainClient.delete_card(index, card_index)
+        }
         Popup {
             id: create_card
             width: 210

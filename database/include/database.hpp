@@ -14,11 +14,11 @@ const QString CARD_TABLE_NAME = "card_signature";
 const QString CARD_PRIMARY_KEY = "card_id";
 const QString TAG_TABLE_NAME = "tag_signature";
 const QString TAG_PRIMARY_KEY = "tag_id";
-const QString USER_ID_SEQUENCE = "user_signature_user_id_seq";
-const QString BOARD_ID_SEQUENCE = "board_signature_board_id_seq";
-const QString LIST_ID_SEQUENCE = "list_signature_list_id_seq";
-const QString CARD_ID_SEQUENCE = "card_signature_card_id_seq";
-const QString TAG_ID_SEQUENCE = "tag_signature_tag_id_seq";
+const QString USER_ID_SEQUENCE = "user_signature_id_seq";
+const QString BOARD_ID_SEQUENCE = "board_signature_id_seq";
+const QString LIST_ID_SEQUENCE = "list_signature_id_seq";
+const QString CARD_ID_SEQUENCE = "card_signature_id_seq";
+const QString TAG_ID_SEQUENCE = "tag_signature_id_seq";
 
 const QString QT_DATABASE_DRIVER = "QPSQL";
 
@@ -35,12 +35,8 @@ class db_manager {
     quint32 get_user_id_by_name(const QString &name);
     quint32 insert_user(const QString &login, const QString &password);
 
-public:
-    static void fill_query_name_to_sql_command();
-
-public:
-    static QMap<QString, QString> query_name_to_sql_command;
-
+public: static void fill_query_name_to_sql_command();
+public: static QMap<QString, QString> query_name_to_sql_command;
 public:
     db_manager(
         QString database_name,
@@ -54,22 +50,15 @@ public:
 
     void set_schema(const QString &name);
     void test_foo();
-    //    void create_schema(const QString &schema_name);
-    quint32 insert_board(
-        quint32 user_id,
-        const QString &name,
-        const QString &description
-    );
-    quint32
-    insert_list(int board_id, const QString &name, const QString &description);
-    quint32
-    insert_card(int list_id, const QString &name, const QString &description);
+//    void create_schema(const QString &schema_name);
+    quint32 insert_board(quint32 user_id, const QString &name, const QString &description);
+    quint32 insert_list(int board_id, const QString &name, const QString &description);
+    quint32 insert_card(int list_id, const QString &name, const QString &description);
     quint32 insert_tag(const QString &name);
     bool pin_tag_to_card(int card_id, int tag_id);
     bool update_command(
         const QString &table_name,
         const QString &updating_field_name,
-        const QString &key_field_name,
         const QString &new_value,
         quint32 key_value
     );
@@ -80,7 +69,6 @@ public:
     tag select_tag(quint32 id);
     bool delete_command(
         const QString &table_name,
-        const QString &key_field_name,
         quint32 key_value
     );
     QVector<board> get_user_boards(quint32 user_id);
@@ -92,6 +80,9 @@ public:
     quint32 get_sequence_last_value(const QString &sequence);
 
     quint32 authorize_user(const QString &login, const QString &password);
+
+    board get_full_board(quint32 board_id);
+    //  TODO get_full_board();
 };
 
 }  // namespace database
