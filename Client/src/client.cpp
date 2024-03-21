@@ -11,10 +11,11 @@
 
 Client::Client(QObject *parent)
     : QObject(parent),
-      db(database::db_manager("postgres", "postgres", "localhost", "1")) {
+      db(database::db_manager("local_boards", "postgres", "localhost", "1")) {
     m_socket = new QTcpSocket(this);
 
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(readData()));
+    m_local_id = db.authorize_user("default", "default");
 }
 
 void Client::write(std::string &data) {
@@ -97,9 +98,6 @@ void Client::prepare_local_board_select_menu() {
         return;
     }
     m_local_menu = new BoardMenu(this);
-    connect(
-        m_local_menu, SIGNAL(load_boaard(int)), this, SLOT(load_board(int))
-    );
     QVector<board> avaliable_boards = db.get_user_boards(m_local_id);
     for (const auto &board : avaliable_boards) {
         m_local_menu->add_board(board);
@@ -144,6 +142,8 @@ void Client::request_board(int index) {
 }
 
 void Client::create_list(QString &name) {
+    if (name == "")
+        name = "New list";  
     if (m_mode == ClientMode::Local) {
         quint32 board_id = m_current_board->m_board_id;
         quint32 list_id = db.insert_list(board_id, name, "");
@@ -157,6 +157,10 @@ void Client::create_list(QString &name) {
 }
 
 void Client::create_card(int list_index, QString &name, QString &description) {
+    if (name == "")
+        name = "New card";
+    if (description == "")
+        description = "smth";
     if (m_mode == ClientMode::Local) {
         quint32 list_id = m_current_board->get_list_id(list_index);
         quint32 card_id = db.insert_card(list_id, name, description);
@@ -170,6 +174,11 @@ void Client::create_card(int list_index, QString &name, QString &description) {
 }
 
 void Client::create_board(QString &name, QString &description) {
+    if (name == "")
+        name = "New board";
+    if (description == "")
+        description = "smth";
+
     if (m_mode == ClientMode::Local) {
         quint32 board_id = db.insert_board(m_local_id, name, description);
         m_board_menu->create_board(name, description, board_id);
@@ -184,7 +193,7 @@ void Client::delete_list(int list_index) {
     quint32 list_id = m_current_board->get_list_id(list_index);
     if (m_mode == ClientMode::Local) {
         // db.delete_list(list_id);  // TODO: update when will be correct db api
-        db.delete_command("list_signature", "list", list_id);
+        db.delete_command("list_signature", "id", list_id);
     } else {
         std::string request = parser::delete_request(list_id, "list");
         write(request);
@@ -197,7 +206,7 @@ void Client::delete_card(int list_index, int card_index) {
     quint32 card_id = m_current_board->get_card_id(list_index, card_index);
     if (m_mode == ClientMode::Local) {
         // db.delete_card(card_id);  // TODO: update when will be correct db api
-        db.delete_command("card_signature", "card", card_id);
+        db.delete_command("card_signature", "id", card_id);
     } else {
         std::string request = parser::delete_request(card_id, "card");
         write(request);

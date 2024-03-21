@@ -5,10 +5,6 @@
 #include "listmodel.hpp"
 
 BoardModel::BoardModel(QObject *parent) : QAbstractListModel(parent) {
-    connect(
-        parent, SIGNAL(create_card(quint32, card &)), this,
-        SLOT(create_card(quint32, card &))
-    );
 }
 
 BoardModel::BoardModel(QObject *parent, const nlohmann::json &board_json)

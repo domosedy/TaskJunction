@@ -24,8 +24,9 @@ db_manager::db_manager(
     m_database.setPassword(m_password);
     if (!m_database.open()) {
         qDebug() << "Cannot open database:" << m_database.lastError();
+        return;
     }
-    //    fill_query_name_to_sql_command();
+    fill_query_name_to_sql_command();
 }
 
 QMap<QString, QString> db_manager::query_name_to_sql_command;

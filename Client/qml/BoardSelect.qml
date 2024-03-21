@@ -152,22 +152,27 @@ Rectangle {
                 height: 100;
                 color: "white"
                 anchors.horizontalCenter: parent.horizontalCenter
-                Text {
-                    text: name
-                    font.family: "Courier"
-                    font.pointSize: 16
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.leftMargin: 5
+                ColumnLayout {
+                    width: parent.width
+                    height: parent.height
+                    anchors.top: parent.top
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 10
+                    Text {
+                        text: name
+                        font.family: "Courier"
+                        font.pointSize: 16
+                        Layout.preferredWidth: parent.width - 20
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+                    Text {
+                        text: description
+                        font.family: "Courier"
+                        font.pointSize: 16
+                        Layout.preferredWidth: parent.width - 20
+                        Layout.alignment: Qt.AlignHCenter
+                    }   
                 }
-                Text {
-                    text: description
-                    font.family: "Courier"
-                    font.pointSize: 16
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.rightMargin: 5
-                }   
                 MouseArea {
                     anchors.fill: parent
                     onDoubleClicked: {

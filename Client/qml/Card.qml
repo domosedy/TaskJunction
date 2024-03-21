@@ -81,7 +81,7 @@ Component {
                     onClicked: {
                         card_window.close()
                         //deleteRequest(index)
-                        mainClient.deleteCard(listMain.index, index) // TODO: test if it works as expected
+                        mainClient.delete_card(listMain.index, index) // TODO: test if it works as expected
                     }
                 }
 

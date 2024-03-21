@@ -132,7 +132,7 @@ Component {
                                 (parent.hovered ? Qt.darker(style.primaryColor, 1.4) : style.primaryColor)
                     }            
                     anchors.verticalCenter: parent.verticalCenter
-                    onClicked: mainClient.deleteList(index)
+                    onClicked: mainClient.delete_list(index)
                 }  
             }          
         }

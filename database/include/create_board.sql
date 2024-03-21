@@ -1,6 +1,3 @@
-CREATE SCHEMA project_template;
-SET search_path TO project_template;
-
 CREATE TABLE
 user_authorization_data(login varchar(50) PRIMARY KEY, password text);
 
