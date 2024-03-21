@@ -56,6 +56,7 @@ public:
     quint32 insert_card(int list_id, const QString &name, const QString &description);
     quint32 insert_tag(const QString &name);
     bool pin_tag_to_card(int card_id, int tag_id);
+    bool unpin_tag_from_card(int card_id, int tag_id);
     bool update_command(
         const QString &table_name,
         const QString &updating_field_name,
@@ -82,7 +83,6 @@ public:
     quint32 authorize_user(const QString &login, const QString &password);
 
     board get_full_board(quint32 board_id);
-    //  TODO get_full_board();
 };
 
 }  // namespace database

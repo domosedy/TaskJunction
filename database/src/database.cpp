@@ -80,6 +80,9 @@ void db_manager::fill_query_name_to_sql_command() {
     query_name_to_sql_command["delete_command"] =
                 "DELETE FROM %1.%2 WHERE id = :key_value;";
 
+    query_name_to_sql_command["delete_from_card_to_tags"] =
+                "DELETE FROM %1.card_to_tags WHERE card_id = :card_id AND tag_id = :tag_id;";
+
     query_name_to_sql_command["create_schema"] =
                 "CREATE SCHEMA %1;"
                 "DO $$DECLARE tbl_record RECORD;"
@@ -346,6 +349,18 @@ bool db_manager::delete_command(
     query.bindValue(":key_value", key_value);
     if (!query.exec()) {
         qDebug() << "delete_command: " << m_database.lastError();
+        return false;
+    }
+    return true;
+}
+
+bool db_manager::unpin_tag_from_card(int card_id, int tag_id) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["delete_from_card_to_tags"].arg(m_schema));
+    query.bindValue(":card_id", card_id);
+    query.bindValue(":tag_id", tag_id);
+    if (!query.exec()) {
+        qDebug() << "unpin_tag_from_card: " << m_database.lastError();
         return false;
     }
     return true;

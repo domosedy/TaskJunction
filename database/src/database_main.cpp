@@ -20,13 +20,10 @@ int main(int argc, char *argv[]) {
 
 //    qDebug() << db_manager.authorize_user("username", "password");
 //    db_manager.insert_board(1, "board_name", "description");
-    db_manager.insert_list(2, "list_name", "test3");
-    db_manager.insert_card(8, "card_name", "test");
-    db_manager.insert_card(10, "card_name", "test");
-    db_manager.insert_card(8, "card_name", "test");
-    db_manager.insert_card(10, "card_name", "test");
+//    db_manager.insert_list(1, "list_name", "test3");
 //    db_manager.insert_tag("tag_name");
-//    db_manager.pin_tag_to_card(1, 1);
+//    db_manager.pin_tag_to_card(10, 1);
+//    db_manager.unpin_tag_from_card(10, 1);
 //    board board(db_manager.select_board(1));
 //    auto lists(db_manager.get_board_lists(1));
 //    for (const auto &list : lists) {
