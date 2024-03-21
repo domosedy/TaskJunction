@@ -477,4 +477,13 @@ QVector<tag> db_manager::get_card_tags(quint32 card_id) {
     return result;
 }
 
+board db_manager::get_full_board(quint32 board_id) {
+    board board = select_board(board_id);
+    board.m_lists = get_board_lists(board_id);
+    for (auto &list: board.m_lists) {
+        list.m_cards = get_list_cards(list.m_list_id);
+    }
+    return board;
+}
+
 }  // namespace database

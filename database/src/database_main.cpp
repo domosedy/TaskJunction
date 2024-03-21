@@ -20,15 +20,18 @@ int main(int argc, char *argv[]) {
 
 //    qDebug() << db_manager.authorize_user("username", "password");
 //    db_manager.insert_board(1, "board_name", "description");
-//    db_manager.insert_list(1, "list_name", "test3");
-//    db_manager.insert_card(1, "card_name", "test");
+    db_manager.insert_list(2, "list_name", "test3");
+    db_manager.insert_card(8, "card_name", "test");
+    db_manager.insert_card(10, "card_name", "test");
+    db_manager.insert_card(8, "card_name", "test");
+    db_manager.insert_card(10, "card_name", "test");
 //    db_manager.insert_tag("tag_name");
 //    db_manager.pin_tag_to_card(1, 1);
-    board board(db_manager.select_board(1));
-    auto lists(db_manager.get_board_lists(1));
-    for (const auto &list : lists) {
-        list.print_data();
-    }
+//    board board(db_manager.select_board(1));
+//    auto lists(db_manager.get_board_lists(1));
+//    for (const auto &list : lists) {
+//        list.print_data();
+//    }
 //        db_manager.update_command(
 //            LIST_TABLE_NAME,  "board_id", LIST_PRIMARY_KEY, "10",2
 //        );
@@ -38,6 +41,13 @@ int main(int argc, char *argv[]) {
     //    db_manager.delete_command(LIST_TABLE_NAME, LIST_PRIMARY_KEY, 3);
 //    db_manager.delete_command("list_signature", "list_id", 4);
 //    db_manager.delete_command("user_signature", "user_id", 1);
-
+//    db_manager.delete_command("card_signature", 1);
+    board board = db_manager.get_full_board(2);
+    for (const auto &list: board.m_lists) {
+        qDebug() << "list:" << list.m_list_id;
+        for (const auto &card: list.m_cards) {
+            qDebug() << "    card:" << card.m_card_id;
+        }
+    }
     return 0;
 }

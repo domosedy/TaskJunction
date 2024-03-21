@@ -81,6 +81,7 @@ public:
 
     quint32 authorize_user(const QString &login, const QString &password);
 
+    board get_full_board(quint32 board_id);
     //  TODO get_full_board();
 };
 
