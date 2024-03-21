@@ -59,7 +59,6 @@ public:
     bool update_command(
         const QString &table_name,
         const QString &updating_field_name,
-        const QString &key_field_name,
         const QString &new_value,
         quint32 key_value
     );
@@ -70,7 +69,6 @@ public:
     tag select_tag(quint32 id);
     bool delete_command(
         const QString &table_name,
-        const QString &key_field_name,
         quint32 key_value
     );
     QVector<board> get_user_boards(quint32 user_id);
@@ -82,6 +80,8 @@ public:
     quint32 get_sequence_last_value(const QString &sequence);
 
     quint32 authorize_user(const QString &login, const QString &password);
+
+    //  TODO get_full_board();
 };
 
 }  // namespace database
