@@ -100,7 +100,7 @@ void Server::execute_query(uint user_id, const query_type &query) {
             result = res.first.toStdString();
             break;
         case RequestType::GET_BOARDS_INFO:
-            result = execute_get_query(client_id).toStdString();
+            result = execute_get_query(std::get<get_boards_info_query>(query)).toStdString();
         default:
             result = std::move(error{"An error occured"}.to_json());        
     }
@@ -174,14 +174,13 @@ std::pair<QString, quint32> Server::execute_login_query(const login_query &query
     return {response.to_json().c_str(), id};
 }
 
-QString Server::execute_get_query(quint32 client_id) {
-    if (client_id == 0) {
-        return error{"You are not authorized"}.to_json().c_str();
-    }
-
-    board result = db.select_board(client_id);
-    
-    result.m_lists = db.get_board_lists(client_id);
+QString Server::execute_get_query(const get_boards_info_query &query) {
+    // if (query.id == 0) {
+    //     return error{"You are not authorized"}.to_json().c_str();
+    // }
+    board result = db.select_board(query.id);
+    rDebug() << query.id;
+    result.m_lists = db.get_board_lists(query.id);
     for (auto &list : result.m_lists) {
         list.m_cards = db.get_list_cards(list.m_list_id);
         

@@ -25,7 +25,7 @@ db_manager::db_manager(
     if (!m_database.open()) {
         qDebug() << "Cannot open database:" << m_database.lastError();
     }
-//    fill_query_name_to_sql_command();
+    fill_query_name_to_sql_command();
 }
 
 QMap<QString, QString> db_manager::query_name_to_sql_command;
@@ -96,7 +96,7 @@ void db_manager::fill_query_name_to_sql_command() {
                 "SELECT %2 FROM %1.%3 WHERE %4 = :id";
 
     query_name_to_sql_command["select_last_value"] =
-                "select currval(:sequence_name);";
+                "SELECT last_value FROM %1";
 
     query_name_to_sql_command["check_user_rights"] =
                 "SELECT exists (SELECT * FROM %1.board_signature WHERE id = :board_id AND user_id = :user_id LIMIT 1);";
@@ -131,7 +131,7 @@ void db_manager::drop_all_tables() {
     foreach (QString str, all_tables) {
         QSqlQuery query(m_database);
         if (!query.exec(command.arg(str))) {
-            qDebug() << m_database.lastError();
+            qDebug() << "drop_all_tables:" << m_database.lastError();
         }
     }
 }
@@ -149,7 +149,7 @@ void db_manager::clear_all_tables() {
     foreach (QString str, all_tables) {
         QSqlQuery query(m_database);
         if (!query.exec(command.arg(str))) {
-            qDebug() << m_database.lastError();
+            qDebug() << "clear_all_tables" << m_database.lastError();
         }
     }
 }
@@ -161,10 +161,9 @@ void db_manager::set_schema(const QString &name) {
 quint32 db_manager::get_sequence_last_value(const QString &sequence) {
     //  TODO: cannot explicitly set a schema
     QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["select_last_value"]);
-    query.bindValue(":sequence_name", sequence);
+    query.prepare(query_name_to_sql_command["select_last_value"].arg(sequence));
     if (!query.exec()) {
-        qDebug() << m_database.lastError();
+        qDebug() << "get_sequence_last_value:" << m_database.lastError();
         return 0;
     }
     query.next();
@@ -188,7 +187,6 @@ bool db_manager::check_user_password(const QString &login, const QString &passwo
     query.prepare(query_name_to_sql_command["check_user_password"].arg(m_schema));
     query.bindValue(":login", login);
     query.bindValue(":password", password);
-    qDebug() << login << " " << password;
     if (!query.exec()) {
         qDebug() << "check_user_password:" << m_database.lastError();
         return false;
@@ -221,7 +219,7 @@ bool db_manager::check_user_rights(quint32 user_id, quint32 board_id) {
     query.bindValue(":user_id", user_id);
     query.bindValue(":board_id", board_id);
     if (!query.exec()) {
-        qDebug() << m_database.lastError();
+        qDebug() << "check_user_rights:" <<  m_database.lastError();
         return false;
     }
     query.next();
@@ -234,15 +232,13 @@ quint32 db_manager::insert_user(const QString &login, const QString &password) {
     query.bindValue(":login", login);
     query.bindValue(":password", password);
     if (!query.exec()) {
-        qDebug() << m_database.lastError()
-                 << query_name_to_sql_command["insert_user"].arg(m_schema);
+        qDebug() << "insert_user:" << m_database.lastError();
         return 0;
     }
     query.prepare(query_name_to_sql_command["insert_user_signature"].arg(m_schema));
     query.bindValue(":login", login);
     if (!query.exec()) {
-        qDebug() << m_database.lastError()
-                 << query_name_to_sql_command["insert_user"].arg(m_schema);
+        qDebug() << "insert_user:" << m_database.lastError();
         return 0;
     }
     return get_sequence_last_value(USER_ID_SEQUENCE);
@@ -255,8 +251,7 @@ quint32 db_manager::insert_board(quint32 user_id, const QString &name, const QSt
     query.bindValue(":name", name);
     query.bindValue(":description", description);
     if (!query.exec()) {
-        qDebug() << "insert_board_error" << m_database.lastError()
-                 << query_name_to_sql_command["insert_board"].arg(m_schema);
+        qDebug() << "insert_board:" << m_database.lastError();
         return 0;
     }
     return get_sequence_last_value(BOARD_ID_SEQUENCE);
@@ -273,7 +268,7 @@ quint32 db_manager::insert_list(
     query.bindValue(":name", name);
     query.bindValue(":description", description);
     if (!query.exec()) {
-        qDebug() << m_database.lastError();
+        qDebug() << "insert_list" << m_database.lastError();
         return 0;
     }
     return get_sequence_last_value(LIST_ID_SEQUENCE);
@@ -290,7 +285,7 @@ quint32 db_manager::insert_card(
     query.bindValue(":name", name);
     query.bindValue(":description", description);
     if (!query.exec()) {
-        qDebug() << m_database.lastError();
+        qDebug() << "insert_card" << m_database.lastError();
         return 0;
     }
     return get_sequence_last_value(CARD_ID_SEQUENCE);
@@ -301,7 +296,7 @@ quint32 db_manager::insert_tag(const QString &name) {
     query.prepare(query_name_to_sql_command["insert_tag"].arg(m_schema));
     query.bindValue(":name", name);
     if (!query.exec()) {
-        qDebug() << m_database.lastError();
+        qDebug() << "insert_tag" << m_database.lastError();
         return 0;
     }
     return get_sequence_last_value(TAG_ID_SEQUENCE);
@@ -315,10 +310,7 @@ bool db_manager::pin_tag_to_card(int card_id, int tag_id) {
     query.bindValue(":card_id", card_id);
     query.bindValue(":tag_id", tag_id);
     if (!query.exec()) {
-        qDebug() << m_database.lastError()
-                 << query_name_to_sql_command["insert_into_card_to_tags"].arg(
-                        m_schema
-                    );
+        qDebug() << "pin_tag_to_card:" << m_database.lastError();
         return false;
     }
     return true;
@@ -337,7 +329,7 @@ bool db_manager::update_command(
     query.bindValue(":new_value", new_value);
     query.bindValue(":key_value", key_value);
     if (!query.exec()) {
-        qDebug() << m_database.lastError();
+        qDebug() << "update_command:" << m_database.lastError();
         return false;
     }
     return true;
@@ -353,7 +345,7 @@ bool db_manager::delete_command(
     ));
     query.bindValue(":key_value", key_value);
     if (!query.exec()) {
-        qDebug() << m_database.lastError();
+        qDebug() << "delete_command: " << m_database.lastError();
         return false;
     }
     return true;
@@ -373,7 +365,7 @@ db_manager::select_info_by_id(const QString &query_name, quint32 key_value) {
     query.prepare(query_name_to_sql_command[query_name].arg(m_schema));
     query.bindValue(":key_value", key_value);
     if (!query.exec()) {
-        qDebug() << m_database.lastError();
+        qDebug() << "select_info_by_id:" << m_database.lastError();
     }
     query.next();
     return query.record();
@@ -427,7 +419,7 @@ QVector<board> db_manager::get_user_boards(quint32 user_id) {
     ));
     query.bindValue(":id", user_id);
     if (!query.exec()) {
-        qDebug() << m_database.lastError();
+        qDebug() << "get_user_boards:" << m_database.lastError();
     }
     QVector<board> result;
     while (query.next()) {
@@ -443,7 +435,7 @@ QVector<list> db_manager::get_board_lists(quint32 board_id) {
     ));
     query.bindValue(":id", board_id);
     if (!query.exec()) {
-        qDebug() << m_database.lastError();
+        qDebug() << "get_board_lists:" << m_database.lastError();
     }
     QVector<list> result;
     while (query.next()) {
@@ -460,7 +452,7 @@ QVector<card> db_manager::get_list_cards(quint32 list_id) {
     ));
     query.bindValue(":id", list_id);
     if (!query.exec()) {
-        qDebug() << m_database.lastError();
+        qDebug() << "get_list_cards:" << m_database.lastError();
     }
     QVector<card> result;
     while (query.next()) {
@@ -476,7 +468,7 @@ QVector<tag> db_manager::get_card_tags(quint32 card_id) {
     ));
     query.bindValue(":id", card_id);
     if (!query.exec()) {
-        qDebug() << m_database.lastError();
+        qDebug() << "get_card_tags:" << m_database.lastError();
     }
     QVector<tag> result;
     while (query.next()) {

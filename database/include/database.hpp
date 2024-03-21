@@ -14,11 +14,11 @@ const QString CARD_TABLE_NAME = "card_signature";
 const QString CARD_PRIMARY_KEY = "card_id";
 const QString TAG_TABLE_NAME = "tag_signature";
 const QString TAG_PRIMARY_KEY = "tag_id";
-const QString USER_ID_SEQUENCE = "user_signature_user_id_seq";
-const QString BOARD_ID_SEQUENCE = "board_signature_board_id_seq";
-const QString LIST_ID_SEQUENCE = "list_signature_list_id_seq";
-const QString CARD_ID_SEQUENCE = "card_signature_card_id_seq";
-const QString TAG_ID_SEQUENCE = "tag_signature_tag_id_seq";
+const QString USER_ID_SEQUENCE = "user_signature_id_seq";
+const QString BOARD_ID_SEQUENCE = "board_signature_id_seq";
+const QString LIST_ID_SEQUENCE = "list_signature_id_seq";
+const QString CARD_ID_SEQUENCE = "card_signature_id_seq";
+const QString TAG_ID_SEQUENCE = "tag_signature_id_seq";
 
 const QString QT_DATABASE_DRIVER = "QPSQL";
 

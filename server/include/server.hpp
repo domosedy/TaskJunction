@@ -24,7 +24,7 @@ class Server : public QObject {
     QString execute_update_query(const update_query &query);
     QString execute_create_query(const create_query &query, quint32 id);
     QString execute_delete_query(const delete_query &query);
-    QString execute_get_query(quint32 id);
+    QString execute_get_query(const get_boards_info_query &query);
 
     std::pair<QString, quint32> execute_login_query(const login_query &query);
 

@@ -87,8 +87,12 @@ static std::optional<login_query> parseLoginQuery(const json &json_data) {
     return login_query{password.value(), username.value()};
 }
 
-static std::optional<get_boards_info_query> parseGetQuery(const json &parsedData) {
-    return get_boards_info_query{};
+static std::optional<get_boards_info_query> parseGetQuery(const json &json_data) {
+    auto id = get_int_field_data(json_data, "id");
+    if (!id.has_value()) {
+        return std::nullopt;
+    }
+    return get_boards_info_query{id.value()};
 }
 
 std::optional<query_type> parseData(const QString &data) {

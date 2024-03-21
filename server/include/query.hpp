@@ -30,7 +30,7 @@ struct login_query {
 };
 
 struct get_boards_info_query {
-    // std::size_t id;
+    std::size_t id;
 };
 
 
