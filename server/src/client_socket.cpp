@@ -11,19 +11,19 @@ void ClientSocket::sendData(const QByteArray &data) {
     quint16 size = data.size();
     QByteArray data_size;
     QDataStream out(&data_size, QIODevice::WriteOnly);
-    // out << size;
+    out << size;
 
     socket->write(data_size + data);
 }
 
 void ClientSocket::readData() {
-    QDataStream size_data = socket->readLine();
+    QDataStream size_data = socket->read(2);
     quint16 size;
 
     size_data >> size;
     rDebug() << "readed size " << size;
 
-    QByteArray data = socket->readLine();
+    QByteArray data = socket->read(size);
     
     QString json_request = data.toStdString().c_str();
 
