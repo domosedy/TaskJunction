@@ -68,6 +68,16 @@ inline std::string delete_request(quint32 id, const QString &object_type) {
     return request.dump();
 }
 
+inline std::string update_request(const QString &object_type, quint32 id, const QString &field, const QString &value) {
+    json request = {
+        {"type", "update"},
+        {"id", id},
+        {"new-value", value.toStdString().c_str()},
+        {"field", field.toStdString().c_str()},
+        {"type", object_type.toStdString().c_str()}};
+    return request.dump();
+}
+
 inline board parse_board(const json &object) {
     QString name = QString::fromStdString(object["name"]);
     QString description = QString::fromStdString(object["description"]);

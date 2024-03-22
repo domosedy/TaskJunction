@@ -11,10 +11,19 @@ Component {
         width: style.listWidth
         height: Math.max(90, Math.min((listmodel.count+1) * 45,mainarea.height-40))
         color: style.listBackgroundColor
-        signal deleteTriggered(card_index : int)
-        onDeleteTriggered: (card_index) => {
+
+        function deleteRequest(card_index : int) {
             mainClient.delete_card(index, card_index)
         }
+
+        function updateCardName(card_index : int, new_name : string) {
+            mainClient.update_card_name(index, card_index, new_name)
+        }
+
+        function updateCardDescription(card_index : int, new_desctiption : string) {
+            mainClient.update_card_description(index, card_index, new_desctiption)
+        }
+        
         Popup {
             id: create_card
             width: 210
@@ -112,16 +121,35 @@ Component {
                     onClicked: {
                         create_card.open()
                     }
-                }
-                Text {
+                }  
+                TextInput {
+                    z: 1
+                    id: list_name
                     text: name
-                    color: "white"
                     font.family: "Courier"
                     font.pointSize: 16
+                    color: "white"
                     width: parent.width - 2*listheader.height
                     anchors.verticalCenter: parent.verticalCenter
                     clip: true
-                }                     
+
+                    readOnly: true
+                    MouseArea {
+                        id: ln_area
+                        anchors.fill: parent
+                        onDoubleClicked: {
+                            list_name.readOnly = false
+                            ln_area.enabled = false
+                            list_name.cursorPosition = 0
+                        }
+                    }
+                    onAccepted: { 
+                        list_name.readOnly = true
+                        ln_area.enabled = true
+                        list_name.focus = false
+                        mainClient.update_list_name(index, list_name.text)
+                    }
+                }                             
                 Button {
                     Text {
                         anchors.centerIn: parent

@@ -104,3 +104,12 @@ int ListModel::get_count() {
 quint32 ListModel::get_card_id(const int index) const {
     return m_cards[index].m_card_id;
 }
+
+void ListModel::update_card_name(int card_index, QString& name) {
+    m_cards[card_index].m_name = name;
+    emit dataChanged(this->index(card_index, 0), this->index(card_index, 0), {CardRoles::NameRole});
+}
+void ListModel::update_card_description(int card_index, QString& description) {
+    m_cards[card_index].m_description = description;
+    emit dataChanged(this->index(card_index, 0), this->index(card_index, 0), {CardRoles::DescriptionRole});
+} 

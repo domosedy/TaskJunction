@@ -28,6 +28,8 @@ public:
     Q_INVOKABLE void create_card(QString &name, QString &description);
     Q_INVOKABLE void delete_card(int index);
     void create_card(const card &new_card);
+    void update_card_name(int card_index, QString& name);
+    void update_card_description(int card_index, QString& description);   
     int get_count();
     quint32 get_card_id(const int index) const;
 signals:

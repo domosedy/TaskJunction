@@ -8,7 +8,6 @@ Component {
     id: card
     Rectangle {
         id: card_main
-        signal deleteRequest(card_index : int)
         color: "white"
         width: style.cardWidth
         height: style.cardHeight
@@ -38,7 +37,8 @@ Component {
                 id: content
                 border.color: style.primaryColor
                 border.width: style.defaultBorderSize
-                Text {
+                TextInput {
+                    z: 1
                     id: card_name
                     text: name
                     font.family: "Courier"
@@ -49,8 +49,27 @@ Component {
                     anchors.topMargin: 10
                     width: parent.width-20
                     wrapMode: Text.Wrap
+
+                    readOnly: true
+                    MouseArea {
+                        id: n_area
+                        anchors.fill: parent
+                        onDoubleClicked: {
+                            card_name.readOnly = false
+                            n_area.enabled = false
+                            card_name.cursorPosition = 0
+                        }
+                    }
+                    onAccepted: { // Issue when closing popup without saving
+                        card_name.readOnly = true
+                        n_area.enabled = true
+                        card_name.focus = false
+                        listMain.updateCardName(index, card_name.text)
+                    }
                 }
-                Text {
+                TextInput {
+                    z: 1
+                    id: card_description
                     text: description
                     font.family: "Courier"
                     font.pointSize: 10
@@ -60,6 +79,22 @@ Component {
                     anchors.leftMargin: 10
                     width: parent.width-20
                     wrapMode: Text.Wrap
+
+                    readOnly: true
+                    MouseArea {
+                        id: d_area
+                        anchors.fill: parent
+                        onDoubleClicked: {
+                            card_description.readOnly = false
+                            d_area.enabled = false
+                        }
+                    }
+                    onAccepted: {
+                        card_description.readOnly = true
+                        d_area.enabled = true
+                        card_description.focus = false
+                        listMain.updateCardDescription(index, card_description.text)
+                    }
                 }                
                 Button {
                     z: 1
@@ -80,8 +115,7 @@ Component {
                     anchors.bottomMargin: 10
                     onClicked: {
                         card_window.close()
-                        //deleteRequest(index)
-                        listMain.deleteTriggered(index)
+                        listMain.deleteRequest(index)
                     }
                 }
 
@@ -91,9 +125,6 @@ Component {
                     drag.target: parent
                 }                  
             }
-        }
-        Component.onCompleted: {
-            deleteRequest.connect(listMain.deleteTriggered)
         }
     }
 }   

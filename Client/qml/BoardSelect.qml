@@ -39,7 +39,7 @@ Rectangle {
                     font.bold: true
                     Layout.preferredWidth: parent.width - 20
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                }      
+                }                          
                 TextField {
                     z: 1
                     id: boardDescription
@@ -164,7 +164,7 @@ Rectangle {
                         font.pointSize: 16
                         Layout.preferredWidth: parent.width - 20
                         Layout.alignment: Qt.AlignHCenter
-                    }
+                    }                     
                     Text {
                         text: description
                         font.family: "Courier"

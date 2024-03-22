@@ -130,10 +130,14 @@ void Client::prepare_remote_board_select_menu(
 }
 
 void Client::request_board(int index) {
+    if (index == m_current_index) {
+        return;
+    }
     quint32 board_id = m_board_menu->get_id(index);
     if (m_mode == ClientMode::Local) {
         const board &requested_board = db.get_full_board(board_id);
         m_current_board = new BoardModel(this, requested_board);
+        m_current_index = index;
         emit boardChanged();
     } else {
         std::string request = parser::board_request(board_id);
@@ -243,5 +247,38 @@ void Client::login(
         qDebug() << "No server!";
         m_connection_status = ConnectionStatus::Unable_to_connect;
         emit connectionStatusChanged();
+    }
+}
+
+void Client::update_card_name(int list_index, int card_index, QString& name) {
+    quint32 card_id = m_current_board->get_card_id(list_index, card_index);
+    if (m_mode == ClientMode::Local && db.update_command("card_signature", "name", name, card_id)) {
+        m_current_board->update_card_name(list_index, card_index, name);
+    } else {
+        std::string request = parser::update_request("card", card_id, "name", name);
+        write(request);
+        m_current_board->update_card_name(list_index, card_index, name);
+    }
+}
+
+void Client::update_card_description(int list_index, int card_index, QString& description) {
+    quint32 card_id = m_current_board->get_card_id(list_index, card_index);
+    if (m_mode == ClientMode::Local && db.update_command("card_signature", "description", description, card_id)) {
+        m_current_board->update_card_description(list_index, card_index, description);
+    } else {
+        std::string request = parser::update_request("card", card_id, "description", description);
+        write(request);
+        m_current_board->update_card_description(list_index, card_index, description);
+    }
+}
+
+void Client::update_list_name(int list_index, QString& name) {
+    quint32 list_id = m_current_board->get_list_id(list_index);
+    if (m_mode == ClientMode::Local && db.update_command("list_signature", "name", name, list_id)) {
+        m_current_board->update_list_name(list_index, name);
+    } else {
+        std::string request = parser::update_request("list", list_id, "name", name);
+        write(request);
+        m_current_board->update_list_name(list_index, name);
     }
 }

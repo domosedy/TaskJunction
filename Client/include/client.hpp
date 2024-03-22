@@ -52,6 +52,9 @@ public:
     Q_INVOKABLE void request_board(int index);
     Q_INVOKABLE void delete_list(int list_index);
     Q_INVOKABLE void delete_card(int list_index, int card_index);
+    Q_INVOKABLE void update_card_name(int list_index, int card_index, QString& name);
+    Q_INVOKABLE void update_card_description(int list_index, int card_index, QString& description);
+    Q_INVOKABLE void update_list_name(int list_index, QString& name);
 
 signals:
     void boardChanged();
@@ -67,7 +70,7 @@ private:
     database::db_manager db;
     QTcpSocket *m_socket = nullptr;
     BoardModel *m_current_board = nullptr;
-    QMap<quint32, BoardModel *> m_loaded_boards;
+    QMap<int, BoardModel *> m_loaded_boards;
     BoardMenu *m_remote_menu = nullptr;
     BoardMenu *m_local_menu = nullptr;
     BoardMenu *m_board_menu = nullptr;
@@ -78,6 +81,7 @@ private:
     bool m_is_authorized = false;
     ConnectionStatus m_connection_status = ConnectionStatus::Unauthorized;
     ClientMode m_mode = ClientMode::Local;
+    int m_current_index = -1;
 
     void write(std::string &data);
     void parse_response(const QString &data);
