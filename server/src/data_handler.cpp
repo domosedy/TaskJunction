@@ -73,7 +73,7 @@ static std::optional<create_query> parseCreateQuery(const json &json_data) {
         return std::nullopt;
     }
 
-    return create_query{parent_id.value(), value_type.value(), value_name.value()};
+    return create_query{parent_id.value(), value_type.value(), value_name.value(), value_description.value()};
 }
 
 static std::optional<login_query> parseLoginQuery(const json &json_data) {
