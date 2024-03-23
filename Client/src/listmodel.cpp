@@ -75,7 +75,7 @@ void ListModel::create_card(QString &name, QString &description) {
     }
 
     beginInsertRows(QModelIndex(), m_cards.size(), m_cards.size());
-    m_cards.append(card(0,0,name, description));
+    m_cards.append(card(0, 0, name, description));
     endInsertRows();
 
     emit countChanged();
@@ -105,11 +105,18 @@ quint32 ListModel::get_card_id(const int index) const {
     return m_cards[index].m_card_id;
 }
 
-void ListModel::update_card_name(int card_index, QString& name) {
+void ListModel::update_card_name(int card_index, QString &name) {
     m_cards[card_index].m_name = name;
-    emit dataChanged(this->index(card_index, 0), this->index(card_index, 0), {CardRoles::NameRole});
+    emit dataChanged(
+        this->index(card_index, 0), this->index(card_index, 0),
+        {CardRoles::NameRole}
+    );
 }
-void ListModel::update_card_description(int card_index, QString& description) {
+
+void ListModel::update_card_description(int card_index, QString &description) {
     m_cards[card_index].m_description = description;
-    emit dataChanged(this->index(card_index, 0), this->index(card_index, 0), {CardRoles::DescriptionRole});
-} 
+    emit dataChanged(
+        this->index(card_index, 0), this->index(card_index, 0),
+        {CardRoles::DescriptionRole}
+    );
+}

@@ -106,6 +106,11 @@ void BoardModel::create_card(int index, const card &new_card) {
     m_lists[index]->create_card(new_card);
 }
 
+void BoardModel::create_card(quint32 card_id, const card &new_card) {
+    int index = m_index_by_id[card_id];
+    m_lists[index]->create_card(new_card);
+}
+
 int BoardModel::get_count() const {
     return m_lists.count();
 }
@@ -119,16 +124,25 @@ quint32 BoardModel::get_card_id(const int list_index, const int card_index)
     return m_lists[list_index]->get_card_id(card_index);
 }
 
-void BoardModel::update_card_name(int list_index, int card_index, QString& name) {
+void BoardModel::update_card_name(
+    int list_index,
+    int card_index,
+    QString &name
+) {
     m_lists[list_index]->update_card_name(card_index, name);
-    emit dataChanged(this->index(0,list_index), this->index(0,list_index));
+    emit dataChanged(this->index(0, list_index), this->index(0, list_index));
 }
-void BoardModel::update_card_description(int list_index, int card_index, QString& description) {
-    m_lists[list_index]->update_card_description(card_index, description);
-    emit dataChanged(this->index(0,list_index), this->index(0,list_index));
-} 
 
-void BoardModel::update_list_name(int list_index, QString& name) {
+void BoardModel::update_card_description(
+    int list_index,
+    int card_index,
+    QString &description
+) {
+    m_lists[list_index]->update_card_description(card_index, description);
+    emit dataChanged(this->index(0, list_index), this->index(0, list_index));
+}
+
+void BoardModel::update_list_name(int list_index, QString &name) {
     m_lists[list_index]->m_name = name;
     emit dataChanged(this->index(list_index, 0), this->index(list_index, 0));
-} 
+}

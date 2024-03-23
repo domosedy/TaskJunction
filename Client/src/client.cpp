@@ -21,28 +21,26 @@ Client::Client(QObject *parent)
 void Client::write(std::string &data) {
     QByteArray msg = data.c_str();
     QByteArray sz;
-    QDataStream sendStream(&sz, QIODevice::WriteOnly);
-    quint32 size = msg.size();
-    sendStream << size;
-    rDebug() << size;
+    QDataStream ds(&sz, QIODevice::ReadWrite);
+    quint16 size = msg.size();
+    ds << size;
+    qDebug() << size;
+    qDebug() << sz;
+    qDebug() << msg;
     m_socket->write(sz + msg);
 }
 
 void Client::readData() {
-    QDataStream in(m_socket);
-    if (in.status() == QDataStream::Ok) {
-        QDataStream size_data = m_socket->read(2);
-        quint32 size;
-        size_data >> size;
-        QByteArray data = m_socket->read(size);
-        qDebug() << data.toStdString().c_str();
-    } else {
-        qDebug() << "Error";
-    }
+    QDataStream size_data = m_socket->read(2);
+    quint16 size;
+    size_data >> size;
+    QString response = m_socket->read(size);
+    qDebug() << response;
+    parse_response(response);
 }
 
 void Client::parse_response(const QString &data) {
-    if (nlohmann::json::accept(data.toStdString())) {
+    if (!(nlohmann::json::accept(data.toStdString()))) {
         qDebug() << "Cannot parse response";
         return;
     }
@@ -54,9 +52,6 @@ void Client::parse_response(const QString &data) {
     }
     std::string response_type = response["type"];
     if (response_type == "authorization") {
-        if (!response.contains("response")) {
-            qDebug() << "Invalid response structure";
-        }
         if (response["response"] == "ok") {
             nlohmann::json avaliable_boards = response["boards"];
             prepare_remote_board_select_menu(avaliable_boards);
@@ -76,8 +71,15 @@ void Client::parse_response(const QString &data) {
         [[maybe_unused]] quint32 list_id = response["list-id"];
         [[maybe_unused]] quint32 card_id = response["card-id"];
         if (list_id == 0) {
-            board new_board = parser::parse_board(response["object"]);
+            board new_board = parser::parse_board(response["object-json"]);
             m_board_menu->add_board(new_board);
+        }
+        if (card_id == 0) {
+            list new_list = parser::parse_list(response["object-json"]);
+            m_board_menu->create_list(new_list);
+        } else {
+            card new_card = parser::parse_card(response["object-json"]);
+            m_board_menu->create_card(list_id, new_card);
         }
     }
 }
@@ -146,25 +148,29 @@ void Client::request_board(int index) {
 }
 
 void Client::create_list(QString &name) {
-    if (name == "")
-        name = "New list";  
+    if (name == "") {
+        name = "New list";
+    }
     if (m_mode == ClientMode::Local) {
         quint32 board_id = m_current_board->m_board_id;
         quint32 list_id = db.insert_list(board_id, name, "");
         const list &new_list = db.select_list(list_id);
         m_current_board->create_list(new_list);
     } else {
-        std::string request =
-            parser::create_list_request(m_current_board->m_board_id, name);
+        std::string request = parser::create_request(
+            "list", m_current_board->m_board_id, name, ""
+        );
         write(request);
     }
 }
 
 void Client::create_card(int list_index, QString &name, QString &description) {
-    if (name == "")
+    if (name == "") {
         name = "New card";
-    if (description == "")
+    }
+    if (description == "") {
         description = "smth";
+    }
     if (m_mode == ClientMode::Local) {
         quint32 list_id = m_current_board->get_list_id(list_index);
         quint32 card_id = db.insert_card(list_id, name, description);
@@ -172,23 +178,25 @@ void Client::create_card(int list_index, QString &name, QString &description) {
         m_current_board->create_card(list_index, new_card);
     } else {
         std::string request =
-            parser::create_card_request(list_index, name, description);
+            parser::create_request("card", list_index, name, description);
         write(request);
     }
 }
 
 void Client::create_board(QString &name, QString &description) {
-    if (name == "")
+    if (name == "") {
         name = "New board";
-    if (description == "")
+    }
+    if (description == "") {
         description = "smth";
+    }
 
     if (m_mode == ClientMode::Local) {
         quint32 board_id = db.insert_board(m_local_id, name, description);
         m_board_menu->create_board(name, description, board_id);
     } else {
         std::string request =
-            parser::create_board_request(m_user_id, name, description);
+            parser::create_request("board", m_user_id, name, description);
         write(request);
     }
 }
@@ -196,7 +204,6 @@ void Client::create_board(QString &name, QString &description) {
 void Client::delete_list(int list_index) {
     quint32 list_id = m_current_board->get_list_id(list_index);
     if (m_mode == ClientMode::Local) {
-        // db.delete_list(list_id);  // TODO: update when will be correct db api
         db.delete_command("list_signature", list_id);
     } else {
         std::string request = parser::delete_request(list_id, "list");
@@ -209,7 +216,6 @@ void Client::delete_card(int list_index, int card_index) {
     [[maybe_unused]] quint32 list_id = m_current_board->get_list_id(list_index);
     quint32 card_id = m_current_board->get_card_id(list_index, card_index);
     if (m_mode == ClientMode::Local) {
-        // db.delete_card(card_id);  // TODO: update when will be correct db api
         db.delete_command("card_signature", card_id);
     } else {
         std::string request = parser::delete_request(card_id, "card");
@@ -226,7 +232,7 @@ void Client::login(
 ) {
     if (m_socket->state() != QAbstractSocket::UnconnectedState) {
         if (server_ip == m_server_ip &&
-            server_port.toUShort() == m_server_port) {
+            server_port.toUShort() == m_server_port && m_is_authorized) {
             return;
         }
         m_socket->disconnectFromHost();
@@ -234,13 +240,14 @@ void Client::login(
     if (m_socket->state() != QAbstractSocket::UnconnectedState) {
         m_socket->waitForDisconnected(-1);
     }
-    m_socket->connectToHost(m_server_ip, m_server_port);
     m_server_ip = server_ip;
     m_server_port = server_port.toUShort();
     m_is_authorized = false;
     emit statusChanged();
+    m_socket->connectToHost(m_server_ip, m_server_port);
     if (m_socket->state() == QAbstractSocket::ConnectedState ||
-        m_socket->waitForConnected(-1)) {
+        m_socket->waitForConnected()) {
+        qDebug() << "Connected!";
         std::string login_request = parser::login_request(username, password);
         write(login_request);
     } else {
@@ -250,34 +257,52 @@ void Client::login(
     }
 }
 
-void Client::update_card_name(int list_index, int card_index, QString& name) {
+void Client::update_card_name(int list_index, int card_index, QString &name) {
     quint32 card_id = m_current_board->get_card_id(list_index, card_index);
-    if (m_mode == ClientMode::Local && db.update_command("card_signature", "name", name, card_id)) {
+    if (m_mode == ClientMode::Local &&
+        db.update_command("card_signature", "name", name, card_id)) {
         m_current_board->update_card_name(list_index, card_index, name);
     } else {
-        std::string request = parser::update_request("card", card_id, "name", name);
+        std::string request =
+            parser::update_request("card", card_id, "name", name);
         write(request);
-        m_current_board->update_card_name(list_index, card_index, name);
+        m_current_board->update_card_name(
+            list_index, card_index, name
+        );  // TODO
     }
 }
 
-void Client::update_card_description(int list_index, int card_index, QString& description) {
+void Client::update_card_description(
+    int list_index,
+    int card_index,
+    QString &description
+) {
     quint32 card_id = m_current_board->get_card_id(list_index, card_index);
-    if (m_mode == ClientMode::Local && db.update_command("card_signature", "description", description, card_id)) {
-        m_current_board->update_card_description(list_index, card_index, description);
+    if (m_mode == ClientMode::Local &&
+        db.update_command(
+            "card_signature", "description", description, card_id
+        )) {
+        m_current_board->update_card_description(
+            list_index, card_index, description
+        );
     } else {
-        std::string request = parser::update_request("card", card_id, "description", description);
+        std::string request =
+            parser::update_request("card", card_id, "description", description);
         write(request);
-        m_current_board->update_card_description(list_index, card_index, description);
+        m_current_board->update_card_description(
+            list_index, card_index, description
+        );
     }
 }
 
-void Client::update_list_name(int list_index, QString& name) {
+void Client::update_list_name(int list_index, QString &name) {
     quint32 list_id = m_current_board->get_list_id(list_index);
-    if (m_mode == ClientMode::Local && db.update_command("list_signature", "name", name, list_id)) {
+    if (m_mode == ClientMode::Local &&
+        db.update_command("list_signature", "name", name, list_id)) {
         m_current_board->update_list_name(list_index, name);
     } else {
-        std::string request = parser::update_request("list", list_id, "name", name);
+        std::string request =
+            parser::update_request("list", list_id, "name", name);
         write(request);
         m_current_board->update_list_name(list_index, name);
     }

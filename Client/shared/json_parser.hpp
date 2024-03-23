@@ -18,40 +18,17 @@ login_request(const QString &username, const QString &password) {
     return request.dump();
 }
 
-inline std::string create_list_request(quint32 board_id, const QString &name) {
+inline std::string create_request(
+    const QString &type quint32 parent_id,
+    const QString &name,
+    const QString &description
+) {
     json request = {
         {"type", "create"},
-        {"parent-id", board_id},
-        {"name", name.toStdString().c_str()},
-        {"type", "list"}};
-    return request.dump();
-}
-
-inline std::string create_card_request(
-    quint32 list_id,
-    const QString &name,
-    const QString &description
-) {
-    json request = {
-        {"type", "create-card"},
-        {"parent-id", list_id},
+        {"parent-id", parent_id},
         {"name", name.toStdString().c_str()},
         {"description", description.toStdString().c_str()},
-        {"type", "list"}};
-    return request.dump();
-}
-
-inline std::string create_board_request(
-    quint32 user_id,
-    const QString &name,
-    const QString &description
-) {
-    json request = {
-        {"type", "create-board"},
-        {"parent-id", user_id},
-        {"name", name.toStdString().c_str()},
-        {"description", description.toStdString().c_str()},
-        {"type", "board"}};
+        {"object-type", type.toStdString().c_str()}};
     return request.dump();
 }
 
@@ -68,13 +45,18 @@ inline std::string delete_request(quint32 id, const QString &object_type) {
     return request.dump();
 }
 
-inline std::string update_request(const QString &object_type, quint32 id, const QString &field, const QString &value) {
+inline std::string update_request(
+    const QString &object_type,
+    quint32 id,
+    const QString &field,
+    const QString &value
+) {
     json request = {
         {"type", "update"},
         {"id", id},
         {"new-value", value.toStdString().c_str()},
         {"field", field.toStdString().c_str()},
-        {"type", object_type.toStdString().c_str()}};
+        {"object-type", object_type.toStdString().c_str()}};
     return request.dump();
 }
 
@@ -85,9 +67,20 @@ inline board parse_board(const json &object) {
     return board(id, 0, name, description);
 }
 
-// inline Card parse_card(const json& card) {
-//     return Card();
-// }
+inline list parse_list(const json &object) {
+    QString name = QString::fromStdString(object["name"]);
+    QString description = QString::fromStdString(object["description"]);
+    quint32 id = object["id"];
+    return list(id, 0, name, description);
+}
+
+inline card parse_card(const json &object) {
+    QString name = QString::fromStdString(object["name"]);
+    QString description = QString::fromStdString(object["description"]);
+    quint32 id = object["id"];
+    return card(id, 0, name, description);
+}
+
 }  // namespace parser
 
 #endif

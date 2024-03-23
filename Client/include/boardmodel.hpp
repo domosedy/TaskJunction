@@ -22,15 +22,20 @@ public:
     Q_INVOKABLE void create_list(QString &name);
     void create_list(const list &list_base);
     void create_card(int index, const card &new_card);
+    void create_card(quint32 list_id, const card &new_card);
     void delete_list(int index);
     void delete_card(const int list_index, const int card_index);
     void create_card(int list_index, QString &name, QString &description);
-    void update_card_name(int list_index, int card_index, QString& name);
-    void update_card_description(int list_index, int card_index, QString& description); 
-    void update_list_name(int list_index, QString& name);
+    void update_card_name(int list_index, int card_index, QString &name);
+    void update_card_description(
+        int list_index,
+        int card_index,
+        QString &description
+    );
+    void update_list_name(int list_index, QString &name);
     int get_count() const;
     quint32 get_list_id(const int index) const;
-    quint32 get_card_id(const int list_index, const int card_index) const;    
+    quint32 get_card_id(const int list_index, const int card_index) const;
 
 signals:
     void countChanged();

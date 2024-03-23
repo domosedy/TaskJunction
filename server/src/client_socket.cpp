@@ -7,30 +7,28 @@
 
 void ClientSocket::sendData(const QByteArray &data) {
     rDebug() << data.size();
+
+    quint16 size = data.size();
     QByteArray data_size;
     QDataStream out(&data_size, QIODevice::WriteOnly);
-    out << QVariant(data.size()).toString() << "\n";
+    out << size;
 
     socket->write(data_size + data);
 }
 
 void ClientSocket::readData() {
-    QByteArray data = socket->readLine();
-    auto data_string = data.toStdString();
+    QDataStream size_data = socket->read(2);
+    quint16 size;
 
-    std::stringstream ss(data_string);
-    std::size_t size;
+    size_data >> size;
+    rDebug() << "readed size " << size;
 
-    if (!(ss >> size)) {
-        sendData(ErrorJson{"Bad format of data"}.to_json().c_str());
-        return;
-    }
-
-    data = socket->read(size);
+    QByteArray data = socket->read(size);
+    
     QString json_request = data.toStdString().c_str();
 
-    rDebug() << "Received from " << socket->peerAddress().toString() << size
-                << " " << json_request;
+    rDebug() << "Received from " << socket->peerAddress().toString() 
+            << " " << json_request;
 
     auto value = parseData(json_request);
 

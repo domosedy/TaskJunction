@@ -39,8 +39,8 @@ static std::optional<std::string> get_string_field_data(const json &data, const 
 
 static std::optional<update_query> parseUpdateQuery(const json &json_data) {
     auto value_id = get_int_field_data(json_data, "id");
-    auto new_value = get_string_field_data(json_data, "value");
-    auto value_name = get_string_field_data(json_data, "value-name");
+    auto new_value = get_string_field_data(json_data, "new-value");
+    auto value_name = get_string_field_data(json_data, "field");
     auto updated_type = get_string_field_data(json_data, "type");
 
     if (!value_id.has_value() || !new_value.has_value() || !value_name.has_value() || !updated_type.has_value()) {
@@ -54,7 +54,7 @@ static std::optional<update_query> parseUpdateQuery(const json &json_data) {
 
 static std::optional<delete_query> parseDeleteQuery(const json &json_data) {
     auto value_id = get_int_field_data(json_data, "id");
-    auto value_type = get_string_field_data(json_data, "value-type");
+    auto value_type = get_string_field_data(json_data, "type");
 
     if (!value_id.has_value() || !value_type.has_value()) {
         return std::nullopt;
@@ -67,12 +67,13 @@ static std::optional<create_query> parseCreateQuery(const json &json_data) {
     auto parent_id = get_int_field_data(json_data, "parent-id");
     auto value_type = get_string_field_data(json_data, "type");
     auto value_name = get_string_field_data(json_data, "name");
+    auto value_description = get_string_field_data(json_data, "description");
     
-    if (!parent_id.has_value() || !value_type.has_value() || !value_name.has_value()) {
+    if (!parent_id.has_value() || !value_type.has_value() || !value_name.has_value() || !value_description.has_value()) {
         return std::nullopt;
     }
 
-    return create_query{parent_id.value(), value_type.value(), value_name.value()};
+    return create_query{parent_id.value(), value_type.value(), value_name.value(), value_description.value()};
 }
 
 static std::optional<login_query> parseLoginQuery(const json &json_data) {
@@ -86,11 +87,20 @@ static std::optional<login_query> parseLoginQuery(const json &json_data) {
     return login_query{password.value(), username.value()};
 }
 
+static std::optional<get_boards_info_query> parseGetQuery(const json &json_data) {
+    auto id = get_int_field_data(json_data, "id");
+    if (!id.has_value()) {
+        return std::nullopt;
+    }
+    return get_boards_info_query{id.value()};
+}
+
 std::optional<query_type> parseData(const QString &data) {
     json parsedData;
     try {
         parsedData = json::parse(data.toStdString());
     } catch (...) {
+        rDebug() << "Bebra";
         return std::nullopt;
     }
 
@@ -112,6 +122,8 @@ std::optional<query_type> parseData(const QString &data) {
         result = parseCreateQuery(parsedData);
     } else if (request == "login") {
         result = parseLoginQuery(parsedData);
+    } else if (request == "get-boards-info") {
+        result = parseGetQuery(parsedData);
     }
 
 

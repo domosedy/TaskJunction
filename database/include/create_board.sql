@@ -39,3 +39,7 @@ card_id integer REFERENCES card_signature ON DELETE CASCADE,
 tag_id integer REFERENCES tag_signature ON DELETE CASCADE,
 PRIMARY KEY(card_id, tag_id)
 );
+
+INSERT INTO user_authorization_data VALUES ('default', 'default');
+
+INSERT INTO user_signature VALUES (DEFAULT, 'default');

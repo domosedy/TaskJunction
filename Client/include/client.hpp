@@ -52,9 +52,14 @@ public:
     Q_INVOKABLE void request_board(int index);
     Q_INVOKABLE void delete_list(int list_index);
     Q_INVOKABLE void delete_card(int list_index, int card_index);
-    Q_INVOKABLE void update_card_name(int list_index, int card_index, QString& name);
-    Q_INVOKABLE void update_card_description(int list_index, int card_index, QString& description);
-    Q_INVOKABLE void update_list_name(int list_index, QString& name);
+    Q_INVOKABLE void
+    update_card_name(int list_index, int card_index, QString &name);
+    Q_INVOKABLE void update_card_description(
+        int list_index,
+        int card_index,
+        QString &description
+    );
+    Q_INVOKABLE void update_list_name(int list_index, QString &name);
 
 signals:
     void boardChanged();
