@@ -111,7 +111,7 @@ std::optional<query_type> parseData(const QString &data) {
     }
 
     auto request = request_type.value();
-    rDebug() << request;
+    rDebug() << request.c_str();
 
     std::optional<query_type> result = std::nullopt;
     if (request == "update") {
