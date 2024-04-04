@@ -5,9 +5,9 @@
 #include <QObject>
 #include <QTcpServer>
 #include <QTcpSocket>
+#include "database.hpp"
 #include "logging.hpp"
 #include "query.hpp"
-#include "database.hpp"
 
 using namespace database;
 

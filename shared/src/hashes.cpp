@@ -1,11 +1,11 @@
 #include "hashes.hpp"
-#include <random>
-#include <chrono>
 #include <QCryptographicHash>
-
+#include <chrono>
+#include <random>
 
 QString generate_salt() {
-    std::mt19937 rnd(std::chrono::system_clock::now().time_since_epoch().count());
+    std::mt19937 rnd(std::chrono::system_clock::now().time_since_epoch().count()
+    );
 
     QByteArray byte_data;
 
@@ -14,7 +14,7 @@ QString generate_salt() {
         while (character == '\n') {
             character = static_cast<unsigned char>(rnd());
         }
-        
+
         byte_data.push_back(character);
     }
 
@@ -27,4 +27,3 @@ QString hash_string(const QString &word, const QString &salt) {
 
     return hash_algo.result().toStdString().c_str();
 }
-

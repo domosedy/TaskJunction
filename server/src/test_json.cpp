@@ -1,6 +1,5 @@
-#include "datas.hpp"
 #include <iostream>
-
+#include "datas.hpp"
 
 int main() {
     uint id = 1;
@@ -22,10 +21,10 @@ int main() {
     Board b3{++id, std::vector{l1, l3}, "Board 1", "Descr 1"};
     Board b4{++id, {}, "Board 1", "Descr 1"};
 
-
     LoginResponse log;
     log.authorized = 1;
-    log.all_boards = {std::pair{0, "12"}, std::pair{1, "13"}, std::pair{2, "hello"}};
+    log.all_boards = {
+        std::pair{0, "12"}, std::pair{1, "13"}, std::pair{2, "hello"}};
 
     std::cout << log.to_json() << std::endl;
     std::cout << b1.to_json() << std::endl;

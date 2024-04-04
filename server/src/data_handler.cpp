@@ -1,17 +1,16 @@
 #include "data_handler.hpp"
 #include <QDebug>
 #include <QObject>
+#include <optional>
 #include <string>
-#include <optional>
-#include <optional>
 #include <variant>
 #include "json.hpp"
 #include "logging.hpp"
 
-
 using json = nlohmann::json;
 
-static std::optional<std::size_t> get_int_field_data(const json &data, const std::string &field) {
+static std::optional<std::size_t>
+get_int_field_data(const json &data, const std::string &field) {
     auto field_it = data.find(field);
     if (field_it == data.end()) {
         return std::nullopt;
@@ -24,7 +23,8 @@ static std::optional<std::size_t> get_int_field_data(const json &data, const std
     return *field_it;
 }
 
-static std::optional<std::string> get_string_field_data(const json &data, const std::string &field) {
+static std::optional<std::string>
+get_string_field_data(const json &data, const std::string &field) {
     auto field_it = data.find(field);
     if (field_it == data.end()) {
         return std::nullopt;
@@ -43,13 +43,14 @@ static std::optional<update_query> parseUpdateQuery(const json &json_data) {
     auto value_name = get_string_field_data(json_data, "field");
     auto updated_type = get_string_field_data(json_data, "object-type");
 
-    if (!value_id.has_value() || !new_value.has_value() || !value_name.has_value() || !updated_type.has_value()) {
+    if (!value_id.has_value() || !new_value.has_value() ||
+        !value_name.has_value() || !updated_type.has_value()) {
         return std::nullopt;
     }
 
     return update_query{
-        value_id.value(), new_value.value(), value_name.value(), updated_type.value()
-    };
+        value_id.value(), new_value.value(), value_name.value(),
+        updated_type.value()};
 }
 
 static std::optional<delete_query> parseDeleteQuery(const json &json_data) {
@@ -71,16 +72,17 @@ static std::optional<create_query> parseCreateQuery(const json &json_data) {
     auto value_type = get_string_field_data(json_data, "object-type");
     auto value_name = get_string_field_data(json_data, "name");
     auto value_description = get_string_field_data(json_data, "description");
-    
+
     if (!parent_id.has_value() || !value_type.has_value() ||
         !value_name.has_value() || !value_description.has_value() ||
         !board_id.has_value() || !list_id.has_value() || !card_id.has_value()) {
         return std::nullopt;
     }
 
-    return create_query{parent_id.value(), board_id.value(),
-        list_id.value(), card_id.value(),
-        value_type.value(), value_name.value(), value_description.value()};
+    return create_query{parent_id.value(),        board_id.value(),
+                        list_id.value(),          card_id.value(),
+                        value_type.value(),       value_name.value(),
+                        value_description.value()};
 }
 
 static std::optional<login_query> parseLoginQuery(const json &json_data) {
@@ -94,7 +96,8 @@ static std::optional<login_query> parseLoginQuery(const json &json_data) {
     return login_query{password.value(), username.value()};
 }
 
-static std::optional<get_boards_info_query> parseGetQuery(const json &json_data) {
+static std::optional<get_boards_info_query> parseGetQuery(const json &json_data
+) {
     auto id = get_int_field_data(json_data, "id");
     if (!id.has_value()) {
         return std::nullopt;
@@ -132,7 +135,6 @@ std::optional<query_type> parseData(const QString &data) {
     } else if (request == "get-boards-info") {
         result = parseGetQuery(parsedData);
     }
-
 
     return result;
 }

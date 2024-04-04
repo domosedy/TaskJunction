@@ -14,7 +14,6 @@ struct update_query {
 struct delete_query {
     std::size_t value_id;
     std::string value_type;
-
 };
 
 struct create_query {
@@ -28,7 +27,7 @@ struct create_query {
 };
 
 struct login_query {
-    std::string password; // TODO: hash or salt it
+    std::string password;  // TODO: hash or salt it
     std::string user_name;
 };
 
@@ -36,10 +35,11 @@ struct get_boards_info_query {
     std::size_t id;
 };
 
-
-using query_type = 
-    std::variant<update_query, delete_query, create_query, 
-            login_query, get_boards_info_query>;
-
+using query_type = std::variant<
+    update_query,
+    delete_query,
+    create_query,
+    login_query,
+    get_boards_info_query>;
 
 #endif

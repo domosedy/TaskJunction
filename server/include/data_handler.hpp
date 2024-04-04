@@ -3,8 +3,8 @@
 
 #include <QString>
 #include <memory>
-#include <utility>
 #include <optional>
+#include <utility>
 #include "query.hpp"
 
 std::optional<query_type> parseData(const QString &data);

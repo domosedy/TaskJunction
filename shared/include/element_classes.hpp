@@ -2,17 +2,13 @@
 #define ELEMENT_CLASSES_HPP_
 
 #include <QString>
-#include <QVector>
 #include <QVariant>
-
-#include <string>
+#include <QVector>
 #include <concepts>
+#include <string>
 
-template<typename T>
-concept has_to_json_method =
-requires (T t) { 
-    t.to_json(); 
-};
+template <typename T>
+concept has_to_json_method = requires(T t) { t.to_json(); };
 
 struct tag {
     quint32 m_tag_id;
@@ -31,8 +27,18 @@ struct card {
     QVector<tag> m_tags;
 
     card() = default;
-    explicit card(quint32 card_id, quint32 list_id, QString name, QString description);
-    card(QString name, QString description, quint32 id = 0, quint32 list_id = 0);
+    explicit card(
+        quint32 card_id,
+        quint32 list_id,
+        QString name,
+        QString description
+    );
+    card(
+        QString name,
+        QString description,
+        quint32 id = 0,
+        quint32 list_id = 0
+    );
     std::string to_json() const;
 };
 
@@ -44,9 +50,19 @@ struct list {
     QVector<card> m_cards;
 
     list() = default;
-    explicit list(quint32 list_id, quint32 board_id, QString name, QString description);
+    explicit list(
+        quint32 list_id,
+        quint32 board_id,
+        QString name,
+        QString description
+    );
 
-    list(QString name, QString description, quint32 id = 0, quint32 board_id = 0);
+    list(
+        QString name,
+        QString description,
+        quint32 id = 0,
+        quint32 board_id = 0
+    );
     std::string to_json() const;
 };
 
@@ -58,7 +74,12 @@ struct board {
     QVector<list> m_lists;
 
     board() = default;
-    explicit board(quint32 board_id, quint32 user_id, QString name, QString description);
+    explicit board(
+        quint32 board_id,
+        quint32 user_id,
+        QString name,
+        QString description
+    );
     board(QString name, QString description, quint32 id = 0);
     std::string to_json() const;
 };
@@ -90,10 +111,11 @@ struct error {
 struct create_response {
     quint32 id;
     QString object_type;
-
     std::size_t board_id;
     std::size_t list_id;
     std::size_t card_id;
+
+    std::string jsoned_object;
 
     std::string to_json() const;
 };

@@ -2,8 +2,8 @@
 #include <QDataStream>
 #include <sstream>
 #include "data_handler.hpp"
-#include "logging.hpp"
 #include "element_classes.hpp"
+#include "logging.hpp"
 
 void ClientSocket::sendData(const QByteArray &data) {
     rDebug() << data.size();
@@ -24,11 +24,11 @@ void ClientSocket::readData() {
     rDebug() << "readed size " << size;
 
     QByteArray data = socket->read(size);
-    
+
     QString json_request = data.toStdString().c_str();
 
-    rDebug() << "Received from " << socket->peerAddress().toString() 
-            << " " << json_request;
+    rDebug() << "Received from " << socket->peerAddress().toString() << " "
+             << json_request;
 
     auto value = parseData(json_request);
 
