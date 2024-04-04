@@ -137,11 +137,11 @@ QString Server::execute_create_query(const create_query &query, quint32 user_id)
     quint32 result = 0;
 
     rDebug() << user_id;
-    rDebug() << query.value_type;
+    rDebug() << query.value_type.c_str();
     if (query.value_type == "board") {
         rDebug() << "Hello from board";
-        rDebug() << query.value_name;
-        rDebug() << query.value_description;
+        rDebug() << query.value_name.c_str();
+        rDebug() << query.value_description.c_str();
 
         result = db.insert_board(
             user_id, 
