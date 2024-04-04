@@ -11,7 +11,7 @@ void ClientSocket::sendData(const QByteArray &data) {
     quint16 size = data.size();
     QByteArray data_size;
     QDataStream out(&data_size, QIODevice::WriteOnly);
-    // out << size;
+    out << size;
 
     socket->write(data_size + data);
 }
