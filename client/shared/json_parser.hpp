@@ -19,13 +19,20 @@ login_request(const QString &username, const QString &password) {
 }
 
 inline std::string create_request(
-    const QString &type quint32 parent_id,
+    const QString &type, 
+    const quint32 parent_id,
     const QString &name,
-    const QString &description
+    const QString &description,
+    const quint32 board_id = 0, 
+    const quint32 list_id = 0,
+    const quint32 card_id = 0
 ) {
     json request = {
         {"type", "create"},
         {"parent-id", parent_id},
+        {"board-id", board_id},
+        {"list-id", list_id},
+        {"card-id", card_id},
         {"name", name.toStdString().c_str()},
         {"description", description.toStdString().c_str()},
         {"object-type", type.toStdString().c_str()}};

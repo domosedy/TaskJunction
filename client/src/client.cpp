@@ -76,10 +76,10 @@ void Client::parse_response(const QString &data) {
         }
         if (card_id == 0) {
             list new_list = parser::parse_list(response["object-json"]);
-            m_board_menu->create_list(new_list);
+            m_current_board->create_list(new_list);
         } else {
             card new_card = parser::parse_card(response["object-json"]);
-            m_board_menu->create_card(list_id, new_card);
+            m_current_board->create_card(list_id, new_card);
         }
     }
 }
@@ -151,14 +151,14 @@ void Client::create_list(QString &name) {
     if (name == "") {
         name = "New list";
     }
+    quint32 board_id = m_current_board->m_board_id;
     if (m_mode == ClientMode::Local) {
-        quint32 board_id = m_current_board->m_board_id;
         quint32 list_id = db.insert_list(board_id, name, "");
         const list &new_list = db.select_list(list_id);
         m_current_board->create_list(new_list);
     } else {
         std::string request = parser::create_request(
-            "list", m_current_board->m_board_id, name, ""
+            "list", board_id, name, "", board_id
         );
         write(request);
     }
@@ -171,14 +171,15 @@ void Client::create_card(int list_index, QString &name, QString &description) {
     if (description == "") {
         description = "smth";
     }
+    quint32 board_id = m_current_board->m_board_id;
+    quint32 list_id = m_current_board->get_list_id(list_index);
     if (m_mode == ClientMode::Local) {
-        quint32 list_id = m_current_board->get_list_id(list_index);
         quint32 card_id = db.insert_card(list_id, name, description);
         const card &new_card = db.select_card(card_id);
         m_current_board->create_card(list_index, new_card);
     } else {
         std::string request =
-            parser::create_request("card", list_index, name, description);
+            parser::create_request("card", list_id, name, description, board_id, list_id);
         write(request);
     }
 }
