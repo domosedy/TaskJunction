@@ -41,7 +41,7 @@ static std::optional<update_query> parseUpdateQuery(const json &json_data) {
     auto value_id = get_int_field_data(json_data, "id");
     auto new_value = get_string_field_data(json_data, "new-value");
     auto value_name = get_string_field_data(json_data, "field");
-    auto updated_type = get_string_field_data(json_data, "type");
+    auto updated_type = get_string_field_data(json_data, "object-type");
 
     if (!value_id.has_value() || !new_value.has_value() || !value_name.has_value() || !updated_type.has_value()) {
         return std::nullopt;
@@ -54,7 +54,7 @@ static std::optional<update_query> parseUpdateQuery(const json &json_data) {
 
 static std::optional<delete_query> parseDeleteQuery(const json &json_data) {
     auto value_id = get_int_field_data(json_data, "id");
-    auto value_type = get_string_field_data(json_data, "type");
+    auto value_type = get_string_field_data(json_data, "object-type");
 
     if (!value_id.has_value() || !value_type.has_value()) {
         return std::nullopt;
@@ -65,7 +65,7 @@ static std::optional<delete_query> parseDeleteQuery(const json &json_data) {
 
 static std::optional<create_query> parseCreateQuery(const json &json_data) {
     auto parent_id = get_int_field_data(json_data, "parent-id");
-    auto value_type = get_string_field_data(json_data, "type");
+    auto value_type = get_string_field_data(json_data, "object-type");
     auto value_name = get_string_field_data(json_data, "name");
     auto value_description = get_string_field_data(json_data, "description");
     
@@ -104,7 +104,7 @@ std::optional<query_type> parseData(const QString &data) {
         return std::nullopt;
     }
 
-    auto request_type = get_string_field_data(parsedData, "request-type");
+    auto request_type = get_string_field_data(parsedData, "type");
 
     if (!request_type.has_value()) {
         return std::nullopt;
