@@ -113,12 +113,12 @@ std::string login::to_json() const {
     return ss.str();
 }
 
-std::string create::to_json() const {
+std::string create_response::to_json() const {
     std::stringstream ss;
 
     ss << "{\"type\": \"create-response\", \"" 
-       << type.toStdString() << "-id\": " << id 
-       << ", \"object-type\": \"" << type.toStdString() << "\"}";
+       << object_type.toStdString() << "-id\": " << id 
+       << ", \"object-type\": \"" << object_type.toStdString() << "\"}";
 
     return ss.str();
 }

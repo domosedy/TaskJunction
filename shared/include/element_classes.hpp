@@ -87,9 +87,9 @@ struct error {
     std::string to_json() const;
 };
 
-struct create {
+struct create_response {
     quint32 id;
-    QString type;
+    QString object_type;
 
     std::string to_json() const;
 };

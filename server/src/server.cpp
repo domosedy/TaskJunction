@@ -134,7 +134,8 @@ QString Server::execute_create_query(const create_query &query, quint32 user_id)
         return error{"You are not authorized"}.to_json().c_str();
     }
 
-    bool result = true;
+    quint32 result = 0;
+
     rDebug() << user_id;
     rDebug() << query.value_type;
     if (query.value_type == "board") {
@@ -158,8 +159,8 @@ QString Server::execute_create_query(const create_query &query, quint32 user_id)
             query.value_description.c_str());
     }
 
-    return result ? error{"Ok"}.to_json().c_str() :
-                    error{"An error occured"}.to_json().c_str();
+    return result > 0 ? create_response{result, query.value_type.c_str()}.to_json().c_str() :
+                        error{"An error occured"}.to_json().c_str();
 }
 
 std::pair<QString, quint32> Server::execute_login_query(const login_query &query) {

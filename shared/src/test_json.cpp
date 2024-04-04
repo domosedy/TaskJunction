@@ -35,16 +35,16 @@ int main() {
 
     login log;
     log.m_response = 1;
-    log.m_boards;
-    log.m_boards.push_back(std::pair{0, QString("12")});
-    log.m_boards.push_back(std::pair{1, QString("13")});
-    log.m_boards.push_back(std::pair{2, QString("hello")});
+    //log.m_boards;
+    //log.m_boards.push_back(std::pair{0, QString("12")});
+    //log.m_boards.push_back(std::pair{1, QString("13")});
+    //log.m_boards.push_back(std::pair{2, QString("hello")});
 
-    std::cout << log.to_json() << std::endl;
+    //std::cout << log.to_json() << std::endl;
     // LoginResponse log;
     // log.authorized = 1;
   
-    std::cout << create_response{12, "12"}.to_json() << std::endl;
+    std::cout << create{12, "12"}.to_json() << std::endl;
     // std::cout << log.to_json() << std::endl;
     // std::cout << b1.to_json() << std::endl;
     // std::cout << b2.to_json() << std::endl;
