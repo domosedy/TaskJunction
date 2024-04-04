@@ -24,9 +24,6 @@ void Client::write(std::string &data) {
     QDataStream ds(&sz, QIODevice::ReadWrite);
     quint16 size = msg.size();
     ds << size;
-    qDebug() << size;
-    qDebug() << sz;
-    qDebug() << msg;
     m_socket->write(sz + msg);
 }
 
@@ -35,7 +32,6 @@ void Client::readData() {
     quint16 size;
     size_data >> size;
     QString response = m_socket->read(size);
-    qDebug() << response;
     parse_response(response);
 }
 
@@ -50,6 +46,7 @@ void Client::parse_response(const QString &data) {
         qDebug() << "Invalid response structure";
         return;
     }
+    qDebug() << data;
     std::string response_type = response["type"];
     if (response_type == "authorization") {
         if (response["response"] == "ok") {
