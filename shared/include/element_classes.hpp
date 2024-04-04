@@ -87,4 +87,11 @@ struct error {
     std::string to_json() const;
 };
 
+struct create {
+    quint32 id;
+    QString type;
+
+    std::string to_json() const;
+};
+
 #endif  // ELEMENT_CLASSES_HPP_

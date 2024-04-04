@@ -43,7 +43,8 @@ int main() {
     std::cout << log.to_json() << std::endl;
     // LoginResponse log;
     // log.authorized = 1;
-
+  
+    std::cout << create_response{12, "12"}.to_json() << std::endl;
     // std::cout << log.to_json() << std::endl;
     // std::cout << b1.to_json() << std::endl;
     // std::cout << b2.to_json() << std::endl;
