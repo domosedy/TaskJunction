@@ -3,7 +3,7 @@
 #include <sstream>
 #include "data_handler.hpp"
 #include "logging.hpp"
-#include "datas.hpp"
+#include "element_classes.hpp"
 
 void ClientSocket::sendData(const QByteArray &data) {
     rDebug() << data.size();
@@ -11,7 +11,7 @@ void ClientSocket::sendData(const QByteArray &data) {
     quint16 size = data.size();
     QByteArray data_size;
     QDataStream out(&data_size, QIODevice::WriteOnly);
-    out << size;
+    // out << size;
 
     socket->write(data_size + data);
 }
@@ -33,7 +33,7 @@ void ClientSocket::readData() {
     auto value = parseData(json_request);
 
     if (!value.has_value()) {
-        sendData(ErrorJson{"Bad format of data"}.to_json().c_str());
+        sendData(error{"Bad format of data"}.to_json().c_str());
         return;
     }
 

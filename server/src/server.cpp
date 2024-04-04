@@ -159,7 +159,8 @@ QString Server::execute_create_query(const create_query &query, quint32 user_id)
             query.value_description.c_str());
     }
 
-    return result > 0 ? create_response{result, query.value_type.c_str()}.to_json().c_str() :
+    return result > 0 ? create_response{result, query.value_type.c_str(),
+            query.board_id, query.list_id, query.card_id}.to_json().c_str() :
                         error{"An error occured"}.to_json().c_str();
 }
 

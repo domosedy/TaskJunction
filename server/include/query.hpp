@@ -19,6 +19,9 @@ struct delete_query {
 
 struct create_query {
     std::size_t parent_id;
+    std::size_t board_id;
+    std::size_t list_id;
+    std::size_t card_id;
     std::string value_type;
     std::string value_name;
     std::string value_description;

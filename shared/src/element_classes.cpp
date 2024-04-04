@@ -1,4 +1,5 @@
 #include "element_classes.hpp"
+#include <map>
 #include <sstream>
 
 user::user(quint32 user_id, QString name) : m_user_id(user_id), m_name(std::move(name)) {
@@ -116,9 +117,22 @@ std::string login::to_json() const {
 std::string create_response::to_json() const {
     std::stringstream ss;
 
-    ss << "{\"type\": \"create-response\", \"" 
-       << object_type.toStdString() << "-id\": " << id 
-       << ", \"object-type\": \"" << object_type.toStdString() << "\"}";
+    std::map<std::string, quint32> all_ids;
+    all_ids["board-id"] = board_id;
+    all_ids["list-id"] = list_id;
+    all_ids["card-id"] = card_id;
+
+    all_ids[object_type.toStdString() + "-id"] = id;
+
+
+    ss << "{\"type\": \"create-response\"," ;
+
+    for (const auto &it : all_ids) {
+        ss << "\"" << it.first << "\": " << it.second << ",";
+    }
+
+    //    << object_type.toStdString() << "-id\": " << id 
+    ss << "\"object-type\": \"" << object_type.toStdString() << "\"}";
 
     return ss.str();
 }

@@ -19,7 +19,7 @@ include/json.hpp
 include/logging.hpp 
 include/query.hpp
 include/server.hpp 
-include/datas.hpp
+# include/datas.hpp
 ../database/include/database.hpp
 ../shared/include/element_classes.hpp
 
@@ -27,7 +27,7 @@ include/datas.hpp
 ../shared/src/element_classes.cpp
 src/client_socket.cpp
 src/data_handler.cpp
-src/datas.cpp
+# src/datas.cpp
 src/server_main.cpp
 src/server.cpp)
 

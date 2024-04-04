@@ -91,6 +91,10 @@ struct create_response {
     quint32 id;
     QString object_type;
 
+    std::size_t board_id;
+    std::size_t list_id;
+    std::size_t card_id;
+
     std::string to_json() const;
 };
 
