@@ -121,7 +121,6 @@ void db_manager::fill_query_name_to_sql_command() {
 
 void db_manager::test_foo() {
     QSqlQuery query(m_database);
-    //    query.prepare(query_name_to_sql_command["test_multiple_placeholder"]);
     query.prepare("SELECT nspname FROM pg_catalog.pg_namespace;");
     query.exec();
     while (query.next()) {
@@ -166,7 +165,6 @@ void db_manager::set_schema(const QString &name) {
 }
 
 quint32 db_manager::get_sequence_last_value(const QString &sequence) {
-    //  TODO: cannot explicitly set a schema
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["select_last_value"].arg(sequence));
     if (!query.exec()) {

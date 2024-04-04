@@ -5,7 +5,7 @@ password text
 
 CREATE TABLE user_signature(
 id serial PRIMARY KEY,
-name    varchar(50) REFERENCES user_authorization_data ON DELETE CASCADE
+name    varchar(50) REFERENCES user_authorization_data(login) ON DELETE CASCADE
 );
 
 CREATE TABLE board_signature(
