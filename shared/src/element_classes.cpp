@@ -136,7 +136,7 @@ std::string create_response::to_json() const {
         ss << "\"" << it.first << "\": " << it.second << ",";
     }
 
-    ss << "\"object-type\": " << jsoned_object << "}";
+    ss << "\"object-json\": " << jsoned_object << "}";
 
     return ss.str();
 }
