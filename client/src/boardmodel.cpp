@@ -13,8 +13,11 @@ BoardModel::BoardModel(QObject *parent, const nlohmann::json &board_json)
     m_name = QString::fromStdString(board_json["name"]);
     m_description = QString::fromStdString(board_json["description"]);
     const nlohmann::json &lists = board_json["lists"];
+    int index = 0;
     for (const auto &list : lists) {
+        quint32 m_list_id = list["id"];
         m_lists.push_back(new ListModel(this, list));
+        m_index_by_id[m_list_id] = index++;
     }
 }
 
@@ -23,8 +26,10 @@ BoardModel::BoardModel(QObject *parent, const board &board_base)
     m_board_id = board_base.m_board_id;
     m_name = board_base.m_name;
     m_description = board_base.m_description;
+    int index = 0;
     for (const auto &list : board_base.m_lists) {
         m_lists.push_back(new ListModel(this, list));
+        m_index_by_id[list.m_list_id] = index++;
     }
 }
 
@@ -74,6 +79,7 @@ void BoardModel::create_list(QString &name) {
 }
 
 void BoardModel::create_list(const list &list_base) {
+    m_index_by_id[list_base.m_list_id] = m_lists.size();
     beginInsertRows(QModelIndex(), m_lists.size(), m_lists.size());
     m_lists.append(new ListModel(this, list_base));
     endInsertRows();
@@ -106,8 +112,9 @@ void BoardModel::create_card(int index, const card &new_card) {
     m_lists[index]->create_card(new_card);
 }
 
-void BoardModel::create_card(quint32 card_id, const card &new_card) {
-    int index = m_index_by_id[card_id];
+void BoardModel::create_card(quint32 list_id, const card &new_card) {
+    int index = m_index_by_id[list_id];
+    qDebug() << list_id << index;
     m_lists[index]->create_card(new_card);
 }
 

@@ -1,6 +1,4 @@
-#ifndef JSON_PARSER_HPP_
-#define JSON_PARSER_HPP_
-
+#include "jsonparser.hpp"
 #include <QString>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -8,8 +6,7 @@
 namespace parser {
 using json = nlohmann::json;
 
-inline std::string
-login_request(const QString &username, const QString &password) {
+std::string login_request(const QString &username, const QString &password) {
     json request = {
         {"type", "login"},
         {"user-name", username.toStdString().c_str()},
@@ -18,14 +15,14 @@ login_request(const QString &username, const QString &password) {
     return request.dump();
 }
 
-inline std::string create_request(
-    const QString &type, 
+std::string create_request(
+    const QString &type,
     const quint32 parent_id,
     const QString &name,
     const QString &description,
-    const quint32 board_id = 0, 
-    const quint32 list_id = 0,
-    const quint32 card_id = 0
+    const quint32 board_id,
+    const quint32 list_id,
+    const quint32 card_id
 ) {
     json request = {
         {"type", "create"},
@@ -39,12 +36,12 @@ inline std::string create_request(
     return request.dump();
 }
 
-inline std::string board_request(quint32 board_id) {
-    json request = {{"type", "get-board-info"}, {"id", board_id}};
+std::string board_request(quint32 board_id) {
+    json request = {{"type", "get-boards-info"}, {"id", board_id}};
     return request.dump();
 }
 
-inline std::string delete_request(quint32 id, const QString &object_type) {
+std::string delete_request(quint32 id, const QString &object_type) {
     json request = {
         {"type", "delete"},
         {"id", id},
@@ -52,7 +49,7 @@ inline std::string delete_request(quint32 id, const QString &object_type) {
     return request.dump();
 }
 
-inline std::string update_request(
+std::string update_request(
     const QString &object_type,
     quint32 id,
     const QString &field,
@@ -67,27 +64,46 @@ inline std::string update_request(
     return request.dump();
 }
 
-inline board parse_board(const json &object) {
+board parse_board(const json &object) {
     QString name = QString::fromStdString(object["name"]);
     QString description = QString::fromStdString(object["description"]);
     quint32 id = object["id"];
     return board(id, 0, name, description);
 }
 
-inline list parse_list(const json &object) {
-    QString name = QString::fromStdString(object["name"]);
-    QString description = QString::fromStdString(object["description"]);
-    quint32 id = object["id"];
-    return list(id, 0, name, description);
-}
-
-inline card parse_card(const json &object) {
+card parse_card(const json &object) {
     QString name = QString::fromStdString(object["name"]);
     QString description = QString::fromStdString(object["description"]);
     quint32 id = object["id"];
     return card(id, 0, name, description);
 }
 
-}  // namespace parser
+list parse_list(const json &object) {
+    QString name = QString::fromStdString(object["name"]);
+    QString description = QString::fromStdString(object["description"]);
+    quint32 id = object["id"];
+    list list(id, 0, name, description);
+    QVector<card> cards;
+    for (const auto &card_json : object["cards"]) {
+        card card = parse_card(card_json);
+        cards.push_back(card);
+    }
+    list.m_cards = cards;
+    return list;
+}
 
-#endif
+board parse_board(const json &object, quint32 m_user_id) {
+    QString name = QString::fromStdString(object["name"]);
+    QString description = QString::fromStdString(object["description"]);
+    quint32 board_id = object["id"];
+    board board(board_id, m_user_id, name, description);
+    QVector<list> lists;
+    for (const auto &list_json : object["lists"]) {
+        list list = parse_list(list_json);
+        lists.push_back(list);
+    }
+    board.m_lists = lists;
+    return board;
+}
+
+}  // namespace parser

@@ -92,8 +92,7 @@ Rectangle {
                     (parent.hovered ? Qt.darker(style.primaryColor, 1.2) : style.primaryColor)
                 }     
                 onClicked: {
-                    loader.active = false
-                    start_menu.visible = true
+                    loader.source = "BoardSelect.qml"
                 }
             }                
             Button {

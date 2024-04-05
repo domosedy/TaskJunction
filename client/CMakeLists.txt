@@ -11,16 +11,11 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_FLAGS "-pedantic-errors -Wall -Wextra -Werror -Wshadow")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fno-omit-frame-pointer -fsanitize=address")
+set(CMAKE_CXX_FLAGS "-pedantic-errors -g -Wall -Wextra -Werror -Wshadow")
  
 find_package(Qt6 COMPONENTS Qml Quick Widgets Core Gui Network Sql REQUIRED)
 find_package(PostgreSQL REQUIRED)
-
-include(FetchContent)
-
-FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
-FetchContent_MakeAvailable(json)
+find_package(nlohmann_json REQUIRED)
     
 set(PROJECT_SOURCES
         src/main.cpp
@@ -28,13 +23,13 @@ set(PROJECT_SOURCES
         src/boardmodel.cpp
         src/listmodel.cpp
         src/boardmenu.cpp
+        src/jsonparser.cpp
         src/qml.qrc
         include/client.hpp
         include/boardmodel.hpp
         include/listmodel.hpp
         include/boardmenu.hpp
-        shared/logging.hpp
-        shared/json_parser.hpp
+        include/jsonparser.hpp
         ../shared/include/element_classes.hpp
         ../shared/include/hashes.hpp
         ../shared/src/element_classes.cpp

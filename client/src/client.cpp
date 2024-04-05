@@ -6,8 +6,7 @@
 #include "boardmenu.hpp"
 #include "database.hpp"
 #include "element_classes.hpp"
-#include "json_parser.hpp"
-#include "logging.hpp"
+#include "jsonparser.hpp"
 
 Client::Client(QObject *parent)
     : QObject(parent),
@@ -63,21 +62,25 @@ void Client::parse_response(const QString &data) {
         }
     }
     if (response_type == "create-response") {
-        // validate
         [[maybe_unused]] quint32 board_id = response["board-id"];
         [[maybe_unused]] quint32 list_id = response["list-id"];
         [[maybe_unused]] quint32 card_id = response["card-id"];
         if (list_id == 0) {
             board new_board = parser::parse_board(response["object-json"]);
             m_board_menu->add_board(new_board);
-        }
-        if (card_id == 0) {
+        } else if (card_id == 0) {
             list new_list = parser::parse_list(response["object-json"]);
             m_current_board->create_list(new_list);
         } else {
             card new_card = parser::parse_card(response["object-json"]);
             m_current_board->create_card(list_id, new_card);
         }
+    }
+    if (response_type == "board") {
+        const board loaded_board = parser::parse_board(response, m_user_id);
+        m_loaded_boards[m_current_index] = new BoardModel(this, loaded_board);
+        m_current_board = m_loaded_boards[m_current_index];
+        emit boardChanged();
     }
 }
 
@@ -124,19 +127,16 @@ void Client::prepare_remote_board_select_menu(
         quint32 id = board["id"];
         m_remote_menu->create_board(name, description, id);
     }
-    m_board_menu = m_local_menu;
+    m_board_menu = m_remote_menu;
     emit menuChanged();
 }
 
 void Client::request_board(int index) {
-    if (index == m_current_index) {
-        return;
-    }
     quint32 board_id = m_board_menu->get_id(index);
+    m_current_index = index;
     if (m_mode == ClientMode::Local) {
         const board &requested_board = db.get_full_board(board_id);
         m_current_board = new BoardModel(this, requested_board);
-        m_current_index = index;
         emit boardChanged();
     } else {
         std::string request = parser::board_request(board_id);
@@ -154,9 +154,8 @@ void Client::create_list(QString &name) {
         const list &new_list = db.select_list(list_id);
         m_current_board->create_list(new_list);
     } else {
-        std::string request = parser::create_request(
-            "list", board_id, name, "", board_id
-        );
+        std::string request =
+            parser::create_request("list", board_id, name, "", board_id);
         write(request);
     }
 }
@@ -175,8 +174,9 @@ void Client::create_card(int list_index, QString &name, QString &description) {
         const card &new_card = db.select_card(card_id);
         m_current_board->create_card(list_index, new_card);
     } else {
-        std::string request =
-            parser::create_request("card", list_id, name, description, board_id, list_id);
+        std::string request = parser::create_request(
+            "card", list_id, name, description, board_id, list_id
+        );
         write(request);
     }
 }

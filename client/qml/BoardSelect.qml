@@ -161,14 +161,15 @@ Rectangle {
                     Text {
                         text: name
                         font.family: "Courier"
-                        font.pointSize: 16
+                        font.pointSize: 18
+                        font.bold: true
                         Layout.preferredWidth: parent.width - 20
                         Layout.alignment: Qt.AlignHCenter
                     }                     
                     Text {
                         text: description
                         font.family: "Courier"
-                        font.pointSize: 16
+                        font.pointSize: 14
                         Layout.preferredWidth: parent.width - 20
                         Layout.alignment: Qt.AlignHCenter
                     }   
@@ -176,7 +177,7 @@ Rectangle {
                 MouseArea {
                     anchors.fill: parent
                     onDoubleClicked: {
-                        mainClient.request_board(index);
+                        mainClient.request_board(index)
                         loader.source = "Board.qml"
                     }
                 }         

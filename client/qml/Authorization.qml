@@ -78,7 +78,10 @@ Rectangle {
                     radius: implicitHeight / 2
                     color: "white"
                 }
-                onTextChanged: background.color = "white"
+                onTextChanged: {
+                    background.color = "white"
+                    loginPort.background.color = "white"
+                }
             }
             TextField {
                 id: loginPort
@@ -98,6 +101,10 @@ Rectangle {
                     implicitHeight: 50
                     radius: implicitHeight / 2
                     color: "white"
+                }
+                onTextChanged: {
+                    background.color = "white"
+                    loginIP.background.color = "white"
                 }
             }
             Rectangle {
@@ -161,6 +168,7 @@ Rectangle {
             }            
             if (mainClient.connection_status == Client.Unable_to_connect) {
                 loginIP.background.color = style.deleteBackgroundColor
+                loginPort.background.color = style.deleteBackgroundColor
             }
         }
     }

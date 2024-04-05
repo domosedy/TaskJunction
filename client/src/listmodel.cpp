@@ -11,11 +11,13 @@ ListModel::ListModel(QObject *parent, const nlohmann::json &list_json)
     m_name = QString::fromStdString(list_json["name"]);
     m_description = QString::fromStdString(list_json["description"]);
     const nlohmann::json &cards = list_json["lists"];
+    int index = 0;
     for (const auto &card : cards) {
         QString card_name = QString::fromStdString(card["name"]);
         QString card_description = QString::fromStdString(card["description"]);
         quint32 card_id = card["id"];
         m_cards.emplace_back(card_id, 0, card_name, card_description);
+        m_index_by_id[card_id] = index++;
     }
 }
 
@@ -26,6 +28,10 @@ ListModel::ListModel(QObject *parent, const list &list_base)
     m_name = list_base.m_name;
     m_description = list_base.m_description;
     m_cards = list_base.m_cards;
+    int index = 0;
+    for (auto& card : m_cards) {
+        m_index_by_id[card.m_card_id] = index++;
+    }
 }
 
 ListModel::ListModel(
@@ -73,7 +79,6 @@ void ListModel::create_card(QString &name, QString &description) {
     if (name == "") {
         name = "New card";
     }
-
     beginInsertRows(QModelIndex(), m_cards.size(), m_cards.size());
     m_cards.append(card(0, 0, name, description));
     endInsertRows();
@@ -82,6 +87,7 @@ void ListModel::create_card(QString &name, QString &description) {
 }
 
 void ListModel::create_card(const card &new_card) {
+    m_index_by_id[new_card.m_card_id] = m_cards.size();
     beginInsertRows(QModelIndex(), m_cards.size(), m_cards.size());
     m_cards.append(new_card);
     endInsertRows();
