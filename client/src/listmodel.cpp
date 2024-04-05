@@ -29,7 +29,7 @@ ListModel::ListModel(QObject *parent, const list &list_base)
     m_description = list_base.m_description;
     m_cards = list_base.m_cards;
     int index = 0;
-    for (auto& card : m_cards) {
+    for (auto &card : m_cards) {
         m_index_by_id[card.m_card_id] = index++;
     }
 }
