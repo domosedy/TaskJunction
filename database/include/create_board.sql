@@ -10,6 +10,7 @@ name    varchar(50) REFERENCES user_authorization_data ON DELETE CASCADE
 
 CREATE TABLE board_signature(
 id serial PRIMARY KEY,
+
 user_id integer REFERENCES user_signature ON DELETE CASCADE,
 name varchar(50),
 description text

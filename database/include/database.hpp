@@ -79,7 +79,6 @@ public:
     card select_card(quint32 id);
     tag select_tag(quint32 id);
     bool delete_command(const QString &table_name, quint32 key_value);
-
     QVector<board> get_user_boards(quint32 user_id);
     QVector<list> get_board_lists(quint32 board_id);
     QVector<card> get_list_cards(quint32 list_id);
@@ -87,11 +86,11 @@ public:
 
     bool check_user_rights(quint32 user_id, quint32 board_id);
     quint32 get_sequence_last_value(const QString &sequence);
-
     quint32 authorize_user(const QString &login, const QString &password);
 
     board get_full_board(quint32 board_id);
 };
+
 
 }  // namespace database
 

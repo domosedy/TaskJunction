@@ -38,6 +38,7 @@ tag::tag(quint32 tag_id, QString name)
 
 template <typename T>
     requires has_to_json_method<T>
+
 static std::string array_to_json(const QVector<T> &data) {
     std::stringstream ss;
 

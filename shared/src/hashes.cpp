@@ -14,7 +14,6 @@ QString generate_salt() {
         while (character == '\n') {
             character = static_cast<unsigned char>(rnd());
         }
-
         byte_data.push_back(character);
     }
 
