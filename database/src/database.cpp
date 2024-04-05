@@ -226,6 +226,7 @@ db_manager::authorize_user(const QString &login, const QString &password) {
     }
     return insert_user(login, password);
 }
+
 bool db_manager::check_user_rights(quint32 user_id, quint32 board_id) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["check_user_rights"].arg(m_schema));
@@ -396,7 +397,6 @@ db_manager::select_info_by_id(const QString &query_name, quint32 key_value) {
     query.bindValue(":key_value", key_value);
     if (!query.exec()) {
         qDebug() << "select_info_by_id:" << m_database.lastError();
-
     }
     query.next();
     return query.record();

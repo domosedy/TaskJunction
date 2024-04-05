@@ -1,10 +1,10 @@
 #include "data_handler.hpp"
 #include <QDebug>
 #include <QObject>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
 #include <variant>
-#include <nlohmann/json.hpp>
 #include "logging.hpp"
 
 using json = nlohmann::json;

@@ -91,7 +91,6 @@ public:
     board get_full_board(quint32 board_id);
 };
 
-
 }  // namespace database
 
 #endif  // DATABASE_HPP_
