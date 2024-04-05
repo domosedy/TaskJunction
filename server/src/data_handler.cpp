@@ -4,7 +4,7 @@
 #include <optional>
 #include <string>
 #include <variant>
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include "logging.hpp"
 
 using json = nlohmann::json;
@@ -20,7 +20,7 @@ get_int_field_data(const json &data, const std::string &field) {
         return std::nullopt;
     }
 
-    return *field_it;
+    return std::optional<std::size_t>(*field_it);
 }
 
 static std::optional<std::string>
@@ -34,7 +34,7 @@ get_string_field_data(const json &data, const std::string &field) {
         return std::nullopt;
     }
 
-    return *field_it;
+    return std::optional<std::string>(*field_it);
 }
 
 static std::optional<update_query> parseUpdateQuery(const json &json_data) {

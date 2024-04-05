@@ -9,13 +9,12 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(EXECUTABLE_OUTPUT_PATH ../)
 find_package(Qt6 REQUIRED COMPONENTS Core Network Sql)
+find_package(nlohmann_json REQUIRED)
 
 add_executable(server 
 include/client_socket.hpp 
 include/data_handler.hpp
-include/json.hpp
 include/logging.hpp 
 include/query.hpp
 include/server.hpp 
@@ -38,3 +37,4 @@ target_include_directories(server PUBLIC ../shared/include)
 target_link_libraries(server PRIVATE Qt6::Network)
 target_link_libraries(server PRIVATE Qt6::Sql)
 target_link_libraries(server PRIVATE Qt6::Core)
+target_link_libraries(server PRIVATE nlohmann_json::nlohmann_json)
