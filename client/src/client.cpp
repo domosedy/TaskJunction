@@ -144,7 +144,7 @@ void Client::request_board(int index) {
     }
 }
 
-void Client::create_list(QString &name) {
+void Client::create_list(QString name) {
     if (name == "") {
         name = "New list";
     }
@@ -160,7 +160,7 @@ void Client::create_list(QString &name) {
     }
 }
 
-void Client::create_card(int list_index, QString &name, QString &description) {
+void Client::create_card(int list_index, QString name, QString description) {
     if (name == "") {
         name = "New card";
     }
@@ -181,7 +181,7 @@ void Client::create_card(int list_index, QString &name, QString &description) {
     }
 }
 
-void Client::create_board(QString &name, QString &description) {
+void Client::create_board(QString name, QString description) {
     if (name == "") {
         name = "New board";
     }
@@ -223,10 +223,10 @@ void Client::delete_card(int list_index, int card_index) {
 }
 
 void Client::login(
-    QString &username,
-    QString &password,
-    QString &server_ip,
-    QString &server_port
+    QString username,
+    QString password,
+    QString server_ip,
+    QString server_port
 ) {
     if (m_socket->state() != QAbstractSocket::UnconnectedState) {
         if (server_ip == m_server_ip &&
@@ -255,7 +255,7 @@ void Client::login(
     }
 }
 
-void Client::update_card_name(int list_index, int card_index, QString &name) {
+void Client::update_card_name(int list_index, int card_index, QString name) {
     quint32 card_id = m_current_board->get_card_id(list_index, card_index);
     if (m_mode == ClientMode::Local &&
         db.update_command("card_signature", "name", name, card_id)) {
@@ -273,7 +273,7 @@ void Client::update_card_name(int list_index, int card_index, QString &name) {
 void Client::update_card_description(
     int list_index,
     int card_index,
-    QString &description
+    QString description
 ) {
     quint32 card_id = m_current_board->get_card_id(list_index, card_index);
     if (m_mode == ClientMode::Local &&
@@ -293,7 +293,7 @@ void Client::update_card_description(
     }
 }
 
-void Client::update_list_name(int list_index, QString &name) {
+void Client::update_list_name(int list_index, QString name) {
     quint32 list_id = m_current_board->get_list_id(list_index);
     if (m_mode == ClientMode::Local &&
         db.update_command("list_signature", "name", name, list_id)) {

@@ -35,16 +35,16 @@ public:
 
     explicit Client(QObject *parent = nullptr);
 
-    Q_INVOKABLE void create_board(QString &name, QString &description);
+    Q_INVOKABLE void create_board(QString name, QString description);
     Q_INVOKABLE void login(
-        QString &username,
-        QString &password,
-        QString &server_ip,
-        QString &server_port
+        QString username,
+        QString password,
+        QString server_ip,
+        QString server_port
     );
-    Q_INVOKABLE void create_list(QString &name);
+    Q_INVOKABLE void create_list(QString name);
     Q_INVOKABLE void
-    create_card(int list_index, QString &name, QString &description);
+    create_card(int list_index, QString name, QString description);
     Q_INVOKABLE void prepare_local_board_select_menu();
     Q_INVOKABLE void prepare_remote_board_select_menu(
         const nlohmann::json &avaliable_boards = {}
@@ -53,13 +53,13 @@ public:
     Q_INVOKABLE void delete_list(int list_index);
     Q_INVOKABLE void delete_card(int list_index, int card_index);
     Q_INVOKABLE void
-    update_card_name(int list_index, int card_index, QString &name);
+    update_card_name(int list_index, int card_index, QString name);
     Q_INVOKABLE void update_card_description(
         int list_index,
         int card_index,
-        QString &description
+        QString description
     );
-    Q_INVOKABLE void update_list_name(int list_index, QString &name);
+    Q_INVOKABLE void update_list_name(int list_index, QString name);
 
 signals:
     void boardChanged();
