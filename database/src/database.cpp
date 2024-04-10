@@ -39,15 +39,15 @@ void db_manager::fill_query_name_to_sql_command() {
 
     query_name_to_sql_command["insert_board"] =
         "INSERT INTO %1.board_signature VALUES (DEFAULT, :user_id, :name, "
-        ":description);";
+        ":description, DEFAULT);";
 
     query_name_to_sql_command["insert_list"] =
         "INSERT INTO %1.list_signature VALUES (DEFAULT, :board_id, :name, "
-        ":description);";
+        ":description, DEFAULT);";
 
     query_name_to_sql_command["insert_card"] =
         "INSERT INTO %1.card_signature VALUES (DEFAULT, :list_id, :name, "
-        ":description);";
+        ":description, DEFAULT);";
 
     query_name_to_sql_command["insert_tag"] =
         "INSERT INTO %1.tag_signature VALUES (DEFAULT, :name);";
@@ -58,6 +58,9 @@ void db_manager::fill_query_name_to_sql_command() {
     query_name_to_sql_command["update_command"] =
         "UPDATE %1.%2 SET %3 = :new_value WHERE id = "
         ":key_value;";
+
+    query_name_to_sql_command["update_order"] =
+        "UPDATE %1.%2 SET number = number + (%3) WHERE number > :left AND number < :right;";
 
     query_name_to_sql_command["select_user"] =
         "SELECT id, name FROM %1.user_signature WHERE id = :key_value;";
@@ -96,8 +99,18 @@ void db_manager::fill_query_name_to_sql_command() {
         "END LOOP;"
         "END$$;";
 
-    query_name_to_sql_command["select_subobject_ids"] =
-        "SELECT %2 FROM %1.%3 WHERE %4 = :id";
+    query_name_to_sql_command["select_board_ids_by_user_id"] =
+            "SELECT id FROM %1.board_signature WHERE user_id = :id "
+            "ORDER BY %1.board_signature.number;";
+
+    query_name_to_sql_command["select_list_ids_by_board_id"] =
+            "SELECT id FROM %1.list_signature WHERE board_id = :id;";
+
+    query_name_to_sql_command["select_card_ids_by_list_id"] =
+            "SELECT id FROM %1.card_signature WHERE list_id = :id;";
+
+    query_name_to_sql_command["select_tag_ids_by_card_id"] =
+            "SELECT tag_id FROM %1.card_to_tags WHERE tag_id = :id;";
 
     query_name_to_sql_command["select_last_value"] =
         "SELECT last_value FROM %1";
@@ -116,6 +129,9 @@ void db_manager::fill_query_name_to_sql_command() {
 
     query_name_to_sql_command["get_user_id_by_name"] =
         "SELECT id FROM %1.user_signature WHERE name = :name;";
+
+    query_name_to_sql_command["get_number"] =
+        "SELECT number FROM %1.%2 WHERE id = :id;";
     // "SET search_path TO public;";
 }
 
@@ -443,8 +459,8 @@ tag db_manager::select_tag(quint32 id) {
 
 QVector<board> db_manager::get_user_boards(quint32 user_id) {
     QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["select_subobject_ids"].arg(
-        m_schema, "id", "board_signature", "user_id"
+    query.prepare(query_name_to_sql_command["select_board_ids_by_user_id"].arg(
+        m_schema
     ));
     query.bindValue(":id", user_id);
     if (!query.exec()) {
@@ -459,8 +475,8 @@ QVector<board> db_manager::get_user_boards(quint32 user_id) {
 
 QVector<list> db_manager::get_board_lists(quint32 board_id) {
     QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["select_subobject_ids"].arg(
-        m_schema, "id", "list_signature", "board_id"
+    query.prepare(query_name_to_sql_command["select_list_ids_by_board_id"].arg(
+        m_schema
     ));
     query.bindValue(":id", board_id);
     if (!query.exec()) {
@@ -476,8 +492,8 @@ QVector<list> db_manager::get_board_lists(quint32 board_id) {
 QVector<card> db_manager::get_list_cards(quint32 list_id) {
     QSqlQuery query(m_database);
 
-    query.prepare(query_name_to_sql_command["select_subobject_ids"].arg(
-        m_schema, "id", "card_signature", "list_id"
+    query.prepare(query_name_to_sql_command["select_card_ids_by_list_id"].arg(
+        m_schema
     ));
     query.bindValue(":id", list_id);
     if (!query.exec()) {
@@ -492,8 +508,8 @@ QVector<card> db_manager::get_list_cards(quint32 list_id) {
 
 QVector<tag> db_manager::get_card_tags(quint32 card_id) {
     QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["select_subobject_ids"].arg(
-        m_schema, "tag_id", "card_to_tags", "tag_id"
+    query.prepare(query_name_to_sql_command["select_tag_ids_by_card_id"].arg(
+        m_schema
     ));
     query.bindValue(":id", card_id);
     if (!query.exec()) {
@@ -513,6 +529,40 @@ board db_manager::get_full_board(quint32 board_id) {
         list.m_cards = get_list_cards(list.m_list_id);
     }
     return board;
+}
+
+quint32 db_manager::get_number(const QString &table_name, quint32 id) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["get_number"].arg(m_schema, table_name));
+    query.bindValue(":id", id);
+    if (!query.exec()) {
+        qDebug() << "get_number:" << m_database.lastError();
+        return 0;
+    }
+    query.next();
+    return query.value(0).toInt();
+}
+
+bool db_manager::update_order(const QString &table_name, quint32 id, quint32 new_number) {
+    quint32 number = get_number(table_name, id);
+    if (number == new_number) {
+        return true;
+    }
+    QSqlQuery query(m_database);
+    if (new_number < number) {
+        query.prepare(query_name_to_sql_command["update_order"].arg(m_schema, table_name, "1"));
+        query.bindValue(":left", new_number - 1);
+        query.bindValue(":right", number);
+    } else {
+        query.prepare(query_name_to_sql_command["update_order"].arg(m_schema, table_name, "-1"));
+        query.bindValue(":left", number);
+        query.bindValue(":right", new_number + 1);
+    }
+    if (!query.exec()) {
+        qDebug() << "update_order:" << m_database.lastError();
+        return false;
+    }
+    return update_command(table_name, "number", QString::number(new_number), id);
 }
 
 }  // namespace database

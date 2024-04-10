@@ -91,6 +91,9 @@ public:
     quint32 authorize_user(const QString &login, const QString &password);
 
     board get_full_board(quint32 board_id);
+
+    quint32 get_number(const QString &table_name, quint32 id);
+    bool update_order(const QString &table_name, quint32 id, quint32 new_number);
 };
 
 }  // namespace database
