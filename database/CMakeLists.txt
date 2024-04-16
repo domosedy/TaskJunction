@@ -15,7 +15,9 @@ find_package(PostgreSQL REQUIRED)
 add_executable(database src/database.cpp
         src/database_main.cpp
         include/element_classes.hpp
-        src/element_classes.cpp)
+        src/element_classes.cpp
+        test/test.cpp
+        test/dotest_main.cpp)
 
 target_include_directories(database PUBLIC include)
 target_link_libraries(database PRIVATE Qt6::Network)
