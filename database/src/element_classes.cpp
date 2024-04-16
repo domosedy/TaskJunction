@@ -1,18 +1,22 @@
 #include "element_classes.hpp"
 #include <sstream>
 
+group::group(quint32 group_id, QString name)
+    : m_group_id(group_id), m_name(std::move(name)) {
+}
+
 user::user(quint32 user_id, QString name)
     : m_user_id(user_id), m_name(std::move(name)) {
 }
 
 board::board(
     quint32 board_id,
-    quint32 user_id,
+    quint32 group_id,
     QString name,
     QString description
 )
     : m_board_id(board_id),
-      m_user_id(user_id),
+      m_group_id(group_id),
       m_name(std::move(name)),
       m_description(std::move(description)) {
 }

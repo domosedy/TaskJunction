@@ -68,7 +68,7 @@ struct list {
 
 struct board {
     quint32 m_board_id;
-    quint32 m_user_id;
+    quint32 m_group_id;
     QString m_name;
     QString m_description;
     QVector<list> m_lists;
@@ -99,6 +99,17 @@ struct user {
 
     void print_data() const {
         qDebug() << m_user_id << m_name;
+    }
+};
+
+struct group {
+    quint32 m_group_id;
+    QString m_name;
+
+    explicit group(quint32 group_id, QString name);
+
+    void print_data() const {
+        qDebug() << m_group_id << m_name;
     }
 };
 

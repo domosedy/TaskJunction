@@ -60,14 +60,14 @@ public:
     //    void create_schema(const QString &schema_name);
     quint32 create_group(const QString &name);
     quint32 insert_board(
-        quint32 user_id,
+        quint32 group_id,
         const QString &name,
         const QString &description
     );
     quint32
-    insert_list(int board_id, const QString &name, const QString &description);
+    insert_list(quint32 board_id, const QString &name, const QString &description);
     quint32
-    insert_card(int list_id, const QString &name, const QString &description);
+    insert_card(quint32 list_id, const QString &name, const QString &description);
     quint32 insert_tag(const QString &name);
 
     bool add_user_to_group(quint32 user_id, quint32 group_id);
@@ -82,7 +82,7 @@ public:
         quint32 key_value
     );
 
-//    group select_group(quint32 id); // TODO
+    group select_group(quint32 id);
     user select_user(quint32 id);
     board select_board(quint32 id);
     list select_list(quint32 id);
@@ -91,7 +91,7 @@ public:
 
     bool delete_command(const QString &table_name, quint32 key_value);
 
-//    QVector<board> get_user_boards(quint32 user_id);
+    QVector<group> get_user_groups(quint32 user_id);
     QVector<board> get_group_boards(quint32 group_id);
     QVector<list> get_board_lists(quint32 board_id);
     QVector<card> get_list_cards(quint32 list_id);

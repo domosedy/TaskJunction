@@ -19,8 +19,13 @@ int main(int argc, char *argv[]) {
     //    std::cout << std::boolalpha << db_manager.check_user_rights(2, 2);
 
 //    qDebug() << db_manager.authorize_user("username", "password");
-//    db_manager.create_group("first group");
-//    db_manager.add_user_to_group(2, 1);
+//    qDebug() << db_manager.authorize_user("new_username", "new_password");
+//    db_manager.create_group("second group");
+//    db_manager.add_user_to_group(3, 2);
+//    db_manager.add_user_to_group(2, 2);
+//    auto res = db_manager.get_user_groups(4);
+//    for (auto group: res)
+//        group.print_data();
 //    for (int i = 1; i < 6; ++i) {
 //        db_manager.insert_board(1, "board_name", "description");
 //        db_manager.insert_list(1, "list_name", "test3");
@@ -62,6 +67,6 @@ int main(int argc, char *argv[]) {
 //    qDebug() << db_manager.add_user_to_group(1, 1);
 
 //    db_manager.drop_all_tables();
-
+//    db_manager.clear_all_tables();
     return 0;
 }
