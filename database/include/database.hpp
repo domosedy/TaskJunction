@@ -6,6 +6,7 @@
 #include "element_classes.hpp"
 
 namespace database {
+
 const QString BOARD_TABLE_NAME = "board_signature";
 const QString BOARD_PRIMARY_KEY = "board_id";
 const QString LIST_TABLE_NAME = "list_signature";
@@ -17,9 +18,24 @@ const QString TAG_PRIMARY_KEY = "tag_id";
 const QString USER_ID_SEQUENCE = "user_signature_id_seq";
 const QString GROUP_ID_SEQUENCE = "group_signature_id_seq";
 const QString BOARD_ID_SEQUENCE = "board_signature_id_seq";
+const QString BOARD_NUMBER_SEQUENCE = "board_signature_number_seq";
 const QString LIST_ID_SEQUENCE = "list_signature_id_seq";
+const QString LIST_NUMBER_SEQUENCE = "list_signature_number_seq";
 const QString CARD_ID_SEQUENCE = "card_signature_id_seq";
+const QString CARD_NUMBER_SEQUENCE = "card_signature_number_seq";
 const QString TAG_ID_SEQUENCE = "tag_signature_id_seq";
+
+const QVector<QString> sequences_names {
+        USER_ID_SEQUENCE,
+        GROUP_ID_SEQUENCE,
+        BOARD_ID_SEQUENCE,
+        BOARD_NUMBER_SEQUENCE,
+        LIST_ID_SEQUENCE,
+        LIST_NUMBER_SEQUENCE,
+        CARD_ID_SEQUENCE,
+        CARD_NUMBER_SEQUENCE,
+        TAG_ID_SEQUENCE
+};
 
 const QString QT_DATABASE_DRIVER = "QPSQL";
 

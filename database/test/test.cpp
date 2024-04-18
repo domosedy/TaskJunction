@@ -2,6 +2,7 @@
 #include "database.hpp"
 #include "element_classes.hpp"
 #include "test_utils.hpp"
+#include <iostream>
 
 using namespace database;
 QVector<QString> arguments = {"postgres", "ivan", "localhost", "1"};
@@ -12,19 +13,19 @@ void reset_sequence();
 #ifdef DEFAULT_TESTS
 
 TEST_CASE("create") {
-    db_manager db_manager(arguments[1], arguments[2], arguments[3], arguments[4]);
+    db_manager db_manager(arguments[0], arguments[1], arguments[2], arguments[3]);
     db_manager.clear_all_tables();
 
     SUBCASE("user") {
         quint32 id = db_manager.authorize_user("test_user", "test_password");
-        CHECK(id == 2);
+        CHECK(id == 1);
         auto user = db_manager.select_user(id);
         CHECK(user.m_name == "test_user");
         CHECK(user.m_user_id == id);
     }
 
     SUBCASE("default_group") {
-        auto groups = db_manager.get_user_groups(2);
+        auto groups = db_manager.get_user_groups(1);
         CHECK(groups.size() == 1);
         CHECK(groups[1].m_name == "default");
         CHECK(groups[1].m_group_id == 1);
@@ -104,7 +105,12 @@ TEST_CASE("select") {
 #ifdef TEST_NEW_FEATURE
 
 TEST_CASE("new feature") {
-    
+    db_manager db_manager(arguments[0], arguments[1], arguments[2], arguments[3]);
+    db_manager.clear_all_tables();
+    quint32 user_id = db_manager.authorize_user("doctest_user", "");
+    quint32 group_id = db_manager.create_group("doctest_group");
+    db_manager.add_user_to_group(user_id, group_id);
+    db_manager.insert_board(group_id, "doctest_board", "desc");
 }
 
 #endif

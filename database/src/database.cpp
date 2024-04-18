@@ -150,6 +150,9 @@ void db_manager::fill_query_name_to_sql_command() {
 
     query_name_to_sql_command["get_number"] =
         "SELECT number FROM %1.%2 WHERE id = :id;";
+
+    query_name_to_sql_command["alter_sequence"] =
+        "ALTER SEQUENCE %1.%2 RESTART WITH %3;";
     // "SET search_path TO public;";
 }
 
@@ -190,6 +193,15 @@ void db_manager::clear_all_tables() { // TODO reset sequences
         QSqlQuery query(m_database);
         if (!query.exec(command.arg(str))) {
             qDebug() << "clear_all_tables" << m_database.lastError();
+        }
+    }
+
+    for (auto &sequence_name: sequences_names) {
+        QSqlQuery query(m_database);
+        query.prepare(query_name_to_sql_command["alter_sequence"].arg(m_schema, sequence_name, "1"));
+        if (!query.exec()) {
+            qDebug() << "clear_all_tables::alter_sequence" << m_database.lastError() << '\n' <<
+                     query_name_to_sql_command["alter_sequence"].arg(m_schema, sequence_name, "1");
         }
     }
 }
