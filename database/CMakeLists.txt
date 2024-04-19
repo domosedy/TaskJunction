@@ -13,11 +13,11 @@ find_package(Qt6 REQUIRED COMPONENTS Core Network Sql)
 find_package(PostgreSQL REQUIRED)
 
 add_executable(database src/database.cpp
-#        src/database_main.cpp
         include/element_classes.hpp
         src/element_classes.cpp
         test/test.cpp
         test/dotest_main.cpp
+#        src/database_main.cpp
 )
 
 target_include_directories(database PUBLIC include)
