@@ -161,19 +161,10 @@ void db_manager::fill_query_name_to_sql_command() {
     query_name_to_sql_command["alter_sequence"] =
         "SELECT setval('%1.%2', %3, FALSE);";
     //        "ALTER SEQUENCE %1.%2 RESTART WITH %3;";
-    // "SET search_path TO public;";
-}
 
-void db_manager::test_foo() {
-    QSqlQuery query(m_database);
-    query.prepare("SELECT nspname FROM pg_catalog.pg_namespace;");
-    query.exec();
-    while (query.next()) {
-        auto record = query.record();
-        for (int i = 0; i < record.count(); ++i) {
-            qDebug() << record.field(i).value();
-        }
-    }
+    query_name_to_sql_command["get_rows_number"] =
+        "SELECT count(*) FROM %1.%2;";
+    // "SET search_path TO public;";
 }
 
 void db_manager::drop_all_tables() {
@@ -229,6 +220,17 @@ quint32 db_manager::get_sequence_last_value(const QString &sequence) {
     if (!query.exec()) {
         qDebug() << "get_sequence_last_value:" << m_database.lastError();
         return 0;
+    }
+    query.next();
+    return query.value(0).toInt();
+}
+
+int db_manager::get_rows_number(const QString &table_name) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["get_rows_number"].arg(m_schema, table_name));
+    if (!query.exec()) {
+        qDebug() << "get_rows_number" << m_database.lastError();
+        return -1;
     }
     query.next();
     return query.value(0).toInt();
@@ -685,6 +687,9 @@ bool db_manager::update_order(
     quint32 id,
     quint32 new_number
 ) {
+    if (new_number == 0 || new_number > get_rows_number(table_name)) {
+        return false;
+    }
     quint32 number = get_number(table_name, id);
     if (number == new_number) {
         return true;

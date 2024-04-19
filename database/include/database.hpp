@@ -54,6 +54,8 @@ class db_manager {
     quint32 get_user_id_by_name(const QString &name);
     quint32 get_group_id_by_board_id(const quint32 board_id);
 
+    int get_rows_number(const QString &table_name);
+
     quint32 insert_user(const QString &login, const QString &password);
 
     static void fill_query_name_to_sql_command();
@@ -71,7 +73,6 @@ public:
     void drop_all_tables();
 
     void set_schema(const QString &name);
-    void test_foo();
 
     //    void create_schema(const QString &schema_name);
     quint32 create_group(const QString &name);

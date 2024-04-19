@@ -163,6 +163,46 @@ TEST_CASE("get user groups") {
     }
 }
 
+// TODO check user/group rights
+// TODO check update_command
+
+TEST_CASE("update order") {
+    db_manager db_manager(
+            arguments[0], arguments[1], arguments[2], arguments[3]
+    );
+    db_manager.clear_all_tables();
+
+    {
+        quint32 user_id = db_manager.authorize_user("test_user", "test_password");
+        quint32 group_id = db_manager.get_user_groups(user_id)[0].m_group_id;
+        quint32 board_id = db_manager.insert_board(group_id, "test_board", "");
+        quint32 list_id_1 = db_manager.insert_list(board_id, "test_list_1", "");
+        quint32 list_id_2 = db_manager.insert_list(board_id, "test_list_2", "");
+        CHECK(db_manager.update_order("list_signature", list_id_1, 2));
+        CHECK(db_manager.get_number("list_signature", list_id_1) == 2);
+        CHECK(db_manager.get_number("list_signature", list_id_2) == 1);
+
+        quint32 list_id_3 = db_manager.insert_list(board_id, "test_list_3", "");
+        CHECK(db_manager.update_order("list_signature", list_id_3, 1));
+        CHECK(db_manager.get_number("list_signature", list_id_1) == 3);
+        CHECK(db_manager.get_number("list_signature", list_id_2) == 2);
+        CHECK(db_manager.get_number("list_signature", list_id_3) == 1);
+
+        CHECK(db_manager.update_order("list_signature", list_id_3, 3));
+        CHECK(db_manager.get_number("list_signature", list_id_1) == 2);
+        CHECK(db_manager.get_number("list_signature", list_id_2) == 1);
+        CHECK(db_manager.get_number("list_signature", list_id_3) == 3);
+    }
+
+    {
+        quint32 user_id = db_manager.authorize_user("test_user", "test_password");
+        quint32 group_id = db_manager.get_user_groups(user_id)[0].m_group_id;
+        quint32 board_id = db_manager.insert_board(group_id, "test_board", "");
+        quint32 list_id_1 = db_manager.insert_list(board_id, "test_list_1", "");
+        CHECK(!db_manager.update_order("list_signature", list_id_1, 100));
+        CHECK(!db_manager.update_order("list_signature", list_id_1, 0));
+}
+}
 
 #endif
 
