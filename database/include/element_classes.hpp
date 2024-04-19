@@ -111,6 +111,10 @@ struct group {
     void print_data() const {
         qDebug() << m_group_id << m_name;
     }
+
+    bool operator==(const group &other) const {
+        return m_group_id == other.m_group_id && m_name == other.m_name;
+    }
 };
 
 struct error {

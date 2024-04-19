@@ -106,6 +106,7 @@ public:
     tag select_tag(quint32 id);
 
     bool delete_command(const QString &table_name, quint32 key_value);
+    bool delete_user_from_group(quint32 user_id, quint32 group_id);
 
     QVector<group> get_user_groups(quint32 user_id);
     QVector<board> get_group_boards(quint32 group_id);
