@@ -2,24 +2,20 @@
 #define ELEMENT_CLASSES_HPP_
 
 #include <QString>
-#include <QVector>
 #include <QVariant>
-
-#include <string>
+#include <QVector>
 #include <concepts>
+#include <string>
 
-template<typename T>
-concept has_to_json_method =
-requires (T t) { 
-    t.to_json(); 
-};
+template <typename T>
+concept has_to_json_method = requires(T t) { t.to_json(); };
 
 struct tag {
     quint32 m_tag_id;
     QString m_name;
 
     tag() = default;
-    explicit tag(QVector<QVariant> data);
+    explicit tag(quint32 tag_id, QString name);
     std::string to_json() const;
 };
 
@@ -31,8 +27,18 @@ struct card {
     QVector<tag> m_tags;
 
     card() = default;
-    explicit card(QVector<QVariant> data);
-    card(QString name, QString description, quint32 id = 0, quint32 list_id = 0);
+    explicit card(
+        quint32 card_id,
+        quint32 list_id,
+        QString name,
+        QString description
+    );
+    card(
+        QString name,
+        QString description,
+        quint32 id = 0,
+        quint32 list_id = 0
+    );
     std::string to_json() const;
 };
 
@@ -44,28 +50,90 @@ struct list {
     QVector<card> m_cards;
 
     list() = default;
-    explicit list(QVector<QVariant> data);
-    list(QString name, QString description, quint32 id = 0, quint32 board_id = 0);
+    explicit list(
+        quint32 list_id,
+        quint32 board_id,
+        QString name,
+        QString description
+    );
+
+    list(
+        QString name,
+        QString description,
+        quint32 id = 0,
+        quint32 board_id = 0
+    );
     std::string to_json() const;
 };
 
 struct board {
     quint32 m_board_id;
+    quint32 m_group_id;
     QString m_name;
     QString m_description;
     QVector<list> m_lists;
 
     board() = default;
-    explicit board(QVector<QVariant> data);
+    explicit board(
+        quint32 board_id,
+        quint32 group_id,
+        QString name,
+        QString description
+    );
     board(QString name, QString description, quint32 id = 0);
     std::string to_json() const;
 };
 
 struct login {
     bool m_response;
-    QVector<std::pair<quint32, QString>> m_boards;
+    QVector<board> m_boards;
 
     std::string to_json() const;
 };
+
+struct user {
+    quint32 m_user_id;
+    QString m_name;
+
+    explicit user(quint32 user_id, QString name);
+
+    void print_data() const {
+        qDebug() << m_user_id << m_name;
+    }
+};
+
+struct error {
+    std::string error_message;
+
+    std::string to_json() const;
+};
+
+struct create_response {
+    quint32 id;
+    QString object_type;
+    std::size_t board_id;
+    std::size_t list_id;
+    std::size_t card_id;
+
+    std::string jsoned_object;
+
+    std::string to_json() const;
+};
+
+struct group {
+    quint32 m_group_id;
+    QString m_name;
+
+    explicit group(quint32 group_id, QString name);
+
+    void print_data() const {
+        qDebug() << m_group_id << m_name;
+    }
+
+    bool operator==(const group &other) const {
+        return m_group_id == other.m_group_id && m_name == other.m_name;
+    }
+};
+
 
 #endif  // ELEMENT_CLASSES_HPP_
