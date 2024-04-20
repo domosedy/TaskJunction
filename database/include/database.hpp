@@ -52,7 +52,6 @@ class db_manager {
     bool check_user_password(const QString &login, const QString &password);
 
     quint32 get_user_id_by_name(const QString &name);
-    quint32 get_group_id_by_board_id(const quint32 board_id);
 
     int get_rows_number(const QString &table_name);
 
@@ -114,6 +113,8 @@ public:
     QVector<list> get_board_lists(quint32 board_id);
     QVector<card> get_list_cards(quint32 list_id);
     QVector<tag> get_card_tags(quint32 card_id);
+
+    quint32 get_group_id_by_board_id(quint32 board_id);
 
     bool check_user_rights(quint32 user_id, quint32 board_id);
     bool check_group_rights(quint32 group_id, quint32 board_id);
