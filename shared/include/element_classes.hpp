@@ -76,7 +76,7 @@ struct board {
     board() = default;
     explicit board(
         quint32 board_id,
-        quint32 user_id,
+        quint32 group_id,
         QString name,
         QString description
     );
@@ -102,6 +102,24 @@ struct user {
     }
 };
 
+struct error {
+    std::string error_message;
+
+    std::string to_json() const;
+};
+
+struct create_response {
+    quint32 id;
+    QString object_type;
+    std::size_t board_id;
+    std::size_t list_id;
+    std::size_t card_id;
+
+    std::string jsoned_object;
+
+    std::string to_json() const;
+};
+
 struct group {
     quint32 m_group_id;
     QString m_name;
@@ -117,10 +135,5 @@ struct group {
     }
 };
 
-struct error {
-    std::string error_message;
-
-    std::string to_json() const;
-};
 
 #endif  // ELEMENT_CLASSES_HPP_

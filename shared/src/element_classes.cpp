@@ -1,4 +1,5 @@
 #include "element_classes.hpp"
+#include <map>
 #include <sstream>
 
 group::group(quint32 group_id, QString name)
@@ -18,21 +19,21 @@ board::board(
     : m_board_id(board_id),
       m_group_id(group_id),
       m_name(std::move(name)),
-      m_description(std::move(description)) {
+      m_description(description) {
 }
 
 list::list(quint32 list_id, quint32 board_id, QString name, QString description)
     : m_list_id(list_id),
       m_board_id(board_id),
       m_name(std::move(name)),
-      m_description(std::move(description)) {
+      m_description(description) {
 }
 
 card::card(quint32 card_id, quint32 list_id, QString name, QString description)
     : m_card_id(card_id),
       m_list_id(list_id),
       m_name(std::move(name)),
-      m_description(std::move(description)) {
+      m_description(description) {
 }
 
 tag::tag(quint32 tag_id, QString name)
@@ -93,7 +94,7 @@ std::string board::to_json() const {
 
     ss << "], \"id\": " << m_board_id << ", \"name\": \""
        << m_name.toStdString() << "\""
-       << "}";
+       << ", \"description\": \"" << m_description.toStdString() << "\"}";
 
     return ss.str();
 }
@@ -120,5 +121,26 @@ std::string login::to_json() const {
     ss << array_to_json(m_boards);
 
     ss << "]}";
+    return ss.str();
+}
+
+std::string create_response::to_json() const {
+    std::stringstream ss;
+
+    std::map<std::string, quint32> all_ids;
+    all_ids["board-id"] = board_id;
+    all_ids["list-id"] = list_id;
+    all_ids["card-id"] = card_id;
+
+    all_ids[object_type.toStdString() + "-id"] = id;
+
+    ss << "{\"type\": \"create-response\",";
+
+    for (const auto &it : all_ids) {
+        ss << "\"" << it.first << "\": " << it.second << ",";
+    }
+
+    ss << "\"object-json\": " << jsoned_object << "}";
+
     return ss.str();
 }
