@@ -160,11 +160,12 @@ void db_manager::fill_query_name_to_sql_command() {
 
     query_name_to_sql_command["alter_sequence"] =
         "SELECT setval('%1.%2', %3, FALSE);";
-    //        "ALTER SEQUENCE %1.%2 RESTART WITH %3;";
 
     query_name_to_sql_command["get_rows_number"] =
         "SELECT count(*) FROM %1.%2;";
-    // "SET search_path TO public;";
+
+    query_name_to_sql_command["get_group_users_id"] =
+        "SELECT user_id FROM %1.user_to_group WHERE group_id = :group_id;";
 }
 
 void db_manager::drop_all_tables() {
@@ -655,6 +656,21 @@ QVector<tag> db_manager::get_card_tags(quint32 card_id) {
     QVector<tag> result;
     while (query.next()) {
         result.push_back(select_tag(query.value(0).toInt()));
+    }
+    return result;
+}
+
+QVector<quint32> db_manager::get_group_users_id(quint32 group_id) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["get_group_users_id"].arg(m_schema));
+    query.bindValue(":group_id", group_id);
+    if (!query.exec()) {
+        qDebug() << "get_group_users_id" << m_database.lastError();
+        return {};
+    }
+    QVector<quint32> result;
+    while (query.next()) {
+        result.push_back(query.value(0).toInt());
     }
     return result;
 }
