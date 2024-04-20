@@ -117,7 +117,7 @@ TEST_CASE("select") {
 }
 
 template <typename T>
-[[maybe_unused]] bool check_equivalent(QVector<T> &lhs, QVector<T> &rhs) {
+bool is_equivalent(QVector<T> &lhs, QVector<T> &rhs) {
     if (lhs.size() == rhs.size()) {
         for (int i = 0; i < lhs.size(); ++i) {
             if (lhs[i] != rhs[i]) {
@@ -128,6 +128,9 @@ template <typename T>
     }
     return false;
 }
+
+// TODO check user/group rights
+// TODO check update_command
 
 TEST_CASE("get user groups") {
     db_manager db_manager(
@@ -140,7 +143,7 @@ TEST_CASE("get user groups") {
             db_manager.authorize_user("test_user", "test_password");
         QVector<group> answer = {group(1, "default")};
         auto result = db_manager.get_user_groups(user_id);
-        CHECK(check_equivalent(answer, result));
+        CHECK(is_equivalent(answer, result));
     }
 
     {
@@ -150,7 +153,7 @@ TEST_CASE("get user groups") {
         db_manager.add_user_to_group(user_id, group_id);
         QVector<group> answer = {group(1, "default"), group(2, "test_group")};
         auto result = db_manager.get_user_groups(user_id);
-        CHECK(check_equivalent(answer, result));
+        CHECK(is_equivalent(answer, result));
     }
 
     {
@@ -159,12 +162,9 @@ TEST_CASE("get user groups") {
         CHECK(db_manager.delete_user_from_group(user_id, 2));
         QVector<group> answer = {group(1, "default")};
         auto result = db_manager.get_user_groups(user_id);
-        CHECK(check_equivalent(answer, result));
+        CHECK(is_equivalent(answer, result));
     }
 }
-
-// TODO check user/group rights
-// TODO check update_command
 
 TEST_CASE("update order") {
     db_manager db_manager(
@@ -204,6 +204,27 @@ TEST_CASE("update order") {
 }
 }
 
+TEST_CASE("add user to group / get group users id") {
+    db_manager db_manager(
+            arguments[0], arguments[1], arguments[2], arguments[3]
+    );
+    db_manager.clear_all_tables();
+
+    quint32 user_id_1 = db_manager.authorize_user("test_user_1", "");
+    quint32 user_id_2 = db_manager.authorize_user("test_user_2", "");
+    quint32 user_id_3 = db_manager.authorize_user("test_user_3", "");
+    quint32 group_id = db_manager.create_group("test_group");
+
+    db_manager.add_user_to_group(user_id_1, group_id);
+    db_manager.add_user_to_group(user_id_2, group_id);
+    db_manager.add_user_to_group(user_id_3, group_id);
+
+    QVector<quint32> answer{user_id_1, user_id_2, user_id_3};
+    auto result = db_manager.get_group_users_id(group_id);
+
+    CHECK(is_equivalent(result, answer));
+}
+
 #endif
 
 #ifdef TEST_NEW_FEATURE
@@ -213,10 +234,6 @@ TEST_CASE("new feature") {
         arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
-    quint32 user_id = db_manager.authorize_user("doctest_user", "");
-    quint32 group_id = db_manager.create_group("doctest_group");
-    db_manager.add_user_to_group(user_id, group_id);
-    db_manager.insert_board(group_id, "doctest_board", "desc");
 }
 
 #endif
