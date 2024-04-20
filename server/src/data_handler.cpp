@@ -38,37 +38,46 @@ get_string_field_data(const json &data, const std::string &field) {
 }
 
 static std::optional<update_query> parseUpdateQuery(const json &json_data) {
+    auto board_id = get_int_field_data(json_data, "board-id");
+    auto list_id = get_int_field_data(json_data, "list-id");
+    auto card_id = get_int_field_data(json_data, "card-id");
     auto value_id = get_int_field_data(json_data, "id");
     auto new_value = get_string_field_data(json_data, "new-value");
     auto value_name = get_string_field_data(json_data, "field");
     auto updated_type = get_string_field_data(json_data, "object-type");
 
     if (!value_id.has_value() || !new_value.has_value() ||
-        !value_name.has_value() || !updated_type.has_value()) {
+        !value_name.has_value() || !updated_type.has_value() || 
+        !board_id.has_value() || !list_id.has_value() || !card_id.has_value()) {
         return std::nullopt;
     }
 
-    return update_query{
+    return update_query{board_id.value(), list_id.value(), card_id.value(),
         value_id.value(), new_value.value(), value_name.value(),
         updated_type.value()};
 }
 
 static std::optional<delete_query> parseDeleteQuery(const json &json_data) {
-    auto value_id = get_int_field_data(json_data, "id");
-    auto value_type = get_string_field_data(json_data, "object-type");
-
-    if (!value_id.has_value() || !value_type.has_value()) {
-        return std::nullopt;
-    }
-
-    return delete_query{value_id.value(), value_type.value()};
-}
-
-static std::optional<create_query> parseCreateQuery(const json &json_data) {
-    auto parent_id = get_int_field_data(json_data, "parent-id");
     auto board_id = get_int_field_data(json_data, "board-id");
     auto list_id = get_int_field_data(json_data, "list-id");
     auto card_id = get_int_field_data(json_data, "card-id");
+    auto value_id = get_int_field_data(json_data, "id");
+    auto value_type = get_string_field_data(json_data, "object-type");
+
+    if (!value_id.has_value() || !value_type.has_value() ||
+        !board_id.has_value() || !list_id.has_value() || !card_id.has_value()) {
+        return std::nullopt;
+    }
+
+    return delete_query{board_id.value(), list_id.value(), card_id.value(), 
+        value_id.value(), value_type.value()};
+}
+
+static std::optional<create_query> parseCreateQuery(const json &json_data) {
+    auto board_id = get_int_field_data(json_data, "board-id");
+    auto list_id = get_int_field_data(json_data, "list-id");
+    auto card_id = get_int_field_data(json_data, "card-id");
+    auto parent_id = get_int_field_data(json_data, "parent-id");
     auto value_type = get_string_field_data(json_data, "object-type");
     auto value_name = get_string_field_data(json_data, "name");
     auto value_description = get_string_field_data(json_data, "description");
@@ -79,10 +88,9 @@ static std::optional<create_query> parseCreateQuery(const json &json_data) {
         return std::nullopt;
     }
 
-    return create_query{parent_id.value(),        board_id.value(),
-                        list_id.value(),          card_id.value(),
-                        value_type.value(),       value_name.value(),
-                        value_description.value()};
+    return create_query{board_id.value(), list_id.value(), card_id.value(), 
+                        parent_id.value(), value_type.value(), 
+                        value_name.value(), value_description.value()};
 }
 
 static std::optional<login_query> parseLoginQuery(const json &json_data) {

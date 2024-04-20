@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(EXECUTABLE_OUTPUT_PATH ../)
 find_package(Qt6 REQUIRED COMPONENTS Core Network Sql)
+find_package(Qt6 REQUIRED COMPONENTS WebSockets)
 
 add_executable(server 
 include/client_socket.hpp 
@@ -36,5 +37,6 @@ target_include_directories(server PUBLIC include)
 target_include_directories(server PUBLIC ../database/include)
 target_include_directories(server PUBLIC ../shared/include)
 target_link_libraries(server PRIVATE Qt6::Network)
+target_link_libraries(server PRIVATE Qt6::WebSockets)
 target_link_libraries(server PRIVATE Qt6::Sql)
 target_link_libraries(server PRIVATE Qt6::Core)

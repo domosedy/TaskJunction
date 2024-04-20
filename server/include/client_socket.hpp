@@ -1,23 +1,27 @@
 #ifndef CLIENT_SOCKET_HPP_
 #define CLIENT_SOCKET_HPP_
 
+#include <QWebSocket>
 #include <QByteArray>
 #include <QObject>
 #include <QTcpSocket>
 #include <memory>
 #include "query.hpp"
+#include "logging.hpp"
+
+
 
 class ClientSocket : public QObject {
     Q_OBJECT
 
 private:
-    QTcpSocket *socket;
+    QWebSocket *socket;
     uint user_id;
 
 public:
-    ClientSocket(QTcpSocket *sock, uint user_id)
+    ClientSocket(QWebSocket *sock, uint user_id)
         : socket(sock), user_id(user_id) {
-        connect(socket, SIGNAL(readyRead()), this, SLOT(readData()));
+        connect(socket, SIGNAL(textMessageReceived(const QString&)), this, SLOT(readData(const QString&)));
         connect(socket, SIGNAL(disconnected()), this, SLOT(removeConnection()));
     }
 
@@ -29,10 +33,6 @@ public:
         return user_id;
     }
 
-    quintptr get_socket_id() const {
-        return socket->socketDescriptor();
-    }
-
     void set_client_id(uint new_id) noexcept {
         user_id = new_id;
     }
@@ -41,8 +41,8 @@ public:
     ClientSocket &operator=(const ClientSocket &) = delete;
 
 public slots:
-    void sendData(const QByteArray &data);
-    void readData();
+    void sendData(const QString &data);
+    void readData(const QString &data);
     void removeConnection();
 
 signals:

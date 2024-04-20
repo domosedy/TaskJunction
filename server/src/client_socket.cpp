@@ -5,32 +5,22 @@
 #include "element_classes.hpp"
 #include "logging.hpp"
 
-void ClientSocket::sendData(const QByteArray &data) {
-    rDebug() << data.size();
-
-    quint16 size = data.size();
-    QByteArray data_size;
-    QDataStream out(&data_size, QIODevice::WriteOnly);
-    out << size;
-
-    socket->write(data_size + data);
+void ClientSocket::sendData(const QString &data) {
+    rDebug() << data;
+    socket->sendTextMessage(data);
 }
 
-void ClientSocket::readData() {
-    QDataStream size_data = socket->read(2);
-    quint16 size;
+void ClientSocket::readData(const QString &data) {
+    // QDataStream size_data = socket->read(2);
+    // quint16 size;
 
-    size_data >> size;
-    rDebug() << "readed size " << size;
-
-    QByteArray data = socket->read(size);
-
-    QString json_request = data.toStdString().c_str();
+    // size_data >> size;
+    // rDebug() << "readed size " << size;
 
     rDebug() << "Received from " << socket->peerAddress().toString() << " "
-             << json_request;
+             << data;
 
-    auto value = parseData(json_request);
+    auto value = parseData(data);
 
     if (!value.has_value()) {
         sendData(error{"Bad format of data"}.to_json().c_str());
