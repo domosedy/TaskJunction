@@ -1,4 +1,4 @@
 .vscode/
-./database/
-./server/
-./shared/
+database/
+server/
+shared/
