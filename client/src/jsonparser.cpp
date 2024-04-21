@@ -10,8 +10,8 @@ std::string login_request(const QString &username, const QString &password) {
     json request = {
         {"type", "login"},
         {"user-name", username.toStdString().c_str()},
-        {"password",
-         password.toStdString().c_str()}};  // Salt here or on server side?
+        {"password", password.toStdString().c_str()}
+    };  // Salt here or on server side?
     return request.dump();
 }
 
@@ -32,7 +32,8 @@ std::string create_request(
         {"card-id", card_id},
         {"name", name.toStdString().c_str()},
         {"description", description.toStdString().c_str()},
-        {"object-type", type.toStdString().c_str()}};
+        {"object-type", type.toStdString().c_str()}
+    };
     return request.dump();
 }
 
@@ -45,7 +46,8 @@ std::string delete_request(quint32 id, const QString &object_type) {
     json request = {
         {"type", "delete"},
         {"id", id},
-        {"object-type", object_type.toStdString().c_str()}};
+        {"object-type", object_type.toStdString().c_str()}
+    };
     return request.dump();
 }
 
@@ -60,7 +62,8 @@ std::string update_request(
         {"id", id},
         {"new-value", value.toStdString().c_str()},
         {"field", field.toStdString().c_str()},
-        {"object-type", object_type.toStdString().c_str()}};
+        {"object-type", object_type.toStdString().c_str()}
+    };
     return request.dump();
 }
 

@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS "-pedantic-errors -g -Wall -Wextra -Werror -Wshadow")
  
-find_package(Qt6 COMPONENTS Qml Quick Widgets Core Gui Network Sql REQUIRED)
+find_package(Qt6 COMPONENTS Qml Quick Widgets Core Gui Network Sql WebSockets REQUIRED)
 find_package(PostgreSQL REQUIRED)
 find_package(nlohmann_json REQUIRED)
     
@@ -32,6 +32,7 @@ set(PROJECT_SOURCES
         include/jsonparser.hpp
         ../shared/include/element_classes.hpp
         ../shared/include/hashes.hpp
+        ../shared/include/logging.hpp
         ../shared/src/element_classes.cpp
         ../shared/src/hashes.cpp
         ../database/include/database.hpp
@@ -50,6 +51,7 @@ target_link_libraries(client PRIVATE
     Qt6::Gui
     Qt6::Network 
     Qt6::Sql
+    Qt6::WebSockets
     nlohmann_json::nlohmann_json
     pq
 )

@@ -3,7 +3,7 @@
 
 #include <QMap>
 #include <QObject>
-#include <QTcpSocket>
+#include <QWebSocket>
 #include <nlohmann/json.hpp>
 #include <string>
 #include "boardmenu.hpp"
@@ -68,28 +68,32 @@ signals:
     void statusChanged();
     void connectionStatusChanged();
 private slots:
-    void readData();
+    void readData(const QString &);
     void load_board(int index);
+    void onConnected();
+    void onSocketError(QAbstractSocket::SocketError error);
 
 private:
     database::db_manager db;
-    QTcpSocket *m_socket = nullptr;
+    QWebSocket *m_socket = nullptr;
     BoardModel *m_current_board = nullptr;
     QMap<int, BoardModel *> m_loaded_boards;
     BoardMenu *m_remote_menu = nullptr;
     BoardMenu *m_local_menu = nullptr;
     BoardMenu *m_board_menu = nullptr;
+    QString m_username;
+    QString m_password;
     QString m_server_ip;
     quint32 m_server_port;
     quint32 m_user_id;
     quint32 m_local_id = 1;
+    quint32 m_local_group_id;
     bool m_is_authorized = false;
     ConnectionStatus m_connection_status = ConnectionStatus::Unauthorized;
     ClientMode m_mode = ClientMode::Local;
     int m_current_index = -1;
 
     void write(std::string &data);
-    void parse_response(const QString &data);
 };
 
 #endif  // CLIENT_HPP

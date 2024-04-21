@@ -10,31 +10,32 @@
 
 Client::Client(QObject *parent)
     : QObject(parent),
-      db(database::db_manager("local_boards", "postgres", "localhost", "1")) {
-    m_socket = new QTcpSocket(this);
+      db(database::db_manager("local_boards", "postgres", "localhost", "")) {
+    m_socket =
+        new QWebSocket("Client", QWebSocketProtocol::VersionLatest, this);
+    connect(m_socket, SIGNAL(connected()), this, SLOT(onConnected()));
+    connect(
+        m_socket, SIGNAL(textMessageReceived(const QString &)), this,
+        SLOT(readData(const QString &))
+    );
+    connect(
+        m_socket, SIGNAL(errorOccured(QAbstractSocket::SocketError)), this,
+        SLOT(onSocketError(QAbstractSocket::SocketError))
+    );
 
-    connect(m_socket, SIGNAL(readyRead()), this, SLOT(readData()));
     m_local_id = db.authorize_user("default", "default");
+
+    m_local_group_id = db.create_group("default");
+    db.add_user_to_group(m_local_id, m_local_group_id);
 }
 
 void Client::write(std::string &data) {
-    QByteArray msg = data.c_str();
-    QByteArray sz;
-    QDataStream ds(&sz, QIODevice::ReadWrite);
-    quint16 size = msg.size();
-    ds << size;
-    m_socket->write(sz + msg);
+    qDebug() << "Send:: " << data;
+    m_socket->sendTextMessage(QString::fromStdString(data));
 }
 
-void Client::readData() {
-    QDataStream size_data = m_socket->read(2);
-    quint16 size;
-    size_data >> size;
-    QString response = m_socket->read(size);
-    parse_response(response);
-}
-
-void Client::parse_response(const QString &data) {
+void Client::readData(const QString &data) {
+    qDebug() << "Recieved: " << data;
     if (!(nlohmann::json::accept(data.toStdString()))) {
         qDebug() << "Cannot parse response";
         return;
@@ -100,7 +101,7 @@ void Client::prepare_local_board_select_menu() {
         return;
     }
     m_local_menu = new BoardMenu(this);
-    QVector<board> avaliable_boards = db.get_user_boards(m_local_id);
+    QVector<board> avaliable_boards = db.get_group_boards(m_local_group_id);
     for (const auto &board : avaliable_boards) {
         m_local_menu->add_board(board);
     };
@@ -222,6 +223,19 @@ void Client::delete_card(int list_index, int card_index) {
     m_current_board->delete_card(list_index, card_index);
 }
 
+void Client::onConnected() {
+    qDebug() << "Connected!";
+    std::string login_request = parser::login_request(m_username, m_password);
+    write(login_request);
+}
+
+void Client::onSocketError(QAbstractSocket::SocketError error) {
+    Q_UNUSED(error);
+    qDebug() << "Connection error!";
+    m_connection_status = ConnectionStatus::Unable_to_connect;
+    emit connectionStatusChanged();
+}
+
 void Client::login(
     QString username,
     QString password,
@@ -233,26 +247,20 @@ void Client::login(
             server_port.toUShort() == m_server_port && m_is_authorized) {
             return;
         }
-        m_socket->disconnectFromHost();
-    }
-    if (m_socket->state() != QAbstractSocket::UnconnectedState) {
-        m_socket->waitForDisconnected(-1);
+        m_socket->close();
     }
     m_server_ip = server_ip;
     m_server_port = server_port.toUShort();
+    m_username = username;
+    m_password = password;
     m_is_authorized = false;
     emit statusChanged();
-    m_socket->connectToHost(m_server_ip, m_server_port);
-    if (m_socket->state() == QAbstractSocket::ConnectedState ||
-        m_socket->waitForConnected()) {
-        qDebug() << "Connected!";
-        std::string login_request = parser::login_request(username, password);
-        write(login_request);
-    } else {
-        qDebug() << "No server!";
-        m_connection_status = ConnectionStatus::Unable_to_connect;
-        emit connectionStatusChanged();
-    }
+    QUrl server_url;
+    qDebug() << "Trying to connect!";
+    server_url.setScheme(QString::fromStdString("ws"));
+    server_url.setHost(m_server_ip);
+    server_url.setPort(m_server_port);
+    m_socket->open(server_url);
 }
 
 void Client::update_card_name(int list_index, int card_index, QString name) {
