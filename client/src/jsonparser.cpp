@@ -67,6 +67,15 @@ std::string update_request(
     return request.dump();
 }
 
+std::string connect_to_board_request(quint32 board_id, quint32 user_id) {
+    json request = {
+        {"type", "connect"},
+        {"user_id", user_id},
+        {"board_id", board_id}
+    };
+    return request.dump();
+}
+
 board parse_board(const json &object) {
     QString name = QString::fromStdString(object["name"]);
     QString description = QString::fromStdString(object["description"]);

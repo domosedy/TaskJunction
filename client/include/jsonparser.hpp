@@ -32,6 +32,8 @@ std::string update_request(
     const QString &value
 );
 
+std::string connect_to_board_request(quint32 group_id, quint32 user_id);
+
 board parse_board(const json &object);
 
 card parse_card(const json &object);

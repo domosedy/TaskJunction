@@ -314,3 +314,8 @@ void Client::update_list_name(int list_index, QString name) {
 QString Client::get_current_board_name() {
     return m_current_board->m_name;
 }
+
+void Client::connect_board(quint32 board_id) {
+    std::string request = parser::connect_to_board_request(board_id, m_user_id);
+    write(request);
+}

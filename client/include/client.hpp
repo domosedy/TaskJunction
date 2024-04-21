@@ -61,6 +61,7 @@ public:
         QString description
     );
     Q_INVOKABLE void update_list_name(int list_index, QString name);
+    Q_INVOKABLE void connect_board(quint32 board_id);
 
 signals:
     void boardChanged();
