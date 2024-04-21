@@ -7,6 +7,7 @@
 #include "database.hpp"
 #include "element_classes.hpp"
 #include "jsonparser.hpp"
+#include "logging.hpp"
 
 Client::Client(QObject *parent)
     : QObject(parent),
@@ -19,14 +20,11 @@ Client::Client(QObject *parent)
         SLOT(readData(const QString &))
     );
     connect(
-        m_socket, SIGNAL(errorOccured(QAbstractSocket::SocketError)), this,
+        m_socket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this,
         SLOT(onSocketError(QAbstractSocket::SocketError))
     );
 
     m_local_id = db.authorize_user("default", "default");
-
-    m_local_group_id = db.create_group("default");
-    db.add_user_to_group(m_local_id, m_local_group_id);
 }
 
 void Client::write(std::string &data) {
@@ -35,7 +33,7 @@ void Client::write(std::string &data) {
 }
 
 void Client::readData(const QString &data) {
-    qDebug() << "Recieved: " << data;
+    rDebug() << "Recieved: " << data;
     if (!(nlohmann::json::accept(data.toStdString()))) {
         qDebug() << "Cannot parse response";
         return;
@@ -46,7 +44,6 @@ void Client::readData(const QString &data) {
         qDebug() << "Invalid response structure";
         return;
     }
-    qDebug() << data;
     std::string response_type = response["type"];
     if (response_type == "authorization") {
         if (response["response"] == "ok") {
@@ -191,7 +188,7 @@ void Client::create_board(QString name, QString description) {
     }
 
     if (m_mode == ClientMode::Local) {
-        quint32 board_id = db.insert_board(m_local_id, name, description);
+        quint32 board_id = db.insert_board(m_local_group_id, name, description);
         m_board_menu->create_board(name, description, board_id);
     } else {
         std::string request =
@@ -312,4 +309,8 @@ void Client::update_list_name(int list_index, QString name) {
         write(request);
         m_current_board->update_list_name(list_index, name);
     }
+}
+
+QString Client::get_current_board_name() {
+    return m_current_board->m_name;
 }

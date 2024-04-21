@@ -128,7 +128,16 @@ Rectangle {
                 onClicked: {
                     createBoardPopup.open()
                 }
-            }   
+            } 
+            Text {
+                text: "remote menu"
+                y: 3
+                height: style.smallButtonSize
+                font.family: "Courier"
+                font.pointSize: 16
+                font.bold: true    
+                color: "white"            
+            }  
         }
          
     }

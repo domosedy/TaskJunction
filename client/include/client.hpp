@@ -19,6 +19,7 @@ class Client : public QObject {
     Q_PROPERTY(ConnectionStatus connection_status MEMBER m_connection_status
                    NOTIFY connectionStatusChanged)
     Q_PROPERTY(bool is_authorized MEMBER m_is_authorized NOTIFY statusChanged)
+    Q_PROPERTY(QString current_board_name READ get_current_board_name NOTIFY boardChanged)
 
 public:
     enum ConnectionStatus {
@@ -87,13 +88,14 @@ private:
     quint32 m_server_port;
     quint32 m_user_id;
     quint32 m_local_id = 1;
-    quint32 m_local_group_id;
+    quint32 m_local_group_id = 18;
     bool m_is_authorized = false;
     ConnectionStatus m_connection_status = ConnectionStatus::Unauthorized;
     ClientMode m_mode = ClientMode::Local;
     int m_current_index = -1;
 
     void write(std::string &data);
+    QString get_current_board_name();
 };
 
 #endif  // CLIENT_HPP

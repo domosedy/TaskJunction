@@ -110,6 +110,15 @@ Rectangle {
                 onClicked: {
                     createListPopup.open()
                 }
+            } 
+            Text {
+                text: mainClient.current_board_name
+                y: 3
+                height: style.smallButtonSize
+                font.family: "Courier"
+                font.pointSize: 16
+                font.bold: true    
+                color: "white"            
             }   
         }
          
