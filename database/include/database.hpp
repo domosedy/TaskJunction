@@ -3,6 +3,7 @@
 #include <QVector>
 #include <QtCore>
 #include <QtSql>
+#include <utility>
 #include "element_classes.hpp"
 
 namespace database {
@@ -16,7 +17,6 @@ const QString CARD_PRIMARY_KEY = "card_id";
 const QString TAG_TABLE_NAME = "tag_signature";
 const QString TAG_PRIMARY_KEY = "tag_id";
 const QString USER_ID_SEQUENCE = "user_signature_id_seq";
-const QString GROUP_ID_SEQUENCE = "group_signature_id_seq";
 const QString BOARD_ID_SEQUENCE = "board_signature_id_seq";
 const QString BOARD_NUMBER_SEQUENCE = "board_signature_number_seq";
 const QString LIST_ID_SEQUENCE = "list_signature_id_seq";
@@ -27,7 +27,6 @@ const QString TAG_ID_SEQUENCE = "tag_signature_id_seq";
 
 const QVector<QString> sequences_names {
         USER_ID_SEQUENCE,
-        GROUP_ID_SEQUENCE,
         BOARD_ID_SEQUENCE,
         BOARD_NUMBER_SEQUENCE,
         LIST_ID_SEQUENCE,
@@ -74,9 +73,8 @@ public:
     void set_schema(const QString &name);
 
     //    void create_schema(const QString &schema_name);
-    quint32 create_group(const QString &name);
     quint32 insert_board(
-        quint32 group_id,
+        quint32 user_id,
         const QString &name,
         const QString &description
     );
@@ -86,7 +84,7 @@ public:
     insert_card(quint32 list_id, const QString &name, const QString &description);
     quint32 insert_tag(const QString &name);
 
-    bool add_user_to_group(quint32 user_id, quint32 group_id);
+    bool add_user_to_board(quint32 user_id, quint32 board_id);
 
     bool pin_tag_to_card(int card_id, int tag_id);
     bool unpin_tag_from_card(int card_id, int tag_id);
@@ -98,7 +96,6 @@ public:
         quint32 key_value
     );
 
-    group select_group(quint32 id);
     user select_user(quint32 id);
     board select_board(quint32 id);
     list select_list(quint32 id);
@@ -106,20 +103,16 @@ public:
     tag select_tag(quint32 id);
 
     bool delete_command(const QString &table_name, quint32 key_value);
-    bool delete_user_from_group(quint32 user_id, quint32 group_id);
+    bool delete_user_from_board(quint32 user_id, quint32 board_id);
 
-    QVector<group> get_user_groups(quint32 user_id);
-    QVector<board> get_group_boards(quint32 group_id);
+    QVector<board> get_user_boards(quint32 user_id);
     QVector<list> get_board_lists(quint32 board_id);
     QVector<card> get_list_cards(quint32 list_id);
     QVector<tag> get_card_tags(quint32 card_id);
 
-    QVector<quint32> get_group_users_id(quint32 group_id);
-
-    quint32 get_group_id_by_board_id(quint32 board_id);
+    QVector<quint32> get_board_users_id(quint32 user_id);
 
     bool check_user_rights(quint32 user_id, quint32 board_id);
-    bool check_group_rights(quint32 group_id, quint32 board_id);
     quint32 get_sequence_last_value(const QString &sequence);
 
     quint32 authorize_user(const QString &login, const QString &password);

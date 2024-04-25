@@ -3,11 +3,6 @@ login varchar(50) PRIMARY KEY,
 password text
 );
 
-CREATE TABLE group_signature(
-id serial PRIMARY KEY,
-name text
-);
-
 CREATE TABLE user_signature(
 id serial PRIMARY KEY,
 name    varchar(50) REFERENCES user_authorization_data(login) ON DELETE CASCADE
@@ -15,7 +10,7 @@ name    varchar(50) REFERENCES user_authorization_data(login) ON DELETE CASCADE
 
 CREATE TABLE board_signature(
 id serial PRIMARY KEY,
-group_id integer REFERENCES group_signature ON DELETE CASCADE,
+user_id integer REFERENCES user_signature ON DELETE CASCADE,
 name varchar(50),
 description text,
 number serial
@@ -48,10 +43,10 @@ tag_id integer REFERENCES tag_signature ON DELETE CASCADE,
 PRIMARY KEY(card_id, tag_id)
 );
 
-CREATE TABLE user_to_group(
+CREATE TABLE user_to_board(
 user_id integer REFERENCES user_signature ON DELETE CASCADE,
-group_id integer REFERENCES group_signature ON DELETE CASCADE,
-PRIMARY KEY(user_id, group_id)
+board_id integer REFERENCES board_signature ON DELETE CASCADE,
+PRIMARY KEY(user_id, board_id)
 );
 
 INSERT INTO user_authorization_data VALUES ('default', 'default');

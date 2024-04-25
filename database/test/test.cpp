@@ -23,18 +23,6 @@ TEST_CASE("create") {
     }
 
     {
-        auto groups = db_manager.get_user_groups(1);
-        CHECK(groups.size() == 1);
-        CHECK(groups[0].m_name == "default");
-        CHECK(groups[0].m_group_id == 1);
-    }
-
-    {
-        quint32 id = db_manager.create_group("test_group");
-        CHECK(id == 2);
-    }
-
-    {
         quint32 id =
             db_manager.insert_board(1, "test_board", "test description");
         CHECK(id == 1);
@@ -63,10 +51,8 @@ TEST_CASE("select") {
     db_manager.clear_all_tables();
 
     quint32 user_id = db_manager.authorize_user("test_user", "test_password");
-    auto groups = db_manager.get_user_groups(user_id);
-    quint32 group_id = groups[0].m_group_id;
     quint32 board_id =
-        db_manager.insert_board(group_id, "test_board", "test description");
+        db_manager.insert_board(user_id, "test_board", "test description");
     quint32 list_id =
         db_manager.insert_list(board_id, "test_list", "test description");
     quint32 card_id =
@@ -80,16 +66,10 @@ TEST_CASE("select") {
     }
 
     {
-        group group = db_manager.select_group(group_id);
-        CHECK(group.m_group_id == group_id);
-        CHECK(group.m_name == "default");
-    }
-
-    {
         board board = db_manager.select_board(board_id);
         CHECK(board.m_board_id == board_id);
         CHECK(board.m_name == "test_board");
-        CHECK(board.m_group_id == group_id);
+        CHECK(board.m_user_id == user_id);
         CHECK(board.m_description == "test description");
     }
 
@@ -132,38 +112,12 @@ bool is_equivalent(QVector<T> &lhs, QVector<T> &rhs) {
 // TODO check user/group rights
 // TODO check update_command
 
-TEST_CASE("get user groups") {
+TEST_CASE("get user boards") { // TODO
     db_manager db_manager(
         arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
 
-    {
-        quint32 user_id =
-            db_manager.authorize_user("test_user", "test_password");
-        QVector<group> answer = {group(1, "default")};
-        auto result = db_manager.get_user_groups(user_id);
-        CHECK(is_equivalent(answer, result));
-    }
-
-    {
-        quint32 user_id =
-            db_manager.authorize_user("test_user", "test_password");
-        quint32 group_id = db_manager.create_group("test_group");
-        db_manager.add_user_to_group(user_id, group_id);
-        QVector<group> answer = {group(1, "default"), group(2, "test_group")};
-        auto result = db_manager.get_user_groups(user_id);
-        CHECK(is_equivalent(answer, result));
-    }
-
-    {
-        quint32 user_id =
-            db_manager.authorize_user("test_user", "test_password");
-        CHECK(db_manager.delete_user_from_group(user_id, 2));
-        QVector<group> answer = {group(1, "default")};
-        auto result = db_manager.get_user_groups(user_id);
-        CHECK(is_equivalent(answer, result));
-    }
 }
 
 TEST_CASE("update order") {
@@ -174,8 +128,7 @@ TEST_CASE("update order") {
 
     {
         quint32 user_id = db_manager.authorize_user("test_user", "test_password");
-        quint32 group_id = db_manager.get_user_groups(user_id)[0].m_group_id;
-        quint32 board_id = db_manager.insert_board(group_id, "test_board", "");
+        quint32 board_id = db_manager.insert_board(user_id, "test_board", "");
         quint32 list_id_1 = db_manager.insert_list(board_id, "test_list_1", "");
         quint32 list_id_2 = db_manager.insert_list(board_id, "test_list_2", "");
         CHECK(db_manager.update_order("list_signature", list_id_1, 2));
@@ -196,33 +149,11 @@ TEST_CASE("update order") {
 
     {
         quint32 user_id = db_manager.authorize_user("test_user", "test_password");
-        quint32 group_id = db_manager.get_user_groups(user_id)[0].m_group_id;
-        quint32 board_id = db_manager.insert_board(group_id, "test_board", "");
+        quint32 board_id = db_manager.insert_board(user_id, "test_board", "");
         quint32 list_id_1 = db_manager.insert_list(board_id, "test_list_1", "");
         CHECK(!db_manager.update_order("list_signature", list_id_1, 100));
         CHECK(!db_manager.update_order("list_signature", list_id_1, 0));
 }
-}
-
-TEST_CASE("add user to group / get group users id") {
-    db_manager db_manager(
-            arguments[0], arguments[1], arguments[2], arguments[3]
-    );
-    db_manager.clear_all_tables();
-
-    quint32 user_id_1 = db_manager.authorize_user("test_user_1", "");
-    quint32 user_id_2 = db_manager.authorize_user("test_user_2", "");
-    quint32 user_id_3 = db_manager.authorize_user("test_user_3", "");
-    quint32 group_id = db_manager.create_group("test_group");
-
-    db_manager.add_user_to_group(user_id_1, group_id);
-    db_manager.add_user_to_group(user_id_2, group_id);
-    db_manager.add_user_to_group(user_id_3, group_id);
-
-    QVector<quint32> answer{user_id_1, user_id_2, user_id_3};
-    auto result = db_manager.get_group_users_id(group_id);
-
-    CHECK(is_equivalent(result, answer));
 }
 
 #endif
