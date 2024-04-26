@@ -56,6 +56,8 @@ class db_manager {
 
     quint32 insert_user(const QString &login, const QString &password);
 
+    quint32 get_sequence_last_value(const QString &sequence);
+
     static void fill_query_name_to_sql_command();
     static QMap<QString, QString> query_name_to_sql_command;
 
@@ -86,8 +88,8 @@ public:
 
     bool add_user_to_board(quint32 user_id, quint32 board_id);
 
-    bool pin_tag_to_card(int card_id, int tag_id);
-    bool unpin_tag_from_card(int card_id, int tag_id);
+    bool add_tag_to_card(quint32 card_id, quint32 tag_id);
+    bool delete_tag_from_card(quint32 card_id, quint32 tag_id);
 
     bool update_command(
         const QString &table_name,
@@ -110,10 +112,9 @@ public:
     QVector<card> get_list_cards(quint32 list_id);
     QVector<tag> get_card_tags(quint32 card_id);
 
-    QVector<quint32> get_board_users_id(quint32 user_id);
+    QVector<quint32> get_board_users_id(quint32 board_id);
 
     bool check_user_rights(quint32 user_id, quint32 board_id);
-    quint32 get_sequence_last_value(const QString &sequence);
 
     quint32 authorize_user(const QString &login, const QString &password);
 
