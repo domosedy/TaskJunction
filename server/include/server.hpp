@@ -12,6 +12,14 @@
 
 using namespace database;
 
+// enum class ExecutedCode { SUCCESS, BAD_RIGHTS, ERROR };
+
+struct ReturnedValue {
+    bool exit_code;
+    quint32 board_id;
+    QString jsoned_object;
+};
+
 class ClientSocket;
 
 class Server : public QObject {
@@ -23,10 +31,10 @@ class Server : public QObject {
     QMap<quint32, ClientSocket *> authorized_connections;
     QList<ClientSocket*> unauthorized_connections;
 
-    QString execute_update_query(const update_query &query);
-    std::pair<QString, quint32> execute_create_query(const create_query &query, quint32 id);
-    QString execute_delete_query(const delete_query &query);
-    QString execute_get_query(const get_boards_info_query &query);
+    ReturnedValue execute_update_query(const update_query &query, quint32 id);
+    ReturnedValue execute_create_query(const create_query &query, quint32 id);
+    ReturnedValue execute_delete_query(const delete_query &query, quint32 id);
+    ReturnedValue execute_get_query(const get_boards_info_query &query, quint32 id);
 
     std::pair<QString, quint32> execute_login_query(const login_query &query);
 

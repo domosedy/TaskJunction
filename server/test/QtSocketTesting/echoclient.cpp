@@ -28,9 +28,9 @@ EchoClient::~EchoClient() {
 }
 //! [onConnected]
 void EchoClient::onConnected() {
-    sendData("{ \"type\": \"login\", \"password\": \"12\", \"user-name\": \"as\"}");
-    sendData(R"({"type": "update", "board-id": 1, "list-id": 2, "card-id": 3, "id": 2, "new-value": "aboba", "field": "name", "object-type": "board"})");
-    sendData("{ \"type\": \"get-boards-info\", \"id\": 1, \"object-type\": \"list\", \"name\": \"52\", \"description\": \"42\"}");
+    sendData("{ \"type\": \"login\", \"password\": \"12\", \"user-name\": \"asss\"}");
+    sendData(R"({"type": "update", "board-id": 4, "list-id": 2, "card-id": 3, "id": 2, "new-value": "aboba", "field": "name", "object-type": "board"})");
+    sendData("{ \"type\": \"get-boards-info\", \"id\": 4, \"object-type\": \"list\", \"name\": \"52\", \"description\": \"42\"}");
 }
 //! [onConnected]
 

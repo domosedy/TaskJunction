@@ -83,74 +83,77 @@ void Server::execute_query(uint user_id, const query_type &query) {
         query
     );
 
-    std::string result = "";
-    std::pair<QString, quint32> res;
-    std::size_t board_id = 0;
+    ReturnedValue executed_result;
 
-    switch (result_code) {
-        case RequestType::UPDATE:
-            result = execute_update_query(std::get<update_query>(query)).toStdString();
-            board_id = std::get<update_query>(query).board_id;
-            break;
-        case RequestType::CREATE:
-            res = execute_create_query(std::get<create_query>(query), client_id);
-            result = res.first.toStdString();
-            board_id = res.second;
-            break;
-        case RequestType::DELETE:
-            result = execute_delete_query(std::get<delete_query>(query))
-                         .toStdString();
-            board_id = std::get<delete_query>(query).board_id;
-            break;
-        case RequestType::LOGIN:
-            res = execute_login_query(std::get<login_query>(query));
-            if (res.second != 0) {
-                clientSocket->set_client_id(res.second);
-                unauthorized_connections.removeAll(clientSocket);
-                authorized_connections[res.second] = clientSocket;
-            }
-            result = res.first.toStdString();
-            break;
-        case RequestType::GET_BOARDS_INFO:
-            result = execute_get_query(std::get<get_boards_info_query>(query))
-                         .toStdString();
-            break;
-        default:
-            result = std::move(error{"An error occured"}.to_json());
+    if (result_code == RequestType::LOGIN) {
+        auto res = execute_login_query(std::get<login_query>(query));
+        if (res.second != 0) {
+            clientSocket->set_client_id(res.second);
+            unauthorized_connections.removeAll(clientSocket);
+            authorized_connections[res.second] = clientSocket;
+        }
+        auto result = res.first.toStdString();
+        clientSocket->sendData(result.c_str());
+        return;
+    } else if (result_code == RequestType::UPDATE) {
+        executed_result = execute_update_query(std::get<update_query>(query), client_id);
+    } else if (result_code == RequestType::CREATE) {
+        executed_result = execute_create_query(std::get<create_query>(query), client_id);
+    } else if (result_code == RequestType::DELETE) {
+        executed_result = execute_delete_query(std::get<delete_query>(query), client_id);
+    } else if (result_code == RequestType::GET_BOARDS_INFO) {
+        executed_result = execute_get_query(std::get<get_boards_info_query>(query), client_id);
+        clientSocket->sendData(executed_result.jsoned_object);
+        return;
+    } else {
+        executed_result = {false, 1, error{"Bad request format"}.to_json().c_str()};
     }
 
-    // auto id = clientSocket->get_client_id();
-    clientSocket->sendData(result.c_str());
+    if (!executed_result.exit_code) {
+        clientSocket->sendData(executed_result.jsoned_object);
+        return;
+    }
 
-    // auto group_id = 
-    
-    // auto send_result = [&result] ()
+    for (auto &user_id : db.get_board_users(executed_result.board_id)) {
+        auto it = authorized_connections.find(user_id);
+        if (it != authorized_connections.end()) {
+            rDebug() << it.value()->get_client_id();
+            it.value()->sendData(executed_result.jsoned_object);
+        }
+    }
 }
 
-QString Server::execute_update_query(const update_query &query) {
+ReturnedValue Server::execute_update_query(const update_query &query, quint32 id) {
+    if (!db.check_user_rights(id, query.board_id)) {
+        return ReturnedValue{false, 0, error{"You have no rights"}.to_json().c_str()};
+    }
+
     auto result = db.update_command(
         (query.updated_type + "_signature").c_str(), query.value_name.c_str(),
         query.new_value.c_str(), query.value_id
     );
 
-    return result ? error{"Ok"}.to_json().c_str()
-                  : error{"An error occured"}.to_json().c_str();
+    return result ? ReturnedValue{true, query.board_id, error{"Ok"}.to_json().c_str()}
+                  : ReturnedValue{false, 0, error{"An error occured"}.to_json().c_str()};
 }
 
-QString Server::execute_delete_query(const delete_query &query) {
-    // if (!db.check_user_rights(user_id, query.))
+ReturnedValue Server::execute_delete_query(const delete_query &query, quint32 id) {
+    if (!db.check_user_rights(id, query.board_id)) {
+        return ReturnedValue{false, 0, error{"You have no rights"}.to_json().c_str()};
+    }
+
     auto result = db.delete_command(
         (query.value_type + "_signature").c_str(), query.value_id
     );
 
-    return result ? error{"Ok"}.to_json().c_str()
-                  : error{"An error occured"}.to_json().c_str();
+    return result ? ReturnedValue{true, query.board_id, error{"Ok"}.to_json().c_str()}
+                  : ReturnedValue{false, 0, error{"An error occured"}.to_json().c_str()};
 }
 
-std::pair<QString, quint32>
+ReturnedValue
 Server::execute_create_query(const create_query &query, quint32 user_id) {
     if (user_id == 0) {
-        return {error{"You are not authorized"}.to_json().c_str(), 0};
+        return ReturnedValue{false, 0, error{"You are not authorized"}.to_json().c_str()};
     }
     
     quint32 result = 0;
@@ -166,9 +169,8 @@ Server::execute_create_query(const create_query &query, quint32 user_id) {
         rDebug() << query.value_name.c_str();
         rDebug() << query.value_description.c_str();
 
-        // FIXME: replace 1 to real group_id
         result = db.insert_board(
-            1, query.value_name.c_str(), query.value_description.c_str()
+            user_id, query.value_name.c_str(), query.value_description.c_str()
         );
 
         board_id = result;
@@ -177,7 +179,7 @@ Server::execute_create_query(const create_query &query, quint32 user_id) {
         }
     } else if (query.value_type == "list") {
         if (!db.check_user_rights(user_id, query.board_id)) {
-            return {error{"Ypu don't have rights on this group"}.to_json().c_str(), 0};
+            return ReturnedValue{false, 0, error{"You don't have rights on this group"}.to_json().c_str()};
         }
         result = db.insert_list(
             query.parent_id, query.value_name.c_str(),
@@ -189,7 +191,7 @@ Server::execute_create_query(const create_query &query, quint32 user_id) {
         }
     } else if (query.value_type == "card") {
         if (!db.check_user_rights(user_id, query.board_id)) {
-            return {error{"Ypu don't have rights on this group"}.to_json().c_str(), 0};
+            return ReturnedValue{false, 0, error{"You don't have rights on this group"}.to_json().c_str()};
         }
 
         result = db.insert_card(
@@ -203,12 +205,12 @@ Server::execute_create_query(const create_query &query, quint32 user_id) {
     }
 
     return result > 0
-               ? std::pair<QString, quint32>{create_response{result, query.value_type.c_str(),
+               ? ReturnedValue{true, board_id, create_response{result, query.value_type.c_str(),
                                  query.board_id, query.list_id,
                                  query.card_id,  jsoned_object}
                      .to_json()
-                     .c_str(), board_id}
-               : std::pair<QString, quint32>{error{"An error occured"}.to_json().c_str(), 0};
+                     .c_str()}
+               : ReturnedValue{false, 0, error{"An error occured"}.to_json().c_str()};
 }
 
 std::pair<QString, quint32> Server::execute_login_query(const login_query &query
@@ -219,9 +221,9 @@ std::pair<QString, quint32> Server::execute_login_query(const login_query &query
 
     rDebug() << "user id is: " << id;
     if (response.m_response) {
-        auto all_groups = db.get_user_groups(id);
-        for (auto &group_iterator : all_groups) {
-            response.m_boards += db.get_group_boards(group_iterator.m_group_id);
+        // auto all_groups = db.(id);
+        for (auto &board : db.get_user_boards(id)) {
+            response.m_boards.push_back(board);
         }
 
         rDebug() << response.m_boards.size();
@@ -230,7 +232,11 @@ std::pair<QString, quint32> Server::execute_login_query(const login_query &query
     return {response.to_json().c_str(), id};
 }
 
-QString Server::execute_get_query(const get_boards_info_query &query) {
+ReturnedValue Server::execute_get_query(const get_boards_info_query &query, quint32 id) {
+    if (!db.check_user_rights(id, query.id)) {
+        return ReturnedValue{false, 0, error{"You have no rights"}.to_json().c_str()};
+    }
+
     rDebug() << "Get query";
     board result = db.select_board(query.id);
     rDebug() << query.id;
@@ -243,7 +249,7 @@ QString Server::execute_get_query(const get_boards_info_query &query) {
         }
     }
 
-    return result.to_json().c_str();
+    return ReturnedValue{true, 0, result.to_json().c_str()};
 }
 
 void Server::removeConnection() {
