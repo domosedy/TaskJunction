@@ -69,9 +69,7 @@ std::string update_request(
 
 std::string connect_to_board_request(quint32 board_id, quint32 user_id) {
     json request = {
-        {"type", "connect"},
-        {"user_id", user_id},
-        {"board_id", board_id}
+        {"type", "connect"}, {"user_id", user_id}, {"board_id", board_id}
     };
     return request.dump();
 }

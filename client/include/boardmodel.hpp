@@ -36,6 +36,7 @@ public:
     int get_count() const;
     quint32 get_list_id(const int index) const;
     quint32 get_card_id(const int list_index, const int card_index) const;
+    void move(int from_card, int to_card, int from_list, int to_list);
 
 signals:
     void countChanged();
@@ -44,7 +45,12 @@ private:
     QVector<ListModel *> m_lists;
     QMap<quint32, int> m_index_by_id;
 
-    enum ListRoles { NameRole = Qt::UserRole + 1, DescriptionRole, ModelRole };
+    enum ListRoles {
+        NameRole = Qt::UserRole + 1,
+        DescriptionRole,
+        ModelRole,
+        IndexRole
+    };
 };
 
 #endif

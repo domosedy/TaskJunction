@@ -19,7 +19,8 @@ class Client : public QObject {
     Q_PROPERTY(ConnectionStatus connection_status MEMBER m_connection_status
                    NOTIFY connectionStatusChanged)
     Q_PROPERTY(bool is_authorized MEMBER m_is_authorized NOTIFY statusChanged)
-    Q_PROPERTY(QString current_board_name READ get_current_board_name NOTIFY boardChanged)
+    Q_PROPERTY(QString current_board_name READ get_current_board_name NOTIFY
+                   boardChanged)
 
 public:
     enum ConnectionStatus {
@@ -62,6 +63,8 @@ public:
     );
     Q_INVOKABLE void update_list_name(int list_index, QString name);
     Q_INVOKABLE void connect_board(quint32 board_id);
+    Q_INVOKABLE void
+    move(int from_card, int to_card, int from_list, int to_list);
 
 signals:
     void boardChanged();

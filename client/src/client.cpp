@@ -319,3 +319,14 @@ void Client::connect_board(quint32 board_id) {
     std::string request = parser::connect_to_board_request(board_id, m_user_id);
     write(request);
 }
+
+void Client::move(int from_card, int to_card, int from_list, int to_list) {
+    m_current_board->move(from_card, to_card, from_list, to_list);
+    if (m_mode == ClientMode::Local) {
+        qDebug() << "DB UPDATE";
+    } else {
+        std::string request =
+            parser::move_request(from_card, to_card, from_list, to_list);
+        write(request);
+    }
+}

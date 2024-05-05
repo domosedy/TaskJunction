@@ -44,6 +44,7 @@ QHash<int, QByteArray> BoardModel::roleNames() const {
         roles[ListRoles::NameRole] = "name";
         roles[ListRoles::DescriptionRole] = "description";
         roles[ListRoles::ModelRole] = "listmodel";
+        roles[ListRoles::IndexRole] = "listIndex";
     }
 
     return roles;
@@ -62,6 +63,8 @@ QVariant BoardModel::data(const QModelIndex &index, int role) const {
             return {list->m_description};
         case ListRoles::ModelRole:
             return QVariant::fromValue<QObject *>(list);
+        case ListRoles::IndexRole:
+            return index.row();
         default:
             return {};
     }
@@ -152,4 +155,17 @@ void BoardModel::update_card_description(
 void BoardModel::update_list_name(int list_index, QString &name) {
     m_lists[list_index]->m_name = name;
     emit dataChanged(this->index(list_index, 0), this->index(list_index, 0));
+}
+
+void BoardModel::move(int from_card, int to_card, int from_list, int to_list) {
+    emit moveRequest(from_card, to_card, from_list, to_list);
+    if (from_list == to_list) {
+        m_lists[from_list]->move(from_card, to_card);
+    } else {
+        card moved = m_lists[from_list]->remove(from_card);
+        moved.m_list_id = m_lists[to_list]->m_list_id;
+        m_lists[to_list]->create_card(moved, to_card);
+    }
+    emit dataChanged(this->index(from_list, 0), this->index(from_list, 0));
+    emit dataChanged(this->index(to_list, 0), this->index(to_list, 0));
 }

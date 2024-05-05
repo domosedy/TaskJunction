@@ -6,6 +6,6 @@
         <file alias="List.qml">../qml/List.qml</file>
         <file alias="Style.qml">../qml/Style.qml</file> 
         <file alias="Authorization.qml">../qml/Authorization.qml</file>
-        <file alias="BoardSelect.qml">../qml/BoardSelect.qml</file>          
+        <file alias="BoardSelect.qml">../qml/BoardSelect.qml</file>      
     </qresource>
 </RCC>
