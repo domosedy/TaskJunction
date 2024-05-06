@@ -56,9 +56,8 @@ void db_manager::fill_query_name_to_sql_command() {
         "UPDATE %1.%2 SET %3 = :new_value WHERE id = "
         ":key_value;";
 
-    query_name_to_sql_command["update_order"] =
-        "UPDATE %1.%2 SET number = number + (%3) WHERE number > :left AND "
-        "number < :right;";
+//    query_name_to_sql_command["move_card"] =
+//        "SELECT move_card(:id, :new_list_id, :new_number);";
 
     query_name_to_sql_command["select_user"] =
         "SELECT id, name FROM %1.user_signature WHERE id = :key_value;";
@@ -603,39 +602,24 @@ quint32 db_manager::get_number(const QString &table_name, quint32 id) {
     return query.value(0).toInt();
 }
 
-bool db_manager::update_order(
-    const QString &table_name,
+/*bool db_manager::move_card(
     quint32 id,
+    quint32 new_list_id,
     quint32 new_number
 ) {
-    if (new_number == 0 || new_number > get_rows_number(table_name)) {
+    if (new_number == 0 || new_number > get_rows_number(CARD_TABLE_NAME)) {
         return false;
-    }
-    quint32 number = get_number(table_name, id);
-    if (number == new_number) {
-        return true;
     }
     QSqlQuery query(m_database);
-    if (new_number < number) {
-        query.prepare(query_name_to_sql_command["update_order"].arg(
-            m_schema, table_name, "1"
-        ));
-        query.bindValue(":left", new_number - 1);
-        query.bindValue(":right", number);
-    } else {
-        query.prepare(query_name_to_sql_command["update_order"].arg(
-            m_schema, table_name, "-1"
-        ));
-        query.bindValue(":left", number);
-        query.bindValue(":right", new_number + 1);
-    }
+    query.prepare(query_name_to_sql_command["move_card"].arg(m_schema));
+    query.bindValue(":id", id);
+    query.bindValue(":new_list_id", new_list_id);
+    query.bindValue("new_number", new_number);
     if (!query.exec()) {
-        qDebug() << "update_order:" << query.lastError().text();
+        qDebug() << "move_card:" << query.lastError().text();
         return false;
     }
-    return update_command(
-        table_name, "number", QString::number(new_number), id
-    );
-}
+    return true;
+}*/
 
 }  // namespace database
