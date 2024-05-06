@@ -28,7 +28,7 @@ id serial PRIMARY KEY,
 list_id int REFERENCES list_signature ON DELETE CASCADE,
 name varchar(50),
 description text,
-number int
+number int DEFAULT 1
 );
 
 CREATE TABLE tag_signature(
@@ -133,6 +133,10 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION card_invariant() RETURNS TRIGGER AS $$
 BEGIN
     IF TG_OP = 'INSERT' THEN
+        IF 0 > NEW.number OR NEW.number > 1 + cards_number FROM list_signature WHERE id = NEW.list_id THEN
+            RETURN NULL;
+        END IF;
+
         UPDATE list_signature SET cards_number = cards_number + 1 WHERE id = NEW.list_id;
         NEW.number = cards_number FROM list_signature WHERE id = NEW.list_id;
         RETURN NEW;
@@ -140,15 +144,20 @@ BEGIN
         UPDATE list_signature SET cards_number = cards_number - 1 WHERE id = OLD.list_id;
         UPDATE card_signature SET number = number - 1 WHERE list_id = OLD.list_id AND number > OLD.number;
         RETURN OLD;
+
     ELSEIF TG_OP = 'UPDATE' THEN
+        IF 0 > NEW.number OR NEW.number > 1 + cards_number FROM list_signature WHERE id = NEW.list_id THEN
+            RETURN NULL;
+        END IF;
+
         IF OLD.list_id <> NEW.list_id THEN
-            UPDATE list_signature SET cards_number = cards_number + 1 WHERE id = NEW.list_id;
-            UPDATE list_signature SET cards_number = cards_number - 1 WHERE id = OLD.list_id;
-            UPDATE card_signature SET number = number - 1 WHERE list_id = OLD.list_id AND number > OLD.number;
-            UPDATE card_signature SET number = number + 1 WHERE list_id = NEW.list_id AND number >= NEW.number;
+                UPDATE list_signature SET cards_number = cards_number + 1 WHERE id = NEW.list_id;
+                UPDATE list_signature SET cards_number = cards_number - 1 WHERE id = OLD.list_id;
+                UPDATE card_signature SET number = number - 1 WHERE list_id = OLD.list_id AND number > OLD.number;
+                UPDATE card_signature SET number = number + 1 WHERE list_id = NEW.list_id AND number >= NEW.number;
         END IF;
         RETURN NEW;
-    END if;
+    END IF;
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;

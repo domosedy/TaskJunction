@@ -132,8 +132,8 @@ void db_manager::fill_query_name_to_sql_command() {
     query_name_to_sql_command["get_user_id_by_name"] =
         "SELECT id FROM %1.user_signature WHERE name = :name;";
 
-    query_name_to_sql_command["get_number"] =
-        "SELECT number FROM %1.%2 WHERE id = :id;";
+    query_name_to_sql_command["get_card_number"] =
+        "SELECT number FROM %1.card_signature WHERE id = :id;";
 
     query_name_to_sql_command["alter_sequence"] =
         "SELECT setval('%1.%2', %3, FALSE);";
@@ -588,14 +588,14 @@ board db_manager::get_full_board(quint32 board_id) {
     return board;
 }
 
-quint32 db_manager::get_number(const QString &table_name, quint32 id) {
+quint32 db_manager::get_card_number(quint32 id) {
     QSqlQuery query(m_database);
     query.prepare(
-        query_name_to_sql_command["get_number"].arg(m_schema, table_name)
+        query_name_to_sql_command["get_card_number"].arg(m_schema)
     );
     query.bindValue(":id", id);
     if (!query.exec()) {
-        qDebug() << "get_number:" << query.lastError().text();
+        qDebug() << "get_card_number:" << query.lastError().text();
         return 0;
     }
     query.next();

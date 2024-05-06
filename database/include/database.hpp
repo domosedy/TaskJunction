@@ -120,8 +120,7 @@ public:
 
     board get_full_board(quint32 board_id);
 
-    quint32 get_number(const QString &table_name, quint32 id);
-    // bool move_card(quint32 id, quint32 new_list_id, quint32 new_number);
+    quint32 get_card_number(quint32 id);
 };
 
 }  // namespace database
