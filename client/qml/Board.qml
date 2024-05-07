@@ -14,7 +14,10 @@ Rectangle {
 
         width: 210
         height: 120
+        x: root.width / 2
+        y: root.height / 2
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+        focus: true
 
         background: Rectangle {
             visible: false
@@ -23,8 +26,9 @@ Rectangle {
         contentItem: Rectangle {
             id: content
 
-            border.color: style.primaryColor
+            border.color: style.listBackgroundColor
             border.width: style.defaultBorderSize
+            color: style.listBackgroundColor
             Drag.active: true
 
             TextField {
@@ -32,20 +36,31 @@ Rectangle {
 
                 z: 1
                 placeholderText: "New list"
-                font.family: "Courier"
-                font.pointSize: 12
-                font.bold: true
-                anchors.horizontalCenter: parent.horizontalCenter
+                placeholderTextColor: "#bfbfbf"
                 anchors.top: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
                 anchors.topMargin: 10
+                font.pointSize: 16
+                font.family: "Poppins"
+                font.bold: true
+
+                background: Rectangle {
+                    implicitWidth: content.width - 20
+                    implicitHeight: 36
+                    radius: style.defaultRadius
+                    color: style.textFormColor
+                    border.color: style.listBackgroundColor
+                    border.width: 1
+                }
+
             }
 
             Button {
                 z: 1
-                height: style.smallButtonSize
-                width: height * 2.5
-                anchors.horizontalCenter: parent.horizontalCenter
+                implicitWidth: parent.width - 20
+                implicitHeight: 36
                 anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottomMargin: 10
                 onClicked: {
                     createListPopup.close();
@@ -54,14 +69,15 @@ Rectangle {
                 }
 
                 Text {
-                    text: "Add"
-                    font.family: "Courier"
-                    font.pointSize: 12
+                    text: "Add list"
+                    font.family: "Poppins"
+                    font.pointSize: 16
                     anchors.centerIn: parent
+                    color: "white"
                 }
 
                 background: Rectangle {
-                    color: parent.down ? Qt.lighter(style.createBackgroundColor, 1.4) : (parent.hovered ? Qt.lighter(style.createBackgroundColor, 1.2) : style.createBackgroundColor)
+                    color: parent.down ? Qt.lighter(style.primaryColor, 1.2) : (parent.hovered ? Qt.lighter(style.primaryColor, 1.2) : style.primaryColor)
                 }
 
             }
@@ -86,65 +102,60 @@ Rectangle {
         z: 1
 
         Button {
-            width: style.smallButtonSize
-            height: width
+            id: toMenuButton
+
+            width: style.headerHeight
+            height: style.headerHeight
+            anchors.left: parent.left
             onClicked: {
                 loader.source = "BoardSelect.qml";
             }
 
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-
-
             Text {
                 text: "<"
-                font.family: "Courier"
-                font.pointSize: 12
+                font.family: "Poppins"
+                font.pointSize: 24
                 anchors.centerIn: parent
                 color: "white"
             }
 
             background: Rectangle {
-                color: parent.down ? Qt.darker(style.primaryColor, 1.4) : (parent.hovered ? Qt.darker(style.primaryColor, 1.2) : style.primaryColor)
-            }
-
-        }
-
-        Button {
-            width: style.smallButtonSize
-            height: width
-            onClicked: {
-                createListPopup.open();
-            }
-
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter       
-
-            Text {
-                anchors.centerIn: parent
-                text: "+"
-                color: "white"
-            }
-
-            background: Rectangle {
-                color: parent.down ? Qt.darker(style.primaryColor, 1.4) : (parent.hovered ? Qt.darker(style.primaryColor, 1.2) : style.primaryColor)
+                color: parent.down ? Qt.darker(style.headerBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.headerBackgroundColor, 1.2) : style.headerBackgroundColor)
             }
 
         }
 
         Text {
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.horizontalCenter: parent.horizontalCenter        
-
             text: mainClient.current_board_name
-            y: 3
-            height: style.smallButtonSize
-            font.family: "Courier"
-            font.pointSize: 16
-            font.bold: true
+            font.family: "Poppins"
+            font.pointSize: 20
             color: "white"
+            anchors.centerIn: parent
         }
+
+        Button {
+            width: 110
+            height: 36
+            onClicked: {
+                createListPopup.open();
+            }
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+
+            Text {
+                text: "+ New list"
+                font.family: "Poppins"
+                font.pointSize: 16
+                color: "white"
+                anchors.centerIn: parent
+            }
+
+            background: Rectangle {
+                color: parent.down ? Qt.darker(style.headerBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.headerBackgroundColor, 1.2) : style.headerBackgroundColor)
+            }
+
+        }
+
     }
 
     Rectangle {
@@ -152,23 +163,22 @@ Rectangle {
 
         width: root.width
         height: root.height
-        color: style.boardBackgroundColor
-        y: boardMenuBar.height+10
+        color: style.primaryColor
+        anchors.top: boardMenuBar.bottom
+        anchors.topMargin: 30
 
         ListView {
             id: listview
+
             anchors.fill: parent
             anchors.leftMargin: 10
             model: mainClient.current_board
             orientation: ListView.Horizontal
-            spacing: 15
+            spacing: 30
 
             delegate: List {
             }
-            // Rectangle {
-            //     anchors.fill: parent
-            //     color: "red"
-            // }
+
         }
 
     }

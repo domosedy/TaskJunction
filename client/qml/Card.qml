@@ -23,6 +23,7 @@ Rectangle {
     Drag.source: root
     Drag.hotSpot.x: root.width / 2
     Drag.hotSpot.y: root.height / 2
+    radius: style.defaultRadius
     states: [
         State {
             when: mouseArea.drag.active
@@ -61,158 +62,199 @@ Rectangle {
         }
     }
 
-    radius: style.defaultRadius
+    Text {
+        id: nameHolder
+
+        text: name
+        font.family: "Poppins"
+        font.pointSize: 16
+        font.bold: true
+        color: "white"
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.topMargin: 20
+        anchors.leftMargin: 20
+    }
 
     Text {
-        text: name
-        font.family: "Courier"
-        font.pointSize: 16
+        id: descriptionHolder
+
+        text: description
+        font.family: "Poppins"
+        font.pointSize: 12
         color: "white"
+        anchors.top: nameHolder.bottom
         anchors.left: parent.left
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.leftMargin: 5
-        clip: true
+        anchors.topMargin: 5
+        anchors.leftMargin: 20
     }
 
     Button {
-        height: style.smallButtonSize
-        width: style.smallButtonSize
+        id: deleteCardButton
+
+        width: 18
+        height: 18
         anchors.right: parent.right
         anchors.top: parent.top
+        anchors.rightMargin: 20
+        anchors.topMargin: 20
+        onClicked: {
+            listMain.deleteRequest(index);
+        }
+
         Text {
+            text: "x"
+            font.family: "Poppins"
+            font.pointSize: 16
             anchors.centerIn: parent
-            text: "="
             color: "white"
         }
-        onClicked: {
-            card_window.open();
-        }
 
         background: Rectangle {
-            radius: style.defaultRadius
-            color: parent.down ? Qt.lighter(style.cardBackgroundColor, 1.4) : (parent.hovered ? Qt.lighter(style.cardBackgroundColor, 1.2) : style.cardBackgroundColor)
+            color: parent.down ? Qt.darker(style.cardBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.cardBackgroundColor, 1.2) : style.cardBackgroundColor)
         }
 
-    }
+    }    
 
-    Popup {
-        id: card_window
+    // Button {
+    //     height: style.smallButtonSize
+    //     width: style.smallButtonSize
+    //     anchors.right: parent.right
+    //     anchors.top: parent.top
+    //     onClicked: {
+    //         card_window.open();
+    //     }
 
-        width: style.cardPopUpWidth
-        height: style.cardPopUpHeight
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+    //     Text {
+    //         anchors.centerIn: parent
+    //         text: "="
+    //         color: "white"
+    //     }
 
-        background: Rectangle {
-            visible: false
-        }
+    //     background: Rectangle {
+    //         radius: style.defaultRadius
+    //         color: parent.down ? Qt.lighter(style.cardBackgroundColor, 1.4) : (parent.hovered ? Qt.lighter(style.cardBackgroundColor, 1.2) : style.cardBackgroundColor)
+    //     }
 
-        contentItem: Rectangle {
-            id: content
+    // }
 
-            border.color: style.primaryColor
-            border.width: style.defaultBorderSize
-            Drag.active: true
+    // Popup {
+    //     id: card_window
 
-            TextInput {
-                id: card_name
+    //     width: style.cardPopUpWidth
+    //     height: style.cardPopUpHeight
+    //     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
 
-                z: 1
-                text: name
-                font.family: "Courier"
-                font.pointSize: 12
-                font.bold: true
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: 10
-                width: parent.width - 20
-                wrapMode: Text.Wrap
-                readOnly: true
-                onAccepted: {
-                    card_name.readOnly = true;
-                    n_area.enabled = true;
-                    card_name.focus = false;
-                    listMain.updateCardName(index, card_name.text);
-                }
+    //     background: Rectangle {
+    //         visible: false
+    //     }
 
-                MouseArea {
-                    id: n_area
+    //     contentItem: Rectangle {
+    //         id: content
 
-                    anchors.fill: parent
-                    onDoubleClicked: {
-                        card_name.readOnly = false;
-                        n_area.enabled = false;
-                        card_name.cursorPosition = 0;
-                    }
-                }
-                // Issue when closing popup without saving
+    //         border.color: style.primaryColor
+    //         border.width: style.defaultBorderSize
+    //         Drag.active: true
 
-            }
+    //         TextInput {
+    //             id: card_name
 
-            TextInput {
-                id: card_description
+    //             z: 1
+    //             text: name
+    //             font.family: "Courier"
+    //             font.pointSize: 12
+    //             font.bold: true
+    //             anchors.horizontalCenter: parent.horizontalCenter
+    //             anchors.top: parent.top
+    //             anchors.topMargin: 10
+    //             width: parent.width - 20
+    //             wrapMode: Text.Wrap
+    //             readOnly: true
+    //             onAccepted: {
+    //                 card_name.readOnly = true;
+    //                 n_area.enabled = true;
+    //                 card_name.focus = false;
+    //                 listMain.updateCardName(index, card_name.text);
+    //             }
 
-                z: 1
-                text: description
-                font.family: "Courier"
-                font.pointSize: 10
-                anchors.left: parent.left
-                anchors.top: card_name.bottom
-                anchors.topMargin: 10
-                anchors.leftMargin: 10
-                width: parent.width - 20
-                wrapMode: Text.Wrap
-                readOnly: true
-                onAccepted: {
-                    card_description.readOnly = true;
-                    d_area.enabled = true;
-                    card_description.focus = false;
-                    listMain.updateCardDescription(index, card_description.text);
-                }
+    //             MouseArea {
+    //                 id: n_area
 
-                MouseArea {
-                    id: d_area
+    //                 anchors.fill: parent
+    //                 onDoubleClicked: {
+    //                     card_name.readOnly = false;
+    //                     n_area.enabled = false;
+    //                     card_name.cursorPosition = 0;
+    //                 }
+    //             }
+    //             // Issue when closing popup without saving
 
-                    anchors.fill: parent
-                    onDoubleClicked: {
-                        card_description.readOnly = false;
-                        d_area.enabled = false;
-                    }
-                }
+    //         }
 
-            }
+    //         TextInput {
+    //             id: card_description
 
-            Button {
-                z: 1
-                width: 80
-                height: 30
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 10
-                onClicked: {
-                    card_window.close();
-                    listMain.deleteRequest(index);
-                }
+    //             z: 1
+    //             text: description
+    //             font.family: "Courier"
+    //             font.pointSize: 10
+    //             anchors.left: parent.left
+    //             anchors.top: card_name.bottom
+    //             anchors.topMargin: 10
+    //             anchors.leftMargin: 10
+    //             width: parent.width - 20
+    //             wrapMode: Text.Wrap
+    //             readOnly: true
+    //             onAccepted: {
+    //                 card_description.readOnly = true;
+    //                 d_area.enabled = true;
+    //                 card_description.focus = false;
+    //                 listMain.updateCardDescription(index, card_description.text);
+    //             }
 
-                Text {
-                    text: "Delete"
-                    font.family: "Courier"
-                    font.pointSize: 12
-                    anchors.centerIn: parent
-                }
+    //             MouseArea {
+    //                 id: d_area
 
-                background: Rectangle {
-                    color: parent.down ? Qt.lighter(style.deleteBackgroundColor, 1.2) : (parent.hovered ? Qt.lighter(style.deleteBackgroundColor, 1.2) : style.deleteBackgroundColor)
-                }
+    //                 anchors.fill: parent
+    //                 onDoubleClicked: {
+    //                     card_description.readOnly = false;
+    //                     d_area.enabled = false;
+    //                 }
+    //             }
 
-            }
+    //         }
 
-            MouseArea {
-                anchors.fill: parent
-                drag.target: parent
-            }
+    //         Button {
+    //             z: 1
+    //             width: 80
+    //             height: 30
+    //             anchors.horizontalCenter: parent.horizontalCenter
+    //             anchors.bottom: parent.bottom
+    //             anchors.bottomMargin: 10
+    //             onClicked: {
+    //                 card_window.close();
+    //                 listMain.deleteRequest(index);
+    //             }
 
-        }
+    //             Text {
+    //                 text: "Delete"
+    //                 font.family: "Courier"
+    //                 font.pointSize: 12
+    //                 anchors.centerIn: parent
+    //             }
 
-    }
+    //             background: Rectangle {
+    //                 color: parent.down ? Qt.lighter(style.deleteBackgroundColor, 1.2) : (parent.hovered ? Qt.lighter(style.deleteBackgroundColor, 1.2) : style.deleteBackgroundColor)
+    //             }
+
+    //         }
+
+    //         MouseArea {
+    //             anchors.fill: parent
+    //             drag.target: parent
+    //         }
+
+    //     }
+    // }
 
 }

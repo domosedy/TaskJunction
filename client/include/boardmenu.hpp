@@ -2,7 +2,11 @@
 #define BOARDMENU_HPP_
 
 #include <QAbstractListModel>
+#include <QScopedPointer>
 #include <QVector>
+#include <memory>
+#include <unordered_map>
+#include "boardmodel.hpp"
 #include "element_classes.hpp"
 
 class BoardMenu : public QAbstractListModel {
@@ -15,16 +19,23 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole)
         const override;
     int get_count();
-    void create_board(QString &name, QString &description, quint32 id);
+    void
+    add_board(QString &name, QString &description, quint32 id, quint32 user_id);
     void add_board(const board &board);
-    quint32 get_id(int board_index) const;
+    std::pair<quint32, bool> get_info(int board_index) const;
+    std::pair<quint32, bool> delete_board(int board_index);
+    BoardModel *load(int index, const board &loaded_board);
+    void unload_remote_boards();
+
+    friend class Client;
 signals:
     void countChanged();
-    void request_board(int index);
-    void load_board(int index);
 
 private:
-    QVector<board> boards;
+    QVector<board> m_boards;
+    bool is_local_loaded = false;
+    QMap<quint32, int> m_board_id_to_index;
+    std::unordered_map<quint32, std::unique_ptr<BoardModel>> m_loaded_boards;
 
     enum BoardRoles { NameRole = Qt::UserRole + 1, DescriptionRole };
 };

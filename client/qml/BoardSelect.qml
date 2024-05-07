@@ -15,8 +15,11 @@ Rectangle {
         id: connectBoardPopUp
 
         width: 210
-        height: 180
+        height: 160
+        x: root.width / 2
+        y: root.height / 2
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+        focus: true
 
         background: Rectangle {
             visible: false
@@ -25,53 +28,57 @@ Rectangle {
         contentItem: Rectangle {
             id: boardPopUpContent
 
-            border.color: style.primaryColor
+            border.color: style.listBackgroundColor
             border.width: style.defaultBorderSize
+            color: style.listBackgroundColor
             Drag.active: true
 
-            ColumnLayout {
+            TextField {
+                id: groupLink
+
                 z: 1
-                width: parent.width
+                placeholderText: "Enter board link"
+                placeholderTextColor: "#bfbfbf"
                 anchors.top: parent.top
-                anchors.topMargin: 10
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 10
+                anchors.topMargin: 10
+                font.pointSize: 16
+                font.family: "Poppins"
 
-                TextField {
-                    id: groupId
-
-                    z: 1
-                    placeholderText: "Board id"
-                    font.family: "Courier"
-                    font.pointSize: 12
-                    font.bold: true
-                    Layout.preferredWidth: parent.width - 20
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                background: Rectangle {
+                    implicitWidth: boardPopUpContent.width - 20
+                    implicitHeight: 36
+                    radius: style.defaultRadius
+                    color: style.textFormColor
+                    border.color: style.listBackgroundColor
+                    border.width: 1
                 }
 
-                Button {
-                    z: 1
-                    Layout.preferredWidth: parent.width - 40
-                    Layout.preferredHeight: 30
-                    Layout.margins: 10
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
-                    onClicked: {
-                        connectBoardPopUp.close();
-                        mainClient.connect_board(boardId.text);
-                        boardId.text = "";
-                    }
+            }
 
-                    Text {
-                        text: "Connect"
-                        font.family: "Courier"
-                        font.pointSize: 12
-                        anchors.centerIn: parent
-                    }
+            Button {
+                z: 1
+                implicitWidth: parent.width - 20
+                implicitHeight: 36
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottomMargin: 10
+                onClicked: {
+                    connectBoardPopUp.close();
+                    mainClient.connect_board(groupLink.text);
+                    groupLink.text = "";
+                }
 
-                    background: Rectangle {
-                        color: parent.down ? Qt.lighter(style.createBackgroundColor, 1.2) : (parent.hovered ? Qt.lighter(style.createBackgroundColor, 1.2) : style.createBackgroundColor)
-                    }
+                Text {
+                    text: "Connect"
+                    font.family: "Poppins"
+                    font.pointSize: 16
+                    anchors.centerIn: parent
+                    color: "white"
+                }
 
+                background: Rectangle {
+                    color: parent.down ? Qt.lighter(style.primaryColor, 1.2) : (parent.hovered ? Qt.lighter(style.primaryColor, 1.2) : style.primaryColor)
                 }
 
             }
@@ -89,76 +96,129 @@ Rectangle {
         id: createBoardPopup
 
         width: 210
-        height: 160
+        height: 210
+        x: root.width / 2
+        y: root.height / 2
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+        focus: true
 
         background: Rectangle {
             visible: false
         }
 
         contentItem: Rectangle {
-            id: content
+            id: createBoardContent
 
             border.color: style.primaryColor
             border.width: style.defaultBorderSize
+            color: style.listBackgroundColor
             Drag.active: true
 
-            ColumnLayout {
+            TextField {
+                id: boardName
+
                 z: 1
-                width: parent.width
+                placeholderText: "Enter name"
+                placeholderTextColor: "#bfbfbf"
                 anchors.top: parent.top
-                anchors.topMargin: 10
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 10
+                anchors.topMargin: 10
+                font.pointSize: 16
+                font.family: "Poppins"
+                text: "New board"
 
-                TextField {
-                    id: boardName
-
-                    z: 1
-                    placeholderText: "New board"
-                    font.family: "Courier"
-                    font.pointSize: 12
-                    font.bold: true
-                    Layout.preferredWidth: parent.width - 20
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                background: Rectangle {
+                    implicitWidth: createBoardContent.width - 20
+                    implicitHeight: 36
+                    radius: style.defaultRadius
+                    color: style.textFormColor
+                    border.color: style.listBackgroundColor
+                    border.width: 1
                 }
 
-                TextField {
-                    id: boardDescription
+            }
 
-                    z: 1
-                    placeholderText: "Description"
-                    font.family: "Courier"
-                    font.pointSize: 12
-                    font.bold: true
-                    Layout.preferredWidth: parent.width - 20
-                    Layout.alignment: Qt.AlignHCenter
+            TextField {
+                id: boardDescription
+
+                z: 1
+                placeholderText: "Enter description"
+                placeholderTextColor: "#bfbfbf"
+                anchors.top: boardName.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.topMargin: 10
+                font.pointSize: 16
+                font.family: "Poppins"
+
+                background: Rectangle {
+                    implicitWidth: createBoardContent.width - 20
+                    implicitHeight: 36
+                    radius: style.defaultRadius
+                    color: style.textFormColor
+                    border.color: style.listBackgroundColor
+                    border.width: 1
                 }
 
-                Button {
-                    z: 1
-                    Layout.preferredWidth: parent.width - 40
-                    Layout.preferredHeight: 30
-                    Layout.margins: 20
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
-                    onClicked: {
-                        createBoardPopup.close();
-                        mainClient.create_board(boardName.text, boardDescription.text);
-                        boardDescription.text = "";
-                        boardName.text = "";
+            }
+
+            // TODO make better
+            ComboBox {
+                id: boardType
+
+                z: 1
+                implicitWidth: parent.width - 20
+                implicitHeight: 36
+                anchors.top: boardDescription.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.topMargin: 10
+                anchors.bottomMargin: 10
+                Component.onCompleted: {
+                    if (mainClient.connection_status != Client.Authorized)
+                        model.append({
+                        "text": "Remote"
+                    });
+
+                }
+
+                model: ListModel {
+                    id: typeModel
+
+                    ListElement {
+                        text: "Local"
                     }
 
-                    Text {
-                        text: "Add"
-                        font.family: "Courier"
-                        font.pointSize: 12
-                        anchors.centerIn: parent
-                    }
+                }
 
-                    background: Rectangle {
-                        color: parent.down ? Qt.lighter(style.createBackgroundColor, 1.2) : (parent.hovered ? Qt.lighter(style.createBackgroundColor, 1.2) : style.createBackgroundColor)
-                    }
+                background: Rectangle {
+                    color: parent.down ? Qt.lighter(style.textFormColor, 1.2) : (parent.hovered ? Qt.lighter(style.textFormColor, 1.2) : style.textFormColor)
+                }
 
+            }
+
+            Button {
+                z: 1
+                implicitWidth: parent.width - 20
+                implicitHeight: 36
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottomMargin: 10
+                onClicked: {
+                    createBoardPopup.close();
+                    mainClient.add_board(boardName.text, boardDescription.text, boardType.currentText);
+                    boardDescription.text = "";
+                    boardName.text = "";
+                }
+
+                Text {
+                    text: "Create"
+                    font.family: "Poppins"
+                    font.pointSize: 16
+                    anchors.centerIn: parent
+                    color: "white"
+                }
+
+                background: Rectangle {
+                    color: parent.down ? Qt.lighter(style.primaryColor, 1.2) : (parent.hovered ? Qt.lighter(style.primaryColor, 1.2) : style.primaryColor)
                 }
 
             }
@@ -173,88 +233,95 @@ Rectangle {
     }
 
     Rectangle {
-        id: boardSelectMenuBar
+        id: boardSelectHeader
 
         visible: true
         width: root.width
         height: style.headerHeight
-        color: style.primaryColor
+        color: style.headerBackgroundColor
         anchors.top: root.top
-        z: 1
 
-        Row {
-            anchors.fill: parent
-            z: 1
+        Button {
+            id: toMenuButton
 
-            Button {
-                width: style.smallButtonSize
-                height: width
-                onClicked: {
-                    loader.active = false;
-                    start_menu.visible = true;
-                }
-
-                Text {
-                    text: "<"
-                    font.family: "Courier"
-                    font.pointSize: 12
-                    anchors.centerIn: parent
-                    color: "white"
-                }
-
-                background: Rectangle {
-                    color: parent.down ? Qt.darker(style.primaryColor, 1.4) : (parent.hovered ? Qt.darker(style.primaryColor, 1.2) : style.primaryColor)
-                }
-
-            }
-
-            Button {
-                width: style.smallButtonSize
-                height: width
-                onClicked: {
-                    createBoardPopup.open();
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "+"
-                    color: "white"
-                }
-
-                background: Rectangle {
-                    color: parent.down ? Qt.darker(style.primaryColor, 1.4) : (parent.hovered ? Qt.darker(style.primaryColor, 1.2) : style.primaryColor)
-                }
-
+            width: style.headerHeight
+            height: style.headerHeight
+            anchors.left: parent.left
+            onClicked: {
+                loader.active = false;
+                startMenu.visible = true;
             }
 
             Text {
-                text: (mainClient.client_mode == Client.Local) ? "local menu" : "remote menu"
-                y: 3
-                height: style.smallButtonSize
-                font.family: "Courier"
-                font.pointSize: 16
-                font.bold: true
+                text: "<"
+                font.family: "Poppins"
+                font.pointSize: 24
+                anchors.centerIn: parent
                 color: "white"
             }
 
-            Button {
-                width: style.smallButtonSize
-                height: width
-                visible: (mainClient.client_mode == Client.Remote)
-                onClicked: {
-                    addGroupPopUp.open();
-                }
+            background: Rectangle {
+                color: parent.down ? Qt.darker(style.headerBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.headerBackgroundColor, 1.2) : style.headerBackgroundColor)
+            }
 
-                Text {
-                    anchors.centerIn: parent
-                    text: "g"
-                    color: "white"
-                }
+        }
 
-                background: Rectangle {
-                    color: parent.down ? Qt.darker(style.primaryColor, 1.4) : (parent.hovered ? Qt.darker(style.primaryColor, 1.2) : style.primaryColor)
-                }
+        Text {
+            text: "Welcome, master ^_^"
+            font.family: "Poppins"
+            font.pointSize: 20
+            color: "white"
+            anchors.centerIn: parent
+        }
 
+        Button {
+            width: 136
+            height: style.headerHeight / 2
+            anchors.top: parent.top
+            anchors.right: parent.right
+            onClicked: {
+                createBoardPopup.open();
+            }
+
+            Text {
+                text: "New board"
+                font.family: "Poppins"
+                font.pointSize: 16
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.rightMargin: 10
+                color: "white"
+            }
+
+            background: Rectangle {
+                color: parent.down ? Qt.darker(style.headerBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.headerBackgroundColor, 1.2) : style.headerBackgroundColor)
+            }
+
+        }
+
+        Button {
+            width: 136
+            height: style.headerHeight / 2
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            //visible: (mainClient.connection_status == Client.Authorized)
+            visible: true
+            onClicked: {
+                connectBoardPopUp.open();
+            }
+
+            Text {
+                text: "Connect"
+                font.family: "Poppins"
+                font.pointSize: 16
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.rightMargin: 10
+                color: "white"
+            }
+
+            background: Rectangle {
+                color: parent.down ? Qt.darker(style.headerBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.headerBackgroundColor, 1.2) : style.headerBackgroundColor)
             }
 
         }
@@ -262,63 +329,139 @@ Rectangle {
     }
 
     Rectangle {
-        id: boardSelectMainarea
+        id: boardSelectMain
 
         width: root.width
-        height: root.height - boardSelectMenuBar.height
-        y: boardSelectMenuBar.height
-        color: style.boardBackgroundColor
+        height: root.height - boardSelectHeader.height
+        y: boardSelectHeader.height
+        color: style.primaryColor
 
         ListView {
             id: boardsList
 
             anchors.fill: parent
             anchors.leftMargin: 10
-            anchors.topMargin: 10
+            anchors.topMargin: 30
             model: mainClient.board_menu
             orientation: ListView.Vertical
             spacing: 5
+            clip: true
 
             delegate: Rectangle {
                 id: boardCard
 
-                width: 300
-                height: 100
-                color: "white"
-                anchors.horizontalCenter: parent.horizontalCenter
+                width: 280
+                height: 160
+                color: style.boardCardColor
+                radius: style.defaultRadius
+                anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
 
-                ColumnLayout {
-                    width: parent.width
-                    height: parent.height
+                Text {
+                    id: nameHolder
+
+                    text: name
+                    font.family: "Poppins"
+                    font.pointSize: 16
+                    font.bold: true
+                    color: "white"
                     anchors.top: parent.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 10
+                    anchors.left: parent.left
+                    anchors.topMargin: 20
+                    anchors.leftMargin: 20
+                }
 
-                    Text {
-                        text: name
-                        font.family: "Courier"
-                        font.pointSize: 18
-                        font.bold: true
-                        Layout.preferredWidth: parent.width - 20
-                        Layout.alignment: Qt.AlignHCenter
+                Text {
+                    id: descriptionHolder
+
+                    text: description
+                    font.family: "Poppins"
+                    font.pointSize: 12
+                    color: "white"
+                    anchors.top: nameHolder.bottom
+                    anchors.left: parent.left
+                    anchors.topMargin: 5
+                    anchors.leftMargin: 20
+                }
+
+                Button {
+                    id: deleteBoardButton
+
+                    width: 18
+                    height: 18
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.rightMargin: 20
+                    anchors.topMargin: 20
+                    onClicked: {
+                        mainClient.delete_board(index);
                     }
 
                     Text {
-                        text: description
-                        font.family: "Courier"
-                        font.pointSize: 14
-                        Layout.preferredWidth: parent.width - 20
-                        Layout.alignment: Qt.AlignHCenter
+                        text: "x"
+                        font.family: "Poppins"
+                        font.pointSize: 16
+                        anchors.centerIn: parent
+                        color: "white"
+                    }
+
+                    background: Rectangle {
+                        color: parent.down ? Qt.darker(style.boardCardColor, 1.4) : (parent.hovered ? Qt.darker(style.boardCardColor, 1.2) : style.boardCardColor)
                     }
 
                 }
 
-                MouseArea {
-                    anchors.fill: parent
-                    onDoubleClicked: {
-                        mainClient.request_board(index);
+                Button {
+                    id: shareBoardButton
+
+                    width: 18
+                    height: 18
+                    anchors.right: parent.right
+                    anchors.top: deleteBoardButton.bottom
+                    anchors.rightMargin: 20
+                    anchors.topMargin: 10
+                    onClicked: {
+                        console.log("Lol there is nothing yet");
+                    }
+
+                    Text {
+                        text: "@"
+                        font.family: "Poppins"
+                        font.pointSize: 12
+                        anchors.centerIn: parent
+                        color: "white"
+                    }
+
+                    background: Rectangle {
+                        color: parent.down ? Qt.darker(style.boardCardColor, 1.4) : (parent.hovered ? Qt.darker(style.boardCardColor, 1.2) : style.boardCardColor)
+                    }
+
+                }
+
+                Button {
+                    width: parent.width - 40
+                    height: 48
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 5
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    onClicked: {
+                        mainClient.load_board(index);
                         loader.source = "Board.qml";
                     }
+
+                    Text {
+                        text: "View board"
+                        font.family: "Poppins"
+                        font.pointSize: 16
+                        font.bold: true
+                        anchors.centerIn: parent
+                        color: "white"
+                    }
+
+                    background: Rectangle {
+                        color: parent.down ? Qt.lighter(style.primaryColor, 1.4) : (parent.hovered ? Qt.lighter(style.primaryColor, 1.2) : style.primaryColor)
+                        radius: style.defaultRadius
+                    }
+
                 }
 
             }

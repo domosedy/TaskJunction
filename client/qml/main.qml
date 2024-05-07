@@ -21,32 +21,38 @@ ApplicationWindow {
     }
 
     ColumnLayout {
-        id: start_menu
+        id: startMenu
 
         visible: true
         anchors.centerIn: parent
         spacing: 10
 
+        Rectangle {
+            id: background
+
+            color: style.primaryColor
+        }
+
         Button {
             Layout.preferredWidth: root.width / 6
             Layout.preferredHeight: root.height / 12
             onClicked: {
-                start_menu.visible = false;
-                if (!mainClient.is_authorized) {
-                    loader.source = "Authorization.qml";
-                } else {
-                    mainClient.prepare_remote_board_select_menu();
-                    loader.source = "BoardSelect.qml";
-                }
+                startMenu.visible = false;
+                loader.source = "Authorization.qml";
                 loader.active = true;
             }
 
             Text {
-                text: "Remote"
                 anchors.centerIn: parent
-                font.family: "Helvetica"
-                font.pointSize: 12
-                color: "#514e92"
+                text: "Log in"
+                color: "white"
+                font.pointSize: 16
+                font.family: "Poppins"
+            }
+
+            background: Rectangle {
+                color: parent.down ? Qt.darker(style.boardBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.boardBackgroundColor, 1.2) : style.boardBackgroundColor)
+                radius: style.defaultRadius
             }
 
         }
@@ -55,18 +61,23 @@ ApplicationWindow {
             Layout.preferredWidth: root.width / 6
             Layout.preferredHeight: root.height / 12
             onClicked: {
-                start_menu.visible = false;
-                mainClient.prepare_local_board_select_menu();
+                startMenu.visible = false;
+                mainClient.load_local_boards();
                 loader.source = "BoardSelect.qml";
                 loader.active = true;
             }
 
             Text {
-                text: "Local"
                 anchors.centerIn: parent
-                font.family: "Helvetica"
-                font.pointSize: 12
-                color: "#514e92"
+                text: "Boards"
+                color: "white"
+                font.pointSize: 16
+                font.family: "Poppins"
+            }
+
+            background: Rectangle {
+                color: parent.down ? Qt.darker(style.boardBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.boardBackgroundColor, 1.2) : style.boardBackgroundColor)
+                radius: style.defaultRadius
             }
 
         }
@@ -79,11 +90,11 @@ ApplicationWindow {
             }
 
             Text {
-                text: "Exit"
                 anchors.centerIn: parent
-                font.family: "Helvetica"
-                font.pointSize: 12
+                text: "Exit"
                 color: "white"
+                font.pointSize: 16
+                font.family: "Poppins"
             }
 
             background: Rectangle {

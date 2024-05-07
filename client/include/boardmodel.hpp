@@ -13,13 +13,12 @@ class BoardModel : public QAbstractListModel, public board {
     Q_PROPERTY(int count READ get_count NOTIFY countChanged)
 public:
     explicit BoardModel(QObject *parent = nullptr);
-    BoardModel(QObject *parent, const nlohmann::json &board_json);
-    BoardModel(QObject *parent, const board &board_base);
+    BoardModel(const nlohmann::json &board_json, QObject *parent = nullptr);
+    BoardModel(const board &board_base, QObject *parent = nullptr);
     QHash<int, QByteArray> roleNames() const override;
     int rowCount(const QModelIndex &parent = {}) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole)
         const override;
-    Q_INVOKABLE void create_list(QString &name);
     void create_list(const list &list_base);
     void create_card(int index, const card &new_card);
     void create_card(quint32 list_id, const card &new_card);
@@ -40,6 +39,7 @@ public:
 
 signals:
     void countChanged();
+    void moveRequest(int, int, int, int);
 
 private:
     QVector<ListModel *> m_lists;

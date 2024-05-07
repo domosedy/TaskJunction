@@ -7,7 +7,7 @@
 BoardModel::BoardModel(QObject *parent) : QAbstractListModel(parent) {
 }
 
-BoardModel::BoardModel(QObject *parent, const nlohmann::json &board_json)
+BoardModel::BoardModel(const nlohmann::json &board_json, QObject *parent)
     : BoardModel(parent) {
     m_board_id = board_json["id"];
     m_name = QString::fromStdString(board_json["name"]);
@@ -21,7 +21,7 @@ BoardModel::BoardModel(QObject *parent, const nlohmann::json &board_json)
     }
 }
 
-BoardModel::BoardModel(QObject *parent, const board &board_base)
+BoardModel::BoardModel(const board &board_base, QObject *parent)
     : BoardModel(parent) {
     m_board_id = board_base.m_board_id;
     m_name = board_base.m_name;
@@ -68,17 +68,6 @@ QVariant BoardModel::data(const QModelIndex &index, int role) const {
         default:
             return {};
     }
-}
-
-void BoardModel::create_list(QString &name) {
-    if (name == "") {
-        name = "New list";
-    }
-    beginInsertRows(QModelIndex(), m_lists.size(), m_lists.size());
-    m_lists.append(new ListModel(this, name, ""));
-    endInsertRows();
-
-    emit countChanged();
 }
 
 void BoardModel::create_list(const list &list_base) {

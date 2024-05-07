@@ -34,13 +34,11 @@ std::string update_request(
 
 std::string connect_to_board_request(quint32 group_id, quint32 user_id);
 
-board parse_board(const json &object);
+card parse_card(const json &object, quint32 m_parent_id);
 
-card parse_card(const json &object);
+list parse_list(const json &object, quint32 m_parent_id);
 
-list parse_list(const json &object);
-
-board parse_board(const json &object, quint32 m_user_id);
+board parse_board(const json &object, quint32 m_parent_id);
 
 }  // namespace parser
 
