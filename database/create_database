@@ -1,12 +1,13 @@
 #!/bin/bash
-export PGPASSWORD="1"
 database='test_database'
 user='test_user'
 password='test_password'
 path='~/Documents/TaskJunction/database/include/create_board.sql'
+
+export PGPASSWORD="1"
 sudo -u postgres psql -c "CREATE DATABASE $database;"
 sudo -u postgres psql -c "CREATE USER $user WITH PASSWORD '$password';"
 sudo -u postgres psql -c "ALTER DATABASE $database OWNER TO $user;"
 
 export PGPASSWORD="$password"
-psql -U $user -d $database -h 127.0.0.1 -p 5432 -c "\i $path;"
+psql -U $user -d $database -h 127.0.0.1  -c "\i $path;"
