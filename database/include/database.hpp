@@ -48,15 +48,13 @@ class db_manager {
     QSqlRecord select_info_by_id(const QString &query_name, quint32 key_value);
     QString m_schema = "public";
 
+    void print_all_tables();
+    void clear_all_tables();
+    void drop_all_tables();
+
     bool check_user_password(const QString &login, const QString &password);
 
-    quint32 get_user_id_by_name(const QString &name);
-
-    int get_rows_number(const QString &table_name);
-
-    quint32 insert_user(const QString &login, const QString &password);
-
-    quint32 get_sequence_last_value(const QString &sequence);
+//    quint32 get_user_id_by_name(const QString &name);
 
     static void fill_query_name_to_sql_command();
     static QMap<QString, QString> query_name_to_sql_command;
@@ -68,13 +66,12 @@ public:
         QString host_name,
         QString password
     );
-    void print_all_tables();
-    void clear_all_tables();
-    void drop_all_tables();
 
     void set_schema(const QString &name);
+    // void create_schema(const QString &schema_name);
 
-    //    void create_schema(const QString &schema_name);
+    quint32 authorize_user(const QString &login, const QString &password);
+
     quint32 insert_board(
         quint32 user_id,
         const QString &name,
@@ -116,11 +113,9 @@ public:
 
     bool check_user_rights(quint32 user_id, quint32 board_id);
 
-    quint32 authorize_user(const QString &login, const QString &password);
+    quint32 get_card_number(quint32 id);
 
     board get_full_board(quint32 board_id);
-
-    quint32 get_card_number(quint32 id);
 };
 
 }  // namespace database
