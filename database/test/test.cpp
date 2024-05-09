@@ -3,7 +3,6 @@
 #include "doctest.h"
 #include "element_classes.hpp"
 #include "test_utils.hpp"
-#include "converter.hpp"
 
 using namespace database;
 QVector<QString> arguments = {"postgres", "ivan", "localhost", "1"};
@@ -25,7 +24,7 @@ bool is_equivalent(QVector<T> &lhs, QVector<T> &rhs) {
 
 TEST_CASE("create") {
     db_manager db_manager(
-            arguments[0], arguments[1], arguments[2], arguments[3]
+        arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
 
@@ -61,7 +60,7 @@ TEST_CASE("create") {
 
 TEST_CASE("select") {
     db_manager db_manager(
-            arguments[0], arguments[1], arguments[2], arguments[3]
+        arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
 
@@ -113,7 +112,7 @@ TEST_CASE("select") {
 
 TEST_CASE("get user boards") {
     db_manager db_manager(
-            arguments[0], arguments[1], arguments[2], arguments[3]
+        arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
 
@@ -121,7 +120,7 @@ TEST_CASE("get user boards") {
     quint32 board_id_1 = db_manager.insert_board(user_id, "board_1", "");
     quint32 board_id_2 = db_manager.insert_board(user_id, "board_2", "");
     quint32 board_id_3 = db_manager.insert_board(user_id, "board_3", "");
-    QVector<quint32> answer = {board_id_1,board_id_2,board_id_3};
+    QVector<quint32> answer = {board_id_1, board_id_2, board_id_3};
 
     auto result = db_manager.get_user_boards(user_id);
     REQUIRE(answer.size() == result.size());
@@ -132,45 +131,47 @@ TEST_CASE("get user boards") {
 
 TEST_CASE("update order") {
     db_manager db_manager(
-            arguments[0], arguments[1], arguments[2], arguments[3]
+        arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
 
     {
-        quint32 user_id = db_manager.authorize_user("test_user", "test_password");
+        quint32 user_id =
+            db_manager.authorize_user("test_user", "test_password");
         quint32 board_id = db_manager.insert_board(user_id, "test_board", "");
         quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
         quint32 card_id_1 = db_manager.insert_card(list_id, "test_card_1", "");
         quint32 card_id_2 = db_manager.insert_card(list_id, "test_card_2", "");
-        CHECK(db_manager.move_card( card_id_1, list_id, 2));
+        CHECK(db_manager.move_card(card_id_1, list_id, 2));
         CHECK(db_manager.get_card_number(card_id_1) == 2);
         CHECK(db_manager.get_card_number(card_id_2) == 1);
 
         quint32 card_id_3 = db_manager.insert_card(list_id, "test_card_3", "");
-        CHECK(db_manager.move_card( card_id_3, list_id, 1));
+        CHECK(db_manager.move_card(card_id_3, list_id, 1));
         CHECK(db_manager.get_card_number(card_id_1) == 3);
         CHECK(db_manager.get_card_number(card_id_2) == 2);
         CHECK(db_manager.get_card_number(card_id_3) == 1);
 
-        CHECK(db_manager.move_card( card_id_3, list_id, 3));
+        CHECK(db_manager.move_card(card_id_3, list_id, 3));
         CHECK(db_manager.get_card_number(card_id_1) == 2);
         CHECK(db_manager.get_card_number(card_id_2) == 1);
         CHECK(db_manager.get_card_number(card_id_3) == 3);
     }
 
     {
-        quint32 user_id = db_manager.authorize_user("test_user", "test_password");
+        quint32 user_id =
+            db_manager.authorize_user("test_user", "test_password");
         quint32 board_id = db_manager.insert_board(user_id, "test_board", "");
         quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
         quint32 card_id = db_manager.insert_card(list_id, "test_card", "");
-        CHECK(!db_manager.move_card( card_id, list_id, 0));
-        CHECK(!db_manager.move_card( card_id, list_id, 100));
+        CHECK(!db_manager.move_card(card_id, list_id, 0));
+        CHECK(!db_manager.move_card(card_id, list_id, 100));
     }
 }
 
 TEST_CASE("check user rights") {
     db_manager db_manager(
-            arguments[0], arguments[1], arguments[2], arguments[3]
+        arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
 
@@ -187,7 +188,7 @@ TEST_CASE("check user rights") {
 
 TEST_CASE("update command") {
     db_manager db_manager(
-            arguments[0], arguments[1], arguments[2], arguments[3]
+        arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
 
@@ -196,21 +197,29 @@ TEST_CASE("update command") {
     QString new_board_name = "new_name";
     QString new_board_description = "new_description";
 
-    CHECK(db_manager.update_command(BOARD_TABLE_NAME, "name", new_board_name, board_id));
+    CHECK(db_manager.update_command(
+        BOARD_TABLE_NAME, "name", new_board_name, board_id
+    ));
     CHECK(db_manager.select_board(board_id).m_name == new_board_name);
 
-    CHECK(db_manager.update_command(BOARD_TABLE_NAME, "description", new_board_description, board_id));
-    CHECK(db_manager.select_board(board_id).m_description == new_board_description);
+    CHECK(db_manager.update_command(
+        BOARD_TABLE_NAME, "description", new_board_description, board_id
+    ));
+    CHECK(
+        db_manager.select_board(board_id).m_description == new_board_description
+    );
 }
 
 TEST_CASE("add user to board") {
     db_manager db_manager(
-            arguments[0], arguments[1], arguments[2], arguments[3]
+        arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
 
-    quint32 user_id_1 = db_manager.authorize_user("test_user_1", "test_password");
-    quint32 user_id_2 = db_manager.authorize_user("test_user_2", "test_password");
+    quint32 user_id_1 =
+        db_manager.authorize_user("test_user_1", "test_password");
+    quint32 user_id_2 =
+        db_manager.authorize_user("test_user_2", "test_password");
 
     quint32 board_id = db_manager.insert_board(user_id_1, "test_board", "");
 
@@ -222,14 +231,14 @@ TEST_CASE("add user to board") {
 
 TEST_CASE("delete user from board") {
     db_manager db_manager(
-            arguments[0], arguments[1], arguments[2], arguments[3]
+        arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
 
     QVector<quint32> user_ids = {
-            db_manager.authorize_user("test_user_1", "test_password"),
-            db_manager.authorize_user("test_user_2", "test_password"),
-            db_manager.authorize_user("test_user_3", "test_password")
+        db_manager.authorize_user("test_user_1", "test_password"),
+        db_manager.authorize_user("test_user_2", "test_password"),
+        db_manager.authorize_user("test_user_3", "test_password")
     };
     quint32 board_id = db_manager.insert_board(user_ids[0], "test_board", "");
 
@@ -250,15 +259,8 @@ TEST_CASE("delete user from board") {
 
 TEST_CASE("new feature") {
     db_manager db_manager(
-            arguments[0], arguments[1], arguments[2], arguments[3]
+        arguments[0], arguments[1], arguments[2], arguments[3]
     );
-    db_manager.clear_all_tables();
-//    quint32 user_id = db_manager.authorize_user("test_user", "test_pasword");
-//    quint32 board_id = db_manager.insert_board(user_id, "test_board", "");
-//    quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
-//    quint32 card_id = db_manager.insert_card(list_id, "test_card", "");
-//    quint32 tag_id = db_manager.insert_tag("test_tag");
-//    db_manager.add_tag_to_card(1, 1);
 }
 
 #endif

@@ -46,8 +46,7 @@ void db_manager::fill_query_name_to_sql_command() {
     query_name_to_sql_command["insert_card"] =
         "SELECT %1.insert_card(:list_id, :name, :description)";
 
-    query_name_to_sql_command["insert_tag"] =
-        "SELECT %1.insert_tag(:name);";
+    query_name_to_sql_command["insert_tag"] = "SELECT %1.insert_tag(:name);";
 
     query_name_to_sql_command["insert_into_card_to_tags"] =
         "INSERT INTO %1.card_to_tags VALUES (:card_id, :tag_id);";
@@ -81,8 +80,7 @@ void db_manager::fill_query_name_to_sql_command() {
     query_name_to_sql_command["delete_command"] =
         "DELETE FROM %1.%2 WHERE id = :key_value;";
 
-    query_name_to_sql_command["delete_card"] =
-            "SELECT %1.delete_card(:id);";
+    query_name_to_sql_command["delete_card"] = "SELECT %1.delete_card(:id);";
 
     query_name_to_sql_command["delete_from_card_to_tags"] =
         "DELETE FROM %1.card_to_tags WHERE card_id = :card_id AND tag_id = "
@@ -234,7 +232,7 @@ quint32 db_manager::insert_board(
         qDebug() << "insert_board:" << query.lastError().text();
         return 0;
     }
-   query.next();
+    query.next();
     return query.value(0).toInt();
 }
 
@@ -306,7 +304,8 @@ bool db_manager::update_command(
     const QString &new_value,
     quint32 key_value
 ) {
-    if (updating_field_name == "number" || updating_field_name == "cards_number") {
+    if (updating_field_name == "number" ||
+        updating_field_name == "cards_number") {
         return false;
     }
     QSqlQuery query(m_database);
@@ -339,7 +338,7 @@ bool db_manager::move_card(int id, int new_list_id, int new_number) {
 bool db_manager::delete_command(const QString &table_name, quint32 key_value) {
     QSqlQuery query(m_database);
     query.prepare(
-            query_name_to_sql_command["delete_command"].arg(m_schema, table_name)
+        query_name_to_sql_command["delete_command"].arg(m_schema, table_name)
     );
     query.bindValue(":key_value", key_value);
     if (!query.exec()) {
@@ -556,9 +555,7 @@ board db_manager::get_full_board(quint32 board_id) {
 
 quint32 db_manager::get_card_number(quint32 id) {
     QSqlQuery query(m_database);
-    query.prepare(
-        query_name_to_sql_command["get_card_number"].arg(m_schema)
-    );
+    query.prepare(query_name_to_sql_command["get_card_number"].arg(m_schema));
     query.bindValue(":id", id);
     if (!query.exec()) {
         qDebug() << "get_card_number:" << query.lastError().text();

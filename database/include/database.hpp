@@ -23,12 +23,9 @@ const QString LIST_ID_SEQUENCE = "list_signature_id_seq";
 const QString CARD_ID_SEQUENCE = "card_signature_id_seq";
 const QString TAG_ID_SEQUENCE = "tag_signature_id_seq";
 
-const QVector<QString> sequences_names {
-        USER_ID_SEQUENCE,
-        BOARD_ID_SEQUENCE,
-        LIST_ID_SEQUENCE,
-        CARD_ID_SEQUENCE,
-        TAG_ID_SEQUENCE
+const QVector<QString> sequences_names{
+    USER_ID_SEQUENCE, BOARD_ID_SEQUENCE, LIST_ID_SEQUENCE, CARD_ID_SEQUENCE,
+    TAG_ID_SEQUENCE
 };
 
 const QString QT_DATABASE_DRIVER = "QPSQL";
@@ -70,10 +67,16 @@ public:
         const QString &name,
         const QString &description
     );
-    quint32
-    insert_list(quint32 board_id, const QString &name, const QString &description);
-    quint32
-    insert_card(quint32 list_id, const QString &name, const QString &description);
+    quint32 insert_list(
+        quint32 board_id,
+        const QString &name,
+        const QString &description
+    );
+    quint32 insert_card(
+        quint32 list_id,
+        const QString &name,
+        const QString &description
+    );
     quint32 insert_tag(const QString &name);
 
     bool add_user_to_board(quint32 user_id, quint32 board_id);
@@ -99,7 +102,6 @@ public:
     bool delete_tag(quint32 id);
     bool delete_user_from_board(quint32 user_id, quint32 board_id);
     bool delete_tag_from_card(quint32 card_id, quint32 tag_id);
-
 
     QVector<board> get_user_boards(quint32 user_id);
     QVector<list> get_board_lists(quint32 board_id);
