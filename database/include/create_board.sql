@@ -146,13 +146,19 @@ BEGIN
     IF NEW.number < 0 OR 1 + cards_number < NEW.number FROM list_signature WHERE id = NEW.list_id THEN
         RETURN NULL;
     END IF;
-    UPDATE list_signature SET cards_number = cards_number + 1 WHERE id = NEW.list_id;
-    NEW.number = cards_number FROM list_signature WHERE id = NEW.list_id;
-    RETURN NEW;
+    IF TG_OP = 'INSERT' THEN
+        UPDATE list_signature SET cards_number = cards_number + 1 WHERE id = NEW.list_id;
+        NEW.number = cards_number FROM list_signature WHERE id = NEW.list_id;
+        RETURN NEW;
+    ELSE
+        IF OLD.id <> NEW.id THEN
+            RETURN NULL;
+        END IF;
+    END IF;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER card_invariant BEFORE INSERT ON card_signature
+CREATE TRIGGER card_invariant BEFORE INSERT OR UPDATE ON card_signature
      FOR EACH ROW EXECUTE PROCEDURE card_invariant();
 
 INSERT INTO user_signature VALUES ('default', 'default', DEFAULT);

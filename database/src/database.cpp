@@ -306,6 +306,9 @@ bool db_manager::update_command(
     const QString &new_value,
     quint32 key_value
 ) {
+    if (updating_field_name == "number" || updating_field_name == "cards_number") {
+        return false;
+    }
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["update_command"].arg(
         m_schema, table_name, updating_field_name
