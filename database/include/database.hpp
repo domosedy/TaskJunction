@@ -16,23 +16,18 @@ const QString CARD_TABLE_NAME = "card_signature";
 const QString CARD_PRIMARY_KEY = "card_id";
 const QString TAG_TABLE_NAME = "tag_signature";
 const QString TAG_PRIMARY_KEY = "tag_id";
+const QString USER_TABLE_NAME = "user_signature";
 const QString USER_ID_SEQUENCE = "user_signature_id_seq";
 const QString BOARD_ID_SEQUENCE = "board_signature_id_seq";
-const QString BOARD_NUMBER_SEQUENCE = "board_signature_number_seq";
 const QString LIST_ID_SEQUENCE = "list_signature_id_seq";
-const QString LIST_NUMBER_SEQUENCE = "list_signature_number_seq";
 const QString CARD_ID_SEQUENCE = "card_signature_id_seq";
-const QString CARD_NUMBER_SEQUENCE = "card_signature_number_seq";
 const QString TAG_ID_SEQUENCE = "tag_signature_id_seq";
 
 const QVector<QString> sequences_names {
         USER_ID_SEQUENCE,
         BOARD_ID_SEQUENCE,
-        BOARD_NUMBER_SEQUENCE,
         LIST_ID_SEQUENCE,
-        LIST_NUMBER_SEQUENCE,
         CARD_ID_SEQUENCE,
-        CARD_NUMBER_SEQUENCE,
         TAG_ID_SEQUENCE
 };
 
@@ -48,13 +43,7 @@ class db_manager {
     QSqlRecord select_info_by_id(const QString &query_name, quint32 key_value);
     QString m_schema = "public";
 
-    void print_all_tables();
-    void clear_all_tables();
-    void drop_all_tables();
-
-    bool check_user_password(const QString &login, const QString &password);
-
-//    quint32 get_user_id_by_name(const QString &name);
+    bool delete_command(const QString &table_name, quint32 key_value);
 
     static void fill_query_name_to_sql_command();
     static QMap<QString, QString> query_name_to_sql_command;
@@ -66,6 +55,10 @@ public:
         QString host_name,
         QString password
     );
+
+    void print_all_tables();
+    void clear_all_tables();
+    void drop_all_tables();
 
     void set_schema(const QString &name);
     // void create_schema(const QString &schema_name);
@@ -84,9 +77,7 @@ public:
     quint32 insert_tag(const QString &name);
 
     bool add_user_to_board(quint32 user_id, quint32 board_id);
-
     bool add_tag_to_card(quint32 card_id, quint32 tag_id);
-    bool delete_tag_from_card(quint32 card_id, quint32 tag_id);
 
     bool update_command(
         const QString &table_name,
@@ -94,15 +85,21 @@ public:
         const QString &new_value,
         quint32 key_value
     );
-
+    bool move_card(int id, int new_list_id, int new_number);
     user select_user(quint32 id);
     board select_board(quint32 id);
     list select_list(quint32 id);
     card select_card(quint32 id);
     tag select_tag(quint32 id);
 
-    bool delete_command(const QString &table_name, quint32 key_value);
+    bool delete_user(quint32 id);
+    bool delete_board(quint32 id);
+    bool delete_list(quint32 id);
+    bool delete_card(quint32 id);
+    bool delete_tag(quint32 id);
     bool delete_user_from_board(quint32 user_id, quint32 board_id);
+    bool delete_tag_from_card(quint32 card_id, quint32 tag_id);
+
 
     QVector<board> get_user_boards(quint32 user_id);
     QVector<list> get_board_lists(quint32 board_id);

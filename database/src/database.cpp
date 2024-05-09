@@ -56,11 +56,11 @@ void db_manager::fill_query_name_to_sql_command() {
         "UPDATE %1.%2 SET %3 = :new_value WHERE id = "
         ":key_value;";
 
-//    query_name_to_sql_command["move_card"] =
-//        "SELECT move_card(:id, :new_list_id, :new_number);";
+    query_name_to_sql_command["move_card"] =
+        "SELECT %1.move_card(:id, :new_list_id, :new_number);";
 
     query_name_to_sql_command["select_user"] =
-        "SELECT id, name FROM %1.user_signature WHERE id = :key_value;";
+        "SELECT id, login FROM %1.user_signature WHERE id = :key_value;";
 
     query_name_to_sql_command["select_board"] =
         "SELECT id, user_id, name, description FROM %1.board_signature WHERE "
@@ -80,6 +80,9 @@ void db_manager::fill_query_name_to_sql_command() {
 
     query_name_to_sql_command["delete_command"] =
         "DELETE FROM %1.%2 WHERE id = :key_value;";
+
+    query_name_to_sql_command["delete_card"] =
+            "SELECT %1.delete_card(:id);";
 
     query_name_to_sql_command["delete_from_card_to_tags"] =
         "DELETE FROM %1.card_to_tags WHERE card_id = :card_id AND tag_id = "
@@ -118,14 +121,6 @@ void db_manager::fill_query_name_to_sql_command() {
         "SELECT exists (SELECT * FROM %1.user_to_board WHERE user_id = "
         ":user_id AND board_id = :board_id);";
 
-    query_name_to_sql_command["check_user_existence"] =
-        "SELECT exists (SELECT * FROM %1.user_authorization_data WHERE login = "
-        ":login LIMIT 1);";
-
-    query_name_to_sql_command["check_user_password"] =
-        "SELECT exists (SELECT * FROM %1.user_authorization_data WHERE login = "
-        ":login AND password = :password LIMIT 1);";
-
     query_name_to_sql_command["get_user_id_by_name"] =
         "SELECT id FROM %1.user_signature WHERE name = :name;";
 
@@ -163,7 +158,7 @@ void db_manager::clear_all_tables() {
     foreach (QString str, all_tables) {
         QSqlQuery query(m_database);
         if (!query.exec(command.arg(str))) {
-            qDebug() << "clear_all_tables" << query.lastError().text();
+            qDebug() << "clear_all_tables:" << query.lastError().text();
         }
     }
 
@@ -184,23 +179,6 @@ void db_manager::clear_all_tables() {
 
 void db_manager::set_schema(const QString &name) {
     m_schema = name;
-}
-
-bool db_manager::check_user_password(
-    const QString &login,
-    const QString &password
-) {
-    QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["check_user_password"].arg(m_schema)
-    );
-    query.bindValue(":login", login);
-    query.bindValue(":password", password);
-    if (!query.exec()) {
-        qDebug() << "check_user_password:" << query.lastError().text();
-        return false;
-    }
-    query.next();
-    return query.value(0).toBool();
 }
 
 quint32
@@ -341,10 +319,24 @@ bool db_manager::update_command(
     return true;
 }
 
+bool db_manager::move_card(int id, int new_list_id, int new_number) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["move_card"].arg(m_schema));
+    query.bindValue(":id", id);
+    query.bindValue(":new_list_id", new_list_id);
+    query.bindValue(":new_number", new_number);
+    if (!query.exec()) {
+        qDebug() << "move_card:" << query.lastError().text();
+        return false;
+    }
+    query.next();
+    return query.value(0).toBool();
+}
+
 bool db_manager::delete_command(const QString &table_name, quint32 key_value) {
     QSqlQuery query(m_database);
     query.prepare(
-        query_name_to_sql_command["delete_command"].arg(m_schema, table_name)
+            query_name_to_sql_command["delete_command"].arg(m_schema, table_name)
     );
     query.bindValue(":key_value", key_value);
     if (!query.exec()) {
@@ -352,6 +344,33 @@ bool db_manager::delete_command(const QString &table_name, quint32 key_value) {
         return false;
     }
     return true;
+}
+
+bool db_manager::delete_user(quint32 id) {
+    return delete_command(USER_TABLE_NAME, id);
+}
+
+bool db_manager::delete_board(quint32 id) {
+    return delete_command(BOARD_TABLE_NAME, id);
+}
+
+bool db_manager::delete_list(quint32 id) {
+    return delete_command(LIST_TABLE_NAME, id);
+}
+
+bool db_manager::delete_card(quint32 id) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["delete_card"].arg(m_schema));
+    query.bindValue(":id", id);
+    if (!query.exec()) {
+        qDebug() << "delete_card:" << query.lastError().text();
+        return false;
+    }
+    return true;
+}
+
+bool db_manager::delete_tag(quint32 id) {
+    return delete_command(TAG_TABLE_NAME, id);
 }
 
 bool db_manager::delete_user_from_board(quint32 user_id, quint32 board_id) {
@@ -545,25 +564,5 @@ quint32 db_manager::get_card_number(quint32 id) {
     query.next();
     return query.value(0).toInt();
 }
-
-/*bool db_manager::move_card(
-    quint32 id,
-    quint32 new_list_id,
-    quint32 new_number
-) {
-    if (new_number == 0 || new_number > get_rows_number(CARD_TABLE_NAME)) {
-        return false;
-    }
-    QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["move_card"].arg(m_schema));
-    query.bindValue(":id", id);
-    query.bindValue(":new_list_id", new_list_id);
-    query.bindValue("new_number", new_number);
-    if (!query.exec()) {
-        qDebug() << "move_card:" << query.lastError().text();
-        return false;
-    }
-    return true;
-}*/
 
 }  // namespace database

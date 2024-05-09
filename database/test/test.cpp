@@ -3,6 +3,7 @@
 #include "doctest.h"
 #include "element_classes.hpp"
 #include "test_utils.hpp"
+#include "converter.hpp"
 
 using namespace database;
 QVector<QString> arguments = {"postgres", "ivan", "localhost", "1"};
@@ -138,30 +139,32 @@ TEST_CASE("update order") {
     {
         quint32 user_id = db_manager.authorize_user("test_user", "test_password");
         quint32 board_id = db_manager.insert_board(user_id, "test_board", "");
-        quint32 list_id_1 = db_manager.insert_list(board_id, "test_list_1", "");
-        quint32 list_id_2 = db_manager.insert_list(board_id, "test_list_2", "");
-        CHECK(db_manager.update_order("list_signature", list_id_1, 2));
-        CHECK(db_manager.get_number("list_signature", list_id_1) == 2);
-        CHECK(db_manager.get_number("list_signature", list_id_2) == 1);
+        quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
+        quint32 card_id_1 = db_manager.insert_card(list_id, "test_card_1", "");
+        quint32 card_id_2 = db_manager.insert_card(list_id, "test_card_2", "");
+        CHECK(db_manager.move_card( card_id_1, list_id, 2));
+        CHECK(db_manager.get_card_number(card_id_1) == 2);
+        CHECK(db_manager.get_card_number(card_id_2) == 1);
 
-        quint32 list_id_3 = db_manager.insert_list(board_id, "test_list_3", "");
-        CHECK(db_manager.update_order("list_signature", list_id_3, 1));
-        CHECK(db_manager.get_number("list_signature", list_id_1) == 3);
-        CHECK(db_manager.get_number("list_signature", list_id_2) == 2);
-        CHECK(db_manager.get_number("list_signature", list_id_3) == 1);
+        quint32 card_id_3 = db_manager.insert_card(list_id, "test_card_3", "");
+        CHECK(db_manager.move_card( card_id_3, list_id, 1));
+        CHECK(db_manager.get_card_number(card_id_1) == 3);
+        CHECK(db_manager.get_card_number(card_id_2) == 2);
+        CHECK(db_manager.get_card_number(card_id_3) == 1);
 
-        CHECK(db_manager.update_order("list_signature", list_id_3, 3));
-        CHECK(db_manager.get_number("list_signature", list_id_1) == 2);
-        CHECK(db_manager.get_number("list_signature", list_id_2) == 1);
-        CHECK(db_manager.get_number("list_signature", list_id_3) == 3);
+        CHECK(db_manager.move_card( card_id_3, list_id, 3));
+        CHECK(db_manager.get_card_number(card_id_1) == 2);
+        CHECK(db_manager.get_card_number(card_id_2) == 1);
+        CHECK(db_manager.get_card_number(card_id_3) == 3);
     }
 
     {
         quint32 user_id = db_manager.authorize_user("test_user", "test_password");
         quint32 board_id = db_manager.insert_board(user_id, "test_board", "");
-        quint32 list_id_1 = db_manager.insert_list(board_id, "test_list_1", "");
-        CHECK(!db_manager.update_order("list_signature", list_id_1, 100));
-        CHECK(!db_manager.update_order("list_signature", list_id_1, 0));
+        quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
+        quint32 card_id = db_manager.insert_card(list_id, "test_card", "");
+        CHECK(!db_manager.move_card( card_id, list_id, 0));
+        CHECK(!db_manager.move_card( card_id, list_id, 100));
     }
 }
 
@@ -250,14 +253,12 @@ TEST_CASE("new feature") {
             arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
-
 //    quint32 user_id = db_manager.authorize_user("test_user", "test_pasword");
 //    quint32 board_id = db_manager.insert_board(user_id, "test_board", "");
 //    quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
 //    quint32 card_id = db_manager.insert_card(list_id, "test_card", "");
 //    quint32 tag_id = db_manager.insert_tag("test_tag");
-    db_manager.add_tag_to_card(1, 1);
-
+//    db_manager.add_tag_to_card(1, 1);
 }
 
 #endif

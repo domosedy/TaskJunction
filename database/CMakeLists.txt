@@ -17,7 +17,7 @@ add_executable(database src/database.cpp
         ../shared/src/element_classes.cpp
         test/test.cpp
         test/dotest_main.cpp
-#        src/database_main.cpp
+        #src/database_main.cpp
 )
 
 target_include_directories(database PUBLIC ../shared/include)
