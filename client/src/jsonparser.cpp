@@ -9,7 +9,7 @@ using json = nlohmann::json;
 std::string login_request(const QString &username, const QString &password) {
     json request = {
         {"type", "login"},
-        {"user-name", username.toStdString().c_str()},
+        {"username", username.toStdString().c_str()},
         {"password", password.toStdString().c_str()}
     };
     return request.dump();

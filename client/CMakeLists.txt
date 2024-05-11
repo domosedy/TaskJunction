@@ -23,11 +23,13 @@ set(PROJECT_SOURCES
         src/boardmodel.cpp
         src/listmodel.cpp
         src/boardmenu.cpp
+        src/cardmodel.cpp
         src/jsonparser.cpp
         src/qml.qrc
         include/client.hpp
         include/boardmodel.hpp
         include/listmodel.hpp
+        include/cardmodel.hpp
         include/boardmenu.hpp
         include/jsonparser.hpp
         ../shared/include/element_classes.hpp

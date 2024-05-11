@@ -32,6 +32,7 @@ public:
         const QString &name
     );
     void update_list(int list_index, QString &name);
+    void create_tag(int list_index, int card_index, const tag& new_tag);
     int get_count() const;
     quint32 get_list_id(const int index) const;
     quint32 get_card_id(const int list_index, const int card_index) const;

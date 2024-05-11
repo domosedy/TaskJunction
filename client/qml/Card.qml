@@ -132,6 +132,65 @@ Rectangle {
 
     }
 
+    Rectangle {
+        id: tags
+
+        width: parent.width - 30
+        height: 30
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 15
+        anchors.leftMargin: 20
+        color: style.cardBackgroundColor
+
+        ListView {
+            id: tagList
+
+            anchors.fill: parent
+            model: cardModel
+            orientation: ListView.Horizontal
+            spacing: 2
+            clip: true
+
+            footerPositioning: ListView.OverlayFooter
+            footer: Button {
+                width: 18
+                height: 18
+
+                onClicked: {
+                    mainClient.create_tag(listIndex_, modelIndex,"lol")
+                }
+
+                Text {
+                    text: "+"
+                    font.family: "Poppins"
+                    font.pointSize: 16
+                    anchors.centerIn: parent
+                    color: "white"
+                }
+
+                background: Rectangle {
+                    color: parent.down ? Qt.darker(style.listBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.listBackgroundColor, 1.2) : style.listBackgroundColor)
+                }
+            }
+
+            delegate: Rectangle {
+                id: tag
+                z: 1
+
+                Text {
+                    text: name
+                    font.family: "Poppins"
+                    font.pointSize: 16
+                    anchors.centerIn: parent
+                    color: "white"
+                }            
+
+                color: style.listBackgroundColor
+                radius: style.defaultBorderSize    
+            }
+        }
+    }
+
     Button {
         id: deleteCardButton
 

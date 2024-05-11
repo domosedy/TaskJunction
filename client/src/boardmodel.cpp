@@ -143,10 +143,14 @@ void BoardModel::move(int from_card, int to_card, int from_list, int to_list) {
     if (from_list == to_list) {
         m_lists[from_list]->move(from_card, to_card);
     } else {
-        card moved = m_lists[from_list]->remove(from_card);
-        moved.m_list_id = m_lists[to_list]->m_list_id;
+        CardModel* moved = m_lists[from_list]->remove(from_card);
+        moved->m_list_id = m_lists[to_list]->m_list_id;
         m_lists[to_list]->create_card(moved, to_card);
     }
     emit dataChanged(this->index(from_list, 0), this->index(from_list, 0));
     emit dataChanged(this->index(to_list, 0), this->index(to_list, 0));
+}
+
+void BoardModel::create_tag(int list_index, int card_index, const tag& new_tag) {
+    m_lists[list_index]->create_tag(card_index, new_tag);
 }

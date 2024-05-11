@@ -128,6 +128,25 @@ void Client::create_list(QString name) {
     }
 }
 
+void Client::create_tag(int list_index, int card_index, QString name) {
+    if (name == "") {
+        name = "lol";
+    }    
+    //quint32 board_id = m_current_board->m_board_id;
+    //quint32 list_id = m_current_board->get_list_id(list_index);
+    quint32 card_id = m_current_board->get_card_id(list_index, card_index);
+    if (!m_current_board->m_is_remote) {
+        quint32 tag_id = db.insert_tag(name);
+        db.add_tag_to_card(card_id, tag_id);
+        qDebug() << card_id << " " << tag_id;
+        const tag &new_tag = db.select_tag(tag_id);
+        m_current_board->create_tag(list_index, card_index, new_tag);
+    } else {
+        std::string request = parser::create_request("card", card_id, name, "");
+        write(request);
+    }
+}
+
 void Client::create_card(int list_index, QString name, QString description) {
     if (name == "") {
         name = "New card";

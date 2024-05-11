@@ -41,6 +41,7 @@ public:
     Q_INVOKABLE void load_local_boards();
     Q_INVOKABLE void load_board(int index);
 
+    Q_INVOKABLE void create_tag(int list_index, int card_index, QString name);
     Q_INVOKABLE void
     create_card(int list_index, QString name, QString description);
     Q_INVOKABLE void create_list(QString name);
@@ -55,7 +56,7 @@ public:
         int card_index,
         QString field,
         QString value
-    );  // qml throws segfault lol
+    );
     Q_INVOKABLE void update_list(int list_index, QString name);
     Q_INVOKABLE void
     update_board(int board_index, QString field, QString value);
@@ -66,7 +67,6 @@ public:
 signals:
     void boardChanged();
     void menuChanged();
-    void modeChanged();
     void statusChanged();
     void connectionStatusChanged();
 private slots:

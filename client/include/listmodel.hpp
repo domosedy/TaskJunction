@@ -6,6 +6,7 @@
 #include <QVector>
 #include <nlohmann/json.hpp>
 #include "element_classes.hpp"
+#include "cardmodel.hpp"
 
 class ListModel : public QAbstractListModel, public list {
     Q_OBJECT
@@ -25,29 +26,8 @@ public:
     int rowCount(const QModelIndex &parent = {}) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole)
         const override;
-    bool setData(
-        const QModelIndex &index,
-        const QVariant &value,
-        int role = Qt::DisplayRole
-    ) override;
-    bool insertRows(int row, int count, const QModelIndex &parent) override;
-    bool removeRows(int row, int count, const QModelIndex &parent) override;
-    QStringList mimeTypes() const override;
-    bool
-    canDropMimeData(const QMimeData *data, Qt::DropAction action, int, int, const QModelIndex &)
-        const override;
-    QMimeData *mimeData(const QModelIndexList &indices) const override;
-    bool dropMimeData(
-        const QMimeData *data,
-        Qt::DropAction action,
-        int row,
-        int column,
-        const QModelIndex &parent
-    ) override;
-    Qt::DropActions supportedDropActions() const override;
-    Qt::DropActions supportedDragActions() const override;
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
-
+    
+    Q_INVOKABLE void create_card(CardModel* card, int index);
     Q_INVOKABLE void create_card(QString &name, QString &description);
     Q_INVOKABLE void delete_card(int index);
     Q_INVOKABLE void move(int from, int to);
@@ -56,23 +36,22 @@ public:
     update_card(int card_index, const QString &field, const QString &value);
     int get_count();
     quint32 get_card_id(const int index) const;
-    card remove(const int index);
+    CardModel* remove(const int index);
+    void create_tag(int index, const tag &new_tag);
 signals:
     void countChanged();
 
 private:
-    QVector<card> m_cards;
-    QMap<quint32, int> m_index_by_id;
+    QVector<CardModel*> m_cards;
+    //QMap<quint32, int> m_index_by_id;
 
     enum CardRoles {
         NameRole = Qt::UserRole + 1,
         DescriptionRole,
-        IdRole,
-        ListIdRole,
-        CardIndex
+        CardIndex,
+        ModelRole
     };
 
-    const QString MimeType = "card.mime";
 };
 
 #endif  // LISTMODEL_HPP_
