@@ -11,7 +11,7 @@ std::string login_request(const QString &username, const QString &password) {
         {"type", "login"},
         {"user-name", username.toStdString().c_str()},
         {"password", password.toStdString().c_str()}
-    };  // Salt here or on server side?
+    };
     return request.dump();
 }
 
@@ -65,6 +65,13 @@ std::string update_request(
         {"object-type", object_type.toStdString().c_str()}
     };
     return request.dump();
+}
+
+std::string move_request(quint32 card_id, quint32 to_list_id, int new_pos) {
+    Q_UNUSED(card_id);
+    Q_UNUSED(to_list_id);
+    Q_UNUSED(new_pos);
+    return "";
 }
 
 std::string connect_to_board_request(quint32 board_id, quint32 user_id) {

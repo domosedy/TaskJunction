@@ -168,7 +168,9 @@ void Client::add_board(QString name, QString description, QString type) {
 }
 
 void Client::delete_board(int board_index) {
-    const auto &[board_id, is_remote] = m_board_menu->delete_board(board_index);
+    const auto &[board_id, is_remote] =
+        m_board_menu->delete_board(board_index);  // TODO make afterwards?
+    qDebug() << board_id;
     if (!is_remote) {
         db.delete_command("board_signature", board_id);
     } else {
@@ -232,54 +234,51 @@ void Client::login(
     m_socket->open(server_url);
 }
 
-void Client::update_card_name(int list_index, int card_index, QString name) {
-    quint32 card_id = m_current_board->get_card_id(list_index, card_index);
-    if (!m_current_board->m_is_remote &&
-        db.update_command("card_signature", "name", name, card_id)) {
-        m_current_board->update_card_name(list_index, card_index, name);
-    } else {
-        std::string request =
-            parser::update_request("card", card_id, "name", name);
-        write(request);
-        m_current_board->update_card_name(
-            list_index, card_index, name
-        );  // TODO
-    }
-}
-
-void Client::update_card_description(
+void Client::update_card(
     int list_index,
     int card_index,
-    QString description
+    QString field,
+    QString value
 ) {
     quint32 card_id = m_current_board->get_card_id(list_index, card_index);
     if (!m_current_board->m_is_remote &&
-        db.update_command(
-            "card_signature", "description", description, card_id
-        )) {
-        m_current_board->update_card_description(
-            list_index, card_index, description
-        );
+        db.update_command("card_signature", field, value, card_id)) {
+        m_current_board->update_card(list_index, card_index, field, value);
     } else {
         std::string request =
-            parser::update_request("card", card_id, "description", description);
+            parser::update_request("card", card_id, field, value);
         write(request);
-        m_current_board->update_card_description(
-            list_index, card_index, description
-        );
+        m_current_board->update_card(
+            list_index, card_index, field, value
+        );  // make afterwards?
     }
 }
 
-void Client::update_list_name(int list_index, QString name) {
+void Client::update_list(int list_index, QString name) {
     quint32 list_id = m_current_board->get_list_id(list_index);
     if (!m_current_board->m_is_remote &&
         db.update_command("list_signature", "name", name, list_id)) {
-        m_current_board->update_list_name(list_index, name);
+        m_current_board->update_list(list_index, name);
     } else {
         std::string request =
             parser::update_request("list", list_id, "name", name);
         write(request);
-        m_current_board->update_list_name(list_index, name);
+        m_current_board->update_list(list_index, name);
+    }
+}
+
+void Client::update_board(int board_index, QString field, QString value) {
+    const auto &[board_id, is_remote] = m_board_menu->get_info(board_index);
+    if (!is_remote &&
+        db.update_command("board_signature", field, value, board_id)) {
+        m_board_menu->update_board(board_index, field, value);
+    } else {
+        std::string request =
+            parser::update_request("board", board_id, field, value);
+        write(request);
+        m_board_menu->update_board(
+            board_index, field, value
+        );  // make afterwards?
     }
 }
 
@@ -289,12 +288,14 @@ QString Client::get_current_board_name() {
 
 void Client::move(int from_card, int to_card, int from_list, int to_list) {
     m_current_board->move(from_card, to_card, from_list, to_list);
+    quint32 to_list_id = m_current_board->get_list_id(to_list);
+    quint32 card_id = m_current_board->get_card_id(from_list, from_card);
     if (!m_current_board->m_is_remote) {
-        qDebug() << "DB UPDATE";
+        db.move_card(card_id, to_list_id, to_card);
     } else {
-        // std::string request =
-        //     parser::move_request(from_card, to_card, from_list, to_list);
-        // write(request);
+        std::string request =
+            parser::move_request(card_id, to_list_id, to_card);
+        write(request);
     }
 }
 

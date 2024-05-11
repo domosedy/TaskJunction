@@ -37,25 +37,29 @@ public:
         QString server_ip,
         QString server_port
     );
-    Q_INVOKABLE void add_board(QString name, QString description, QString type);
     Q_INVOKABLE void connect_board(QString link);
     Q_INVOKABLE void load_local_boards();
     Q_INVOKABLE void load_board(int index);
-    Q_INVOKABLE void delete_board(int board_index);
-    Q_INVOKABLE void create_list(QString name);
-    Q_INVOKABLE void delete_card(int list_index, int card_index);
 
     Q_INVOKABLE void
     create_card(int list_index, QString name, QString description);
+    Q_INVOKABLE void create_list(QString name);
+    Q_INVOKABLE void add_board(QString name, QString description, QString type);
+
+    Q_INVOKABLE void delete_card(int list_index, int card_index);
     Q_INVOKABLE void delete_list(int list_index);
-    Q_INVOKABLE void
-    update_card_name(int list_index, int card_index, QString name);
-    Q_INVOKABLE void update_card_description(
+    Q_INVOKABLE void delete_board(int board_index);
+
+    Q_INVOKABLE void update_card(
         int list_index,
         int card_index,
-        QString description
-    );
-    Q_INVOKABLE void update_list_name(int list_index, QString name);
+        QString field,
+        QString value
+    );  // qml throws segfault lol
+    Q_INVOKABLE void update_list(int list_index, QString name);
+    Q_INVOKABLE void
+    update_board(int board_index, QString field, QString value);
+
     Q_INVOKABLE void
     move(int from_card, int to_card, int from_list, int to_list);
 

@@ -12,11 +12,11 @@ Rectangle {
     }
 
     function updateCardName(card_index: int, new_name: string) {
-        mainClient.update_card_name(index, card_index, new_name);
+        mainClient.update_card(index, card_index, "name", new_name);
     }
 
-    function updateCardDescription(card_index: int, new_desctiption: string) {
-        mainClient.update_card_description(index, card_index, new_desctiption);
+    function updateCardDescription(card_index: int, new_description: string) {
+        mainClient.update_card(index, card_index, "description", new_description);
     }
 
     width: style.listWidth
@@ -32,14 +32,15 @@ Rectangle {
         z: 4
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
         focus: true
+        onOpened: {
+            x:
+            mapFromGlobal(root.width / 2, root.height / 2).x;
+            y:
+            mapFromGlobal(root.width / 2, root.height / 2).y;
+        }
 
         background: Rectangle {
             visible: false
-        }
-
-        onOpened: {
-            x: mapFromGlobal(root.width / 2, root.height/2).x
-            y: mapFromGlobal(root.width / 2, root.height/2).y
         }
 
         contentItem: Rectangle {
@@ -131,6 +132,7 @@ Rectangle {
             }
 
         }
+
     }
 
     Rectangle {
@@ -173,21 +175,21 @@ Rectangle {
                     anchors.leftMargin: 20
                     clip: true
                     readOnly: true
-                    onAccepted: {
+                    onEditingFinished: {
                         listName.readOnly = true;
                         lnArea.enabled = true;
-                        listName.focus = false;
-                        mainClient.update_list_name(index, listName.text);
+                        mainClient.update_list(index, listName.text);
                     }
 
                     MouseArea {
                         id: lnArea
 
                         anchors.fill: parent
-                        onDoubleClicked: {
+                        onClicked: {
                             listName.readOnly = false;
                             lnArea.enabled = false;
                             listName.cursorPosition = 0;
+                            listName.focus = true;
                         }
                     }
 
@@ -232,7 +234,7 @@ Rectangle {
                     height: 40
                     anchors.centerIn: parent
                     onClicked: {
-                        console.log("click")
+                        console.log("click");
                         createCardPopup.open();
                     }
 
@@ -261,6 +263,7 @@ Rectangle {
                         mainClient.move(from, -1, drag.source.listIndex_, listIndex);
                     }
                 }
+
             }
 
             model: DelegateModel {

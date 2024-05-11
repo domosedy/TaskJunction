@@ -131,20 +131,24 @@ quint32 ListModel::get_card_id(const int index) const {
     return m_cards[index].m_card_id;
 }
 
-void ListModel::update_card_name(int card_index, QString &name) {
-    m_cards[card_index].m_name = name;
-    emit dataChanged(
-        this->index(card_index, 0), this->index(card_index, 0),
-        {CardRoles::NameRole}
-    );
-}
-
-void ListModel::update_card_description(int card_index, QString &description) {
-    m_cards[card_index].m_description = description;
-    emit dataChanged(
-        this->index(card_index, 0), this->index(card_index, 0),
-        {CardRoles::DescriptionRole}
-    );
+void ListModel::update_card(
+    int card_index,
+    const QString &field,
+    const QString &value
+) {
+    if (field == "name") {
+        m_cards[card_index].m_name = value;
+        emit dataChanged(
+            this->index(card_index, 0), this->index(card_index, 0),
+            {CardRoles::NameRole}
+        );
+    } else {
+        m_cards[card_index].m_description = value;
+        emit dataChanged(
+            this->index(card_index, 0), this->index(card_index, 0),
+            {CardRoles::DescriptionRole}
+        );
+    }
 }
 
 bool ListModel::setData(

@@ -62,9 +62,10 @@ Rectangle {
         }
     }
 
-    Text {
+    TextInput {
         id: nameHolder
 
+        width: parent.width - 30
         text: name
         font.family: "Poppins"
         font.pointSize: 16
@@ -74,11 +75,33 @@ Rectangle {
         anchors.left: parent.left
         anchors.topMargin: 20
         anchors.leftMargin: 20
+        clip: true
+        readOnly: true
+        onEditingFinished: {
+            nameHolder.readOnly = true;
+            nameArea.enabled = true;
+            mainClient.update_card(listIndex_, modelIndex, "name", nameHolder.text);
+        }
+
+        MouseArea {
+            id: nameArea
+
+            anchors.fill: parent
+            onClicked: {
+                nameHolder.readOnly = false;
+                nameArea.enabled = false;
+                nameHolder.cursorPosition = 0;
+                nameHolder.focus = true;
+            }
+        }
+
     }
 
-    Text {
+    TextInput {
         id: descriptionHolder
 
+        width: parent.width - 30
+        height: parent.height - 70
         text: description
         font.family: "Poppins"
         font.pointSize: 12
@@ -87,6 +110,26 @@ Rectangle {
         anchors.left: parent.left
         anchors.topMargin: 5
         anchors.leftMargin: 20
+        readOnly: true
+        wrapMode: TextInput.Wrap
+        onEditingFinished: {
+            descriptionHolder.readOnly = true;
+            descriptionArea.enabled = true;
+            mainClient.update_card(listIndex_, modelIndex, "description", descriptionHolder.text);
+        }
+
+        MouseArea {
+            id: descriptionArea
+
+            anchors.fill: parent
+            onClicked: {
+                descriptionHolder.readOnly = false;
+                descriptionArea.enabled = false;
+                descriptionHolder.cursorPosition = 0;
+                descriptionHolder.focus = true;
+            }
+        }
+
     }
 
     Button {
@@ -114,147 +157,6 @@ Rectangle {
             color: parent.down ? Qt.darker(style.cardBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.cardBackgroundColor, 1.2) : style.cardBackgroundColor)
         }
 
-    }    
-
-    // Button {
-    //     height: style.smallButtonSize
-    //     width: style.smallButtonSize
-    //     anchors.right: parent.right
-    //     anchors.top: parent.top
-    //     onClicked: {
-    //         card_window.open();
-    //     }
-
-    //     Text {
-    //         anchors.centerIn: parent
-    //         text: "="
-    //         color: "white"
-    //     }
-
-    //     background: Rectangle {
-    //         radius: style.defaultRadius
-    //         color: parent.down ? Qt.lighter(style.cardBackgroundColor, 1.4) : (parent.hovered ? Qt.lighter(style.cardBackgroundColor, 1.2) : style.cardBackgroundColor)
-    //     }
-
-    // }
-
-    // Popup {
-    //     id: card_window
-
-    //     width: style.cardPopUpWidth
-    //     height: style.cardPopUpHeight
-    //     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-
-    //     background: Rectangle {
-    //         visible: false
-    //     }
-
-    //     contentItem: Rectangle {
-    //         id: content
-
-    //         border.color: style.primaryColor
-    //         border.width: style.defaultBorderSize
-    //         Drag.active: true
-
-    //         TextInput {
-    //             id: card_name
-
-    //             z: 1
-    //             text: name
-    //             font.family: "Courier"
-    //             font.pointSize: 12
-    //             font.bold: true
-    //             anchors.horizontalCenter: parent.horizontalCenter
-    //             anchors.top: parent.top
-    //             anchors.topMargin: 10
-    //             width: parent.width - 20
-    //             wrapMode: Text.Wrap
-    //             readOnly: true
-    //             onAccepted: {
-    //                 card_name.readOnly = true;
-    //                 n_area.enabled = true;
-    //                 card_name.focus = false;
-    //                 listMain.updateCardName(index, card_name.text);
-    //             }
-
-    //             MouseArea {
-    //                 id: n_area
-
-    //                 anchors.fill: parent
-    //                 onDoubleClicked: {
-    //                     card_name.readOnly = false;
-    //                     n_area.enabled = false;
-    //                     card_name.cursorPosition = 0;
-    //                 }
-    //             }
-    //             // Issue when closing popup without saving
-
-    //         }
-
-    //         TextInput {
-    //             id: card_description
-
-    //             z: 1
-    //             text: description
-    //             font.family: "Courier"
-    //             font.pointSize: 10
-    //             anchors.left: parent.left
-    //             anchors.top: card_name.bottom
-    //             anchors.topMargin: 10
-    //             anchors.leftMargin: 10
-    //             width: parent.width - 20
-    //             wrapMode: Text.Wrap
-    //             readOnly: true
-    //             onAccepted: {
-    //                 card_description.readOnly = true;
-    //                 d_area.enabled = true;
-    //                 card_description.focus = false;
-    //                 listMain.updateCardDescription(index, card_description.text);
-    //             }
-
-    //             MouseArea {
-    //                 id: d_area
-
-    //                 anchors.fill: parent
-    //                 onDoubleClicked: {
-    //                     card_description.readOnly = false;
-    //                     d_area.enabled = false;
-    //                 }
-    //             }
-
-    //         }
-
-    //         Button {
-    //             z: 1
-    //             width: 80
-    //             height: 30
-    //             anchors.horizontalCenter: parent.horizontalCenter
-    //             anchors.bottom: parent.bottom
-    //             anchors.bottomMargin: 10
-    //             onClicked: {
-    //                 card_window.close();
-    //                 listMain.deleteRequest(index);
-    //             }
-
-    //             Text {
-    //                 text: "Delete"
-    //                 font.family: "Courier"
-    //                 font.pointSize: 12
-    //                 anchors.centerIn: parent
-    //             }
-
-    //             background: Rectangle {
-    //                 color: parent.down ? Qt.lighter(style.deleteBackgroundColor, 1.2) : (parent.hovered ? Qt.lighter(style.deleteBackgroundColor, 1.2) : style.deleteBackgroundColor)
-    //             }
-
-    //         }
-
-    //         MouseArea {
-    //             anchors.fill: parent
-    //             drag.target: parent
-    //         }
-
-    //     }
-    // }
+    }
 
 }

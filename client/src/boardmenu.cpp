@@ -110,3 +110,22 @@ void BoardMenu::unload_remote_boards() {
 
     emit countChanged();
 }
+
+void BoardMenu::update_board(
+    int index,
+    const QString &field,
+    const QString &value
+) {
+    quint32 id = m_boards[index].m_board_id;
+    if (field == "name") {
+        m_boards[index].m_name = value;
+        if (m_loaded_boards.find(id) != m_loaded_boards.end()) {
+            m_loaded_boards[id]->m_name = value;
+        }
+    } else {
+        m_boards[index].m_description = value;
+        if (m_loaded_boards.find(id) != m_loaded_boards.end()) {
+            m_loaded_boards[id]->m_description = value;
+        }
+    }
+}

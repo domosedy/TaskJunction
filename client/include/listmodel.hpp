@@ -52,8 +52,8 @@ public:
     Q_INVOKABLE void delete_card(int index);
     Q_INVOKABLE void move(int from, int to);
     void create_card(const card &new_card, const int index = -1);
-    void update_card_name(int card_index, QString &name);
-    void update_card_description(int card_index, QString &description);
+    void
+    update_card(int card_index, const QString &field, const QString &value);
     int get_count();
     quint32 get_card_id(const int index) const;
     card remove(const int index);

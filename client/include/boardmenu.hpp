@@ -26,6 +26,7 @@ public:
     std::pair<quint32, bool> delete_board(int board_index);
     BoardModel *load(int index, const board &loaded_board);
     void unload_remote_boards();
+    void update_board(int index, const QString &field, const QString &value);
 
     friend class Client;
 signals:

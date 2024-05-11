@@ -356,9 +356,10 @@ Rectangle {
                 radius: style.defaultRadius
                 anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
 
-                Text {
+                TextInput {
                     id: nameHolder
 
+                    width: parent.width - 30
                     text: name
                     font.family: "Poppins"
                     font.pointSize: 16
@@ -368,11 +369,33 @@ Rectangle {
                     anchors.left: parent.left
                     anchors.topMargin: 20
                     anchors.leftMargin: 20
+                    clip: true
+                    readOnly: true
+                    onEditingFinished: {
+                        nameHolder.readOnly = true;
+                        nameArea.enabled = true;
+                        mainClient.update_board(index, "name", nameHolder.text);
+                    }
+
+                    MouseArea {
+                        id: nameArea
+
+                        anchors.fill: parent
+                        onClicked: {
+                            nameHolder.readOnly = false;
+                            nameArea.enabled = false;
+                            nameHolder.cursorPosition = 0;
+                            nameHolder.focus = true;
+                        }
+                    }
+
                 }
 
-                Text {
+                TextInput {
                     id: descriptionHolder
 
+                    width: parent.width - 30
+                    height: parent.height - 70
                     text: description
                     font.family: "Poppins"
                     font.pointSize: 12
@@ -381,6 +404,26 @@ Rectangle {
                     anchors.left: parent.left
                     anchors.topMargin: 5
                     anchors.leftMargin: 20
+                    readOnly: true
+                    wrapMode: TextInput.Wrap
+                    onEditingFinished: {
+                        descriptionHolder.readOnly = true;
+                        descriptionArea.enabled = true;
+                        mainClient.update_board(index, "description", descriptionHolder.text);
+                    }
+
+                    MouseArea {
+                        id: descriptionArea
+
+                        anchors.fill: parent
+                        onClicked: {
+                            descriptionHolder.readOnly = false;
+                            descriptionArea.enabled = false;
+                            descriptionHolder.cursorPosition = 0;
+                            descriptionHolder.focus = true;
+                        }
+                    }
+
                 }
 
                 Button {
