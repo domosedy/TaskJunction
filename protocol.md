@@ -38,8 +38,9 @@
 ```
 {
     "type": "delete",
-    "id": uint32,
-    "object-type": string
+    "board-id": 
+    "list-id":
+    "card-id":  
 }
 ```
 
@@ -47,10 +48,11 @@
 ```
 {
     "type": "update",
-    "id": uint32,
+    "board-id": 
+    "list-id":
+    "card-id":   
     "new-value": string,
     "field": string,
-    "object-type": string
 }
 ```
 
@@ -58,8 +60,10 @@
 ```
 {
     "type": "move",
-    "id": uint32,
-    "list-id": uint32,
+    "board-id": uint32
+    "old-list-id": uint32,
+    "card_id": uint32,
+    "new_list-id": uint32
     "new_index": int
 }
 ```
@@ -143,12 +147,48 @@
 7. Ответ за создание
 ```
 {
-    "type": "create-response",
+    "type": "create",
     "board-id": 
     "list-id":
     "card-id":
     "object-json": один из предыдущих нужного типа.
 }
+```
+
+8. Ответ на удаление
+```
+{
+    "type": "delete",
+    "board-id": 
+    "list-id":
+    "card-id":   
+    "new-value": string,
+    "field": string,
+}
+```
+
+9. Ответ на обновление
+```
+{
+    "type": "delete",
+    "board-id": 
+    "list-id":
+    "card-id":   
+}
+```
+
+10. Ответ на перемещение
+```
+
+{
+    "type": "move",
+    "board-id": uint32
+    "old-list-id": uint32,
+    "card_id": uint32,
+    "new_list-id": uint32
+    "new_index": int
+}
+
 ```
 
 8. Ответ на подключение
@@ -158,3 +198,4 @@
     "response": "ok" / "wrong"
     "board": json 
 }
+
