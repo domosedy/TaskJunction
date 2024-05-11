@@ -85,10 +85,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgSQL;
 
-CREATE OR REPLACE FUNCTION insert_tag(name_ text, OUT card_id_ int) AS $$
+CREATE OR REPLACE FUNCTION insert_tag(name_ text, OUT tag_id_ int) AS $$
 BEGIN
     INSERT INTO tag_signature VALUES (DEFAULT, name_);
-    card_id_ = last_value FROM card_signature_id_seq;
+    tag_id_ = last_value FROM tag_signature_id_seq;
 END;
 $$ LANGUAGE plpgSQL;
 
