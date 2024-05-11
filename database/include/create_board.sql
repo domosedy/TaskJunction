@@ -155,6 +155,7 @@ BEGIN
             RETURN NULL;
         END IF;
     END IF;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
