@@ -9,6 +9,8 @@ QVector<QString> arguments = {"postgres", "ivan", "localhost", "1"};
 
 #ifdef DEFAULT_TESTS
 
+// TODO check deletion
+
 template <typename T>
 bool is_equivalent(QVector<T> &lhs, QVector<T> &rhs) {
     if (lhs.size() == rhs.size()) {
@@ -226,7 +228,7 @@ TEST_CASE("add user to board") {
     CHECK(db_manager.add_user_to_board(user_id_2, board_id));
 
     QVector<quint32> answer = {user_id_1, user_id_2};
-    CHECK(db_manager.get_board_users_id(board_id) == answer);
+    CHECK(db_manager.get_board_user_ids(board_id) == answer);
 }
 
 TEST_CASE("delete user from board") {
@@ -248,7 +250,7 @@ TEST_CASE("delete user from board") {
     db_manager.delete_user_from_board(user_ids[2], board_id);
 
     auto answer = {user_ids[0], user_ids[1]};
-    CHECK(db_manager.get_board_users_id(board_id) == answer);
+    CHECK(db_manager.get_board_user_ids(board_id) == answer);
 }
 
 // TODO trouble with updating order, id, etc fields (must be banned)
@@ -261,6 +263,20 @@ TEST_CASE("new feature") {
     db_manager db_manager(
         arguments[0], arguments[1], arguments[2], arguments[3]
     );
+    db_manager.clear_all_tables();
+    auto user_id = db_manager.authorize_user("1", "1");
+    auto board_id = db_manager.insert_board(user_id, "", "");
+    auto list_id_1 = db_manager.insert_list(board_id, "", "");
+    auto list_id_2 = db_manager.insert_list(board_id, "", "");
+    db_manager.insert_card(list_id_1, "", "");
+    db_manager.insert_card(list_id_1, "", "");
+    db_manager.insert_card(list_id_2, "", "");
+    db_manager.insert_card(list_id_2, "", "");
+    auto card_ids = db_manager.get_board_card_ids(board_id);
+    for (auto card_id : card_ids) {
+        std::cout << card_id << ' ';
+    }
+    std::cout << '\n';
 }
 
 #endif

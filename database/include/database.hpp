@@ -108,7 +108,10 @@ public:
     QVector<card> get_list_cards(quint32 list_id);
     QVector<tag> get_card_tags(quint32 card_id);
 
-    QVector<quint32> get_board_users_id(quint32 board_id);
+    QVector<quint32> get_board_user_ids(quint32 board_id);
+    QVector<quint32> get_board_list_ids(quint32 board_id);
+    QVector<quint32> get_board_card_ids(quint32 board_id);
+    QVector<quint32> get_list_card_ids(quint32 list_id);
 
     bool check_user_rights(quint32 user_id, quint32 board_id);
 

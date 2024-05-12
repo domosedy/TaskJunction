@@ -104,8 +104,7 @@ void db_manager::fill_query_name_to_sql_command() {
 
     query_name_to_sql_command["select_board_ids_by_user_id"] =
         "SELECT board_id FROM %1.user_to_board WHERE user_id = :id;";
-    // TODO "ORDER BY %1.board_signature.number;";
-
+    
     query_name_to_sql_command["select_list_ids_by_board_id"] =
         "SELECT id FROM %1.list_signature WHERE board_id = :id;";
 
@@ -128,8 +127,14 @@ void db_manager::fill_query_name_to_sql_command() {
     query_name_to_sql_command["alter_sequence"] =
         "SELECT setval('%1.%2', %3, FALSE);";
 
-    query_name_to_sql_command["get_board_users_id"] =
+    query_name_to_sql_command["get_board_user_ids"] =
         "SELECT user_id FROM %1.user_to_board WHERE board_id = :board_id;";
+    
+    query_name_to_sql_command["get_board_list_ids"] =
+        "SELECT id FROM %1.list_signature WHERE board_id = :board_id;";
+
+    query_name_to_sql_command["get_list_card_ids"] =
+            "SELECT id FROM %1.card_signature WHERE list_id = :list_id;";
 }
 
 void db_manager::drop_all_tables() {
@@ -495,7 +500,7 @@ QVector<list> db_manager::get_board_lists(quint32 board_id) {
     }
     return result;
 }
-
+    
 QVector<card> db_manager::get_list_cards(quint32 list_id) {
     QSqlQuery query(m_database);
     query.prepare(
@@ -528,13 +533,13 @@ QVector<tag> db_manager::get_card_tags(quint32 card_id) {
     return result;
 }
 
-QVector<quint32> db_manager::get_board_users_id(quint32 board_id) {
+QVector<quint32> db_manager::get_board_user_ids(quint32 board_id) {
     QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["get_board_users_id"].arg(m_schema)
+    query.prepare(query_name_to_sql_command["get_board_user_ids"].arg(m_schema)
     );
     query.bindValue(":board_id", board_id);
     if (!query.exec()) {
-        qDebug() << "get_board_users_id" << query.lastError().text();
+        qDebug() << "get_board_user_ids" << query.lastError().text();
         return {};
     }
     QVector<quint32> result;
@@ -543,6 +548,49 @@ QVector<quint32> db_manager::get_board_users_id(quint32 board_id) {
     }
     return result;
 }
+
+QVector<quint32> db_manager::get_board_list_ids(quint32 board_id) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["get_board_list_ids"].arg(m_schema)
+    );
+    query.bindValue(":board_id", board_id);
+    if (!query.exec()) {
+        qDebug() << "get_board_list_ids" << query.lastError().text();
+        return {};
+    }
+    QVector<quint32> result;
+    while (query.next()) {
+        result.push_back(query.value(0).toInt());
+    }
+    return result;
+}
+
+QVector<quint32> db_manager::get_list_card_ids(quint32 list_id) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["get_list_card_ids"].arg(m_schema)
+    );
+    query.bindValue(":list_id", list_id);
+    if (!query.exec()) {
+        qDebug() << "get_list_card_ids" << query.lastError().text();
+        return {};
+    }
+    QVector<quint32> result;
+    while (query.next()) {
+        result.push_back(query.value(0).toInt());
+    }
+    return result;
+}
+
+QVector<quint32> db_manager::get_board_card_ids(quint32 board_id) {
+    auto lists_ids = get_board_list_ids(board_id);
+    QVector<quint32> result;
+    for (auto list_id : lists_ids) {
+        result.append(get_list_card_ids(list_id));
+    }
+    return result;
+}
+
+
 
 board db_manager::get_full_board(quint32 board_id) {
     board board = select_board(board_id);
