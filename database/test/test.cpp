@@ -329,16 +329,29 @@ TEST_CASE("new feature") {
     );
     db_manager.clear_all_tables();
     auto user_id = db_manager.authorize_user("test_user", "test_password");
-    auto board_id = db_manager.insert_board(user_id, "", "");
-    auto list_id_1 = db_manager.insert_list(board_id, "", "");
-    auto list_id_2 = db_manager.insert_list(board_id, "", "");
-    db_manager.insert_card(list_id_1, "", "");
-    db_manager.insert_card(list_id_1, "", "");
-    db_manager.insert_card(list_id_2, "", "");
-    db_manager.insert_card(list_id_2, "", "");
-    auto card_ids = db_manager.get_board_card_ids(board_id);
-    QVector<quint32> answer = {1, 2, 3, 4};
-    CHECK(card_ids == answer);
+    auto board_id_1 = db_manager.insert_board(user_id, "", "");
+    auto board_id_2 = db_manager.insert_board(user_id, "", "");
+    auto list_id_1 = db_manager.insert_list(board_id_1, "", "");
+    auto list_id_2 = db_manager.insert_list(board_id_2, "", "");
+    auto card_id_1 = db_manager.insert_card(list_id_1, "", "");
+    auto card_id_2 = db_manager.insert_card(list_id_1, "", "");
+    auto card_id_3 = db_manager.insert_card(list_id_1, "", "");
+    auto card_id_4 = db_manager.insert_card(list_id_2, "", "");
+    auto card_id_5 = db_manager.insert_card(list_id_2, "", "");
+    auto card_id_6 = db_manager.insert_card(list_id_2, "", "");
+    auto tag_id_1 = db_manager.insert_tag("1");
+    auto tag_id_2 = db_manager.insert_tag("2");
+    auto tag_id_3 = db_manager.insert_tag("3");
+    db_manager.add_tag_to_card(card_id_1, tag_id_1);
+    db_manager.add_tag_to_card(card_id_2, tag_id_2);
+    db_manager.add_tag_to_card(card_id_3, tag_id_3);
+    db_manager.add_tag_to_card(card_id_4, tag_id_1);
+    db_manager.add_tag_to_card(card_id_5, tag_id_2);
+    db_manager.add_tag_to_card(card_id_6, tag_id_3);
+
+    QVector<quint32> answer = {card_id_1, card_id_2};
+    QString array = "{" + QString::number(tag_id_1) + ", " + QString::number(tag_id_2) + "}";
+    CHECK(db_manager.get_card_ids_by_board_id_and_tag_ids(board_id_1, array) == answer);
 }
 
 #endif

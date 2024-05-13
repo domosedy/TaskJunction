@@ -135,6 +135,14 @@ void db_manager::fill_query_name_to_sql_command() {
 
     query_name_to_sql_command["get_list_card_ids"] =
             "SELECT id FROM %1.card_signature WHERE list_id = :list_id;";
+    query_name_to_sql_command["get_card_ids_by_board_id_and_tag_ids"] =
+        "SELECT card_id FROM %1.card_to_tags WHERE tag_id  = ANY (:tag_ids) "
+        "INTERSECT SELECT id FROM %1.card_signature "
+        "WHERE list_id = ANY (SELECT id FROM %1.list_signature "
+        "WHERE board_id = :board_id);";
+
+//    SELECT card_id FROM card_to_tags WHERE tag_id  = ANY ('{1, 2}') INTERSECT SELECT id FROM card_signature WHERE list_id = ANY (SELECT id FROM list_signature WHERE board_id = 1);
+
 }
 
 void db_manager::drop_all_tables() {
@@ -581,6 +589,22 @@ QVector<quint32> db_manager::get_list_card_ids(quint32 list_id) {
     return result;
 }
 
+QVector<quint32> db_manager::get_card_ids_by_board_id_and_tag_ids(quint32 board_id, const QString &tag_ids) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["get_card_ids_by_board_id_and_tag_ids"].arg(m_schema));
+    query.bindValue(":tag_ids", tag_ids);
+    query.bindValue(":board_id", board_id);
+    if (!query.exec()) {
+        qDebug() << "get_card_ids_by_board_id_and_tag_ids:" << query.lastError().text();
+        return {};
+    }
+    QVector<quint32> result;
+    while (query.next()) {
+        result.push_back(query.value(0).toInt());
+    }
+    return result;
+}
+
 QVector<quint32> db_manager::get_board_card_ids(quint32 board_id) {
     auto lists_ids = get_board_list_ids(board_id);
     QVector<quint32> result;
@@ -589,8 +613,6 @@ QVector<quint32> db_manager::get_board_card_ids(quint32 board_id) {
     }
     return result;
 }
-
-
 
 board db_manager::get_full_board(quint32 board_id) {
     board board = select_board(board_id);
