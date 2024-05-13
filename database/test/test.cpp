@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include "database.hpp"
 #include "doctest.h"
 #include "element_classes.hpp"
@@ -32,7 +33,9 @@ TEST_CASE("create") {
     const int N = 5;
     {
         for (int i = 1; i < N; ++i) {
-            quint32 id = db_manager.authorize_user("test_user" + QString::number(i), "test_password");
+            quint32 id = db_manager.authorize_user(
+                "test_user" + QString::number(i), "test_password"
+            );
             CHECK(id == i);
             auto user = db_manager.select_user(id);
             CHECK(user.m_name == "test_user" + QString::number(i));
@@ -42,19 +45,21 @@ TEST_CASE("create") {
     {
         for (int i = 1; i < N; ++i) {
             quint32 id =
-                    db_manager.insert_board(1, "test_board", "test description");
+                db_manager.insert_board(1, "test_board", "test description");
             CHECK(id == i);
         }
     }
     {
         for (int i = 1; i < N; ++i) {
-            quint32 id = db_manager.insert_list(1, "test_list", "test description");
+            quint32 id =
+                db_manager.insert_list(1, "test_list", "test description");
             CHECK(id == i);
         }
     }
     {
         for (int i = 1; i < 5; ++i) {
-            quint32 id = db_manager.insert_card(1, "test_card", "test description");
+            quint32 id =
+                db_manager.insert_card(1, "test_card", "test description");
             CHECK(id == i);
         }
     }
@@ -120,18 +125,19 @@ TEST_CASE("select") {
 
 TEST_CASE("delete") {
     db_manager db_manager(
-            arguments[0], arguments[1], arguments[2], arguments[3]
+        arguments[0], arguments[1], arguments[2], arguments[3]
     );
 
-    auto create = [&](){
+    auto create = [&]() {
         db_manager.clear_all_tables();
-        quint32 user_id = db_manager.authorize_user("test_user", "test_password");
+        quint32 user_id =
+            db_manager.authorize_user("test_user", "test_password");
         quint32 board_id = db_manager.insert_board(user_id, "test_board", "");
         quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
         quint32 card_id = db_manager.insert_card(list_id, "test_card", "");
         quint32 tag_id = db_manager.insert_tag("test_name");
         db_manager.add_tag_to_card(card_id, tag_id);
-        return QVector<quint32> {user_id, board_id, list_id, card_id, tag_id};
+        return QVector<quint32>{user_id, board_id, list_id, card_id, tag_id};
     };
 
     {
@@ -301,7 +307,7 @@ TEST_CASE("delete user from board") {
 
 TEST_CASE("get board card ids") {
     db_manager db_manager(
-            arguments[0], arguments[1], arguments[2], arguments[3]
+        arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
     auto user_id = db_manager.authorize_user("test_user", "test_password");
@@ -350,8 +356,11 @@ TEST_CASE("new feature") {
     db_manager.add_tag_to_card(card_id_6, tag_id_3);
 
     QVector<quint32> answer = {card_id_1, card_id_2};
-    QString array = "{" + QString::number(tag_id_1) + ", " + QString::number(tag_id_2) + "}";
-    CHECK(db_manager.get_card_ids_by_board_id_and_tag_ids(board_id_1, array) == answer);
+    QString array =
+        QString::fromStdString((std::stringstream{} << '{' << tag_id_1 << ", "
+                                                    << tag_id_2 << '}')
+                                   .str());
+    CHECK(db_manager.filter_cards(board_id_1, array) == answer);
 }
 
 #endif
