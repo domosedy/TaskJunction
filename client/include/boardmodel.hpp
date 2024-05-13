@@ -33,9 +33,11 @@ public:
     );
     void update_list(int list_index, QString &name);
     void create_tag(int list_index, int card_index, const tag& new_tag);
+    void delete_tag(int list_index, int card_index, const int tag_index);
     int get_count() const;
     quint32 get_list_id(const int index) const;
     quint32 get_card_id(const int list_index, const int card_index) const;
+    quint32 get_tag_id(const int list_index, const int card_index, const int tag_index) const;
     void move(int from_card, int to_card, int from_list, int to_list);
 
 signals:

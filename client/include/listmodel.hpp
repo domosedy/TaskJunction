@@ -36,8 +36,10 @@ public:
     update_card(int card_index, const QString &field, const QString &value);
     int get_count();
     quint32 get_card_id(const int index) const;
+    quint32 get_tag_id(const int card_index, const int tag_index) const;
     CardModel* remove(const int index);
     void create_tag(int index, const tag &new_tag);
+    void delete_tag(const int card_index, const int tag_index);
 signals:
     void countChanged();
 

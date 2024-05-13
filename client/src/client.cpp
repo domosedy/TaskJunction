@@ -138,7 +138,6 @@ void Client::create_tag(int list_index, int card_index, QString name) {
     if (!m_current_board->m_is_remote) {
         quint32 tag_id = db.insert_tag(name);
         db.add_tag_to_card(card_id, tag_id);
-        qDebug() << card_id << " " << tag_id;
         const tag &new_tag = db.select_tag(tag_id);
         m_current_board->create_tag(list_index, card_index, new_tag);
     } else {
@@ -191,7 +190,7 @@ void Client::delete_board(int board_index) {
         m_board_menu->delete_board(board_index);  // TODO make afterwards?
     qDebug() << board_id;
     if (!is_remote) {
-        db.delete_command("board_signature", board_id);
+        db.delete_board(board_id);
     } else {
         std::string request = parser::delete_request(board_id, "board");
         write(request);
@@ -201,7 +200,7 @@ void Client::delete_board(int board_index) {
 void Client::delete_list(int list_index) {
     quint32 list_id = m_current_board->get_list_id(list_index);
     if (!m_current_board->m_is_remote) {
-        db.delete_command("list_signature", list_id);
+        db.delete_list(list_id);
     } else {
         std::string request = parser::delete_request(list_id, "list");
         write(request);
@@ -212,12 +211,24 @@ void Client::delete_list(int list_index) {
 void Client::delete_card(int list_index, int card_index) {
     quint32 card_id = m_current_board->get_card_id(list_index, card_index);
     if (!m_current_board->m_is_remote) {
-        db.delete_command("card_signature", card_id);
+        db.delete_card(card_id);
     } else {
         std::string request = parser::delete_request(card_id, "card");
         write(request);
     }
     m_current_board->delete_card(list_index, card_index);
+}
+
+void Client::delete_tag(int list_index, int card_index, int tag_index) {
+    quint32 card_id = m_current_board->get_card_id(list_index, card_index);
+    quint32 tag_id = m_current_board->get_tag_id(list_index, card_index, tag_index);    
+    if (!m_current_board->m_is_remote) {
+        db.delete_tag_from_card(card_id, tag_id);
+        m_current_board->delete_tag(list_index, card_index, tag_index);
+    } else {
+        std::string request = parser::delete_request(tag_id, "tag"); // PASS CARD_ID 
+        write(request);        
+    }
 }
 
 void Client::onConnected() {

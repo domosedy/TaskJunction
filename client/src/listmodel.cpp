@@ -117,12 +117,20 @@ void ListModel::delete_card(int index) {
     emit countChanged();
 }
 
+void ListModel::delete_tag(const int card_index, const int tag_index) {
+    m_cards[card_index]->delete_tag(tag_index);
+}
+
 int ListModel::get_count() {
     return m_cards.count();
 }
 
 quint32 ListModel::get_card_id(const int index) const {
     return m_cards[index]->m_card_id;
+}
+
+quint32 ListModel::get_tag_id(const int card_index, const int tag_index) const {
+    return m_cards[card_index]->get_tag_id(tag_index);
 }
 
 void ListModel::update_card(

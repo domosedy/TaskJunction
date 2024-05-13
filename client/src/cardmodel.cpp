@@ -16,7 +16,6 @@ CardModel::CardModel(QObject *parent, const nlohmann::json &card_json)
         m_tags.emplace_back(tag_id, tag_name);
         m_index_by_id[tag_id] = index++;
     }
-    qDebug() << "id: " << m_card_id << " : " << tags.size();
     emit countChanged();
 }
 
@@ -31,7 +30,6 @@ CardModel::CardModel(QObject *parent, const card &card_base)
     for (auto &tag : m_tags) {
         m_index_by_id[tag.m_tag_id] = index++;
     }
-    qDebug() << "id: " << m_card_id << " : " << m_tags.size();
     emit countChanged();
 }
 

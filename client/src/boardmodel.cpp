@@ -92,6 +92,10 @@ void BoardModel::delete_card(const int list_index, const int card_index) {
     m_lists[list_index]->delete_card(card_index);
 }
 
+void BoardModel::delete_tag(const int list_index, const int card_index, const int tag_index) {
+    m_lists[list_index]->delete_tag(card_index, tag_index);
+}
+
 void BoardModel::create_card(
     int list_index,
     QString &name,
@@ -121,6 +125,11 @@ quint32 BoardModel::get_list_id(const int index) const {
 quint32 BoardModel::get_card_id(const int list_index, const int card_index)
     const {
     return m_lists[list_index]->get_card_id(card_index);
+}
+
+quint32 BoardModel::get_tag_id(const int list_index, const int card_index, const int tag_index)
+    const {
+    return m_lists[list_index]->get_tag_id(card_index, tag_index);
 }
 
 void BoardModel::update_card(

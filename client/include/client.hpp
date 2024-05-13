@@ -47,6 +47,7 @@ public:
     Q_INVOKABLE void create_list(QString name);
     Q_INVOKABLE void add_board(QString name, QString description, QString type);
 
+    Q_INVOKABLE void delete_tag(int list_index, int card_index, int tag_index);
     Q_INVOKABLE void delete_card(int list_index, int card_index);
     Q_INVOKABLE void delete_list(int list_index);
     Q_INVOKABLE void delete_board(int board_index);
