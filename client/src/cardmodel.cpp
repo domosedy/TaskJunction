@@ -110,7 +110,3 @@ void CardModel::update_card(int tag_index, const QString &value) {
 int CardModel::get_tag_idx(quint32 tag_id) const {
     return m_index_by_id[tag_id];
 }
-
-void CardModel::change(bool filter) {
-    m_is_visible = filter;
-}

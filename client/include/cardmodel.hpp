@@ -10,7 +10,6 @@
 class CardModel : public QAbstractListModel, public card {
     Q_OBJECT
     Q_PROPERTY(int count READ get_count NOTIFY countChanged)
-    // Q_PROPERTY(bool is_visible MEMBER m_is_visible NOTIFY filterApplied)
 public:
     explicit CardModel(QObject *parent = nullptr);
     CardModel(QObject *parent, const nlohmann::json &card_json);
@@ -33,17 +32,12 @@ public:
     int get_count();
     quint32 get_tag_id(const int index) const;
     int get_tag_idx(quint32 tag_id) const;
-    void change(bool filter);
 
-    bool m_is_visible = true;
 signals:
     void countChanged();
-    void filterApplied();
 
 private:
     QMap<quint32, int> m_index_by_id;
-
-    // bool m_is_visible = true;
 
     enum TagRoles {
         NameRole = Qt::UserRole + 1,

@@ -3,6 +3,7 @@
 
 #include <QMap>
 #include <QObject>
+#include <QStringList>
 #include <QWebSocket>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -87,7 +88,7 @@ private:
     ConnectionStatus m_connection_status = ConnectionStatus::Unauthorized;
     int m_current_index = -1;
     QSet<quint32> m_filtered_cards;
-    QString m_filter = "";
+    QStringList m_filter;
 
     void write(std::string &data);
     QString get_current_board_name();

@@ -42,7 +42,6 @@ public:
     std::pair<int, int> get_indices(quint32 card_id, quint32 tag_id) const;
 
     void delete_command(const int card_index, const int tag_index);
-    void apply_filter();
 signals:
     void countChanged();
 
@@ -53,8 +52,7 @@ private:
         NameRole = Qt::UserRole + 1,
         DescriptionRole,
         CardIndex,
-        ModelRole,
-        VisibleRole
+        ModelRole
     };
 };
 

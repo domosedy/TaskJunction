@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include <sstream>
 #include <string>
 #include "boardmenu.hpp"
 #include "database.hpp"
@@ -384,7 +385,7 @@ void Client::move(int from_card, int to_card, int from_list, int to_list) {
 }
 
 bool Client::is_filtered(int list_index, int card_index) const {
-    if (m_filter == "") {
+    if (m_filter.isEmpty()) {
         return true;
     }
     quint32 card_id = m_current_board->get_card_id(list_index, card_index);
@@ -392,7 +393,12 @@ bool Client::is_filtered(int list_index, int card_index) const {
 }
 
 void Client::set_filter(QString filter) {
-    m_filter = filter;
+    if (filter == "") {
+        m_filtered_cards.clear();
+        m_filter.clear();
+    }
+    m_filter = filter.split(", ");  // todo make better?
+    m_filtered_cards = db.filter_cards(m_current_board->m_board_id, m_filter);
 }
 
 void Client::connect_board(QString link) {
