@@ -6,6 +6,7 @@
 #include <QVector>
 #include <concepts>
 #include <string>
+#include <fstream>
 
 template <typename T>
 concept has_to_json_method = requires(T t) { t.to_json(); };
@@ -68,7 +69,7 @@ struct list {
 
 struct board {
     quint32 m_board_id;
-    quint32 m_group_id;
+    quint32 m_user_id;
     QString m_name;
     QString m_description;
     QVector<list> m_lists;
@@ -76,7 +77,7 @@ struct board {
     board() = default;
     explicit board(
         quint32 board_id,
-        quint32 group_id,
+        quint32 user_id,
         QString name,
         QString description
     );
@@ -119,21 +120,5 @@ struct create_response {
 
     std::string to_json() const;
 };
-
-struct group {
-    quint32 m_group_id;
-    QString m_name;
-
-    explicit group(quint32 group_id, QString name);
-
-    void print_data() const {
-        qDebug() << m_group_id << m_name;
-    }
-
-    bool operator==(const group &other) const {
-        return m_group_id == other.m_group_id && m_name == other.m_name;
-    }
-};
-
 
 #endif  // ELEMENT_CLASSES_HPP_
