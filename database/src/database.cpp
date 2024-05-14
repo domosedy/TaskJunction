@@ -470,7 +470,9 @@ card db_manager::select_card(quint32 id) {
     quint32 list_id = data[1].toInt();
     QString name = data[2].toString();
     QString description = data[3].toString();
-    return card(card_id, list_id, name, description);
+    card card(card_id, list_id, name, description);
+    card.m_tags = get_card_tags(id);
+    return card;
 }
 
 tag db_manager::select_tag(quint32 id) {
