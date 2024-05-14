@@ -341,7 +341,7 @@ bool db_manager::move_card(int id, int new_list_id, int new_number) {
     query.prepare(query_name_to_sql_command["move_card"].arg(m_schema));
     query.bindValue(":id", id);
     query.bindValue(":new_list_id", new_list_id);
-    query.bindValue(":new_number", new_number);
+    query.bindValue(":new_number", new_number + 1);
     if (!query.exec()) {
         qDebug() << "move_card:" << query.lastError().text();
         return false;

@@ -113,7 +113,7 @@ BEGIN
     list_id_ = list_id FROM card_signature WHERE id = id_;
     number_ = number FROM card_signature WHERE id = id_;
 
-    IF new_number_ <= 0 THEN
+    IF new_number_ < 0 THEN
         RETURN FALSE;
     END IF;
     IF list_id_ = new_list_id_ THEN
@@ -123,7 +123,12 @@ BEGIN
     ELSEIF new_number_ > 1 + cards_number FROM list_signature WHERE id = new_list_id_ THEN
        RETURN FALSE;
     END IF;
-
+    IF new_number_ == 0 THEN
+        new_number_ = cards_number FROM list_signature WHERE id = new_list_id_;
+        IF list_id_ <> new_list_id_ THEN
+           new_number_ = new_number_ + 1;
+        END IF;
+    END IF;
     IF list_id_ <> new_list_id_ THEN
         UPDATE list_signature SET cards_number = cards_number + 1 WHERE id = new_list_id_;
         UPDATE list_signature SET cards_number = cards_number - 1 WHERE id = list_id_;
