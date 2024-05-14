@@ -43,7 +43,7 @@ void Client::readData(const QString &data) {
     std::string response_type = response["type"];
     if (response_type == "authorization") {
         if (response["response"] == "ok") {
-            nlohmann::json avaliable_boards = response["boards"];
+            const nlohmann::json avaliable_boards = response["boards"];
             load_remote_boards(avaliable_boards);
             m_connection_status = ConnectionStatus::Authorized;
             emit connectionStatusChanged();
@@ -53,29 +53,86 @@ void Client::readData(const QString &data) {
             qDebug() << "Wrong password!";
         }
     }
-    if (response_type == "create-response") {
+    if (response_type == "create") {
         quint32 board_id = response["board-id"];
         quint32 list_id = response["list-id"];
         quint32 card_id = response["card-id"];
-        if (list_id == 0) {
-            board new_board =
-                parser::parse_board(response["object-json"], m_user_id);
-            new_board.m_is_remote = true;
-            m_board_menu->add_board(new_board);
-        } else if (card_id == 0) {
-            list new_list =
-                parser::parse_list(response["object-json"], board_id);
-            m_current_board->create_list(new_list);
-        } else {
+        quint32 tag_id = response["tag-id"];
+
+        if (!m_board_menu->is_board_loaded(board_id)) {
+            return;
+        }
+        if (tag_id != 0) {
+            tag new_tag = parser::parse_tag(response["object-json"]);
+            m_board_menu->create_tag(board_id, list_id, card_id, new_tag);
+            return;
+        }
+        if (card_id != 0) {
             card new_card =
                 parser::parse_card(response["object-json"], list_id);
-            m_current_board->create_card(list_id, new_card);
+            m_board_menu->create_card(board_id, list_id, new_card);
+            return;
         }
+        if (list_id != 0) {
+            list new_list =
+                parser::parse_list(response["object-json"], board_id);
+            m_board_menu->create_list(board_id, new_list);
+            return;
+        }
+        board new_board =
+            parser::parse_board(response["object-json"], m_user_id);
+        new_board.m_is_remote = true;
+        m_board_menu->create_board(new_board);
     }
     if (response_type == "board") {
         const board loaded_board = parser::parse_board(response, m_user_id);
         m_current_board = m_board_menu->load(m_current_index, loaded_board);
         emit boardChanged();
+    }
+    if (response_type == "delete") {
+        quint32 board_id = response["board-id"];
+        quint32 list_id = response["list-id"];
+        quint32 card_id = response["card-id"];
+        quint32 tag_id = response["tag-id"];
+
+        if (!m_board_menu->is_board_loaded(board_id)) {
+            return;
+        }
+        m_board_menu->delete_command(board_id, list_id, card_id, tag_id);
+    }
+    if (response_type == "update") {
+        quint32 board_id = response["board-id"];
+        quint32 list_id = response["list-id"];
+        quint32 card_id = response["card-id"];
+        QString new_value = QString::fromStdString(response["new-value"]);
+        QString field = QString::fromStdString(response["field"]);
+
+        if (!m_board_menu->is_board_loaded(board_id)) {
+            return;
+        }
+        m_board_menu->update_command(
+            board_id, list_id, card_id, field, new_value
+        );
+    }
+    if (response_type == "move") {
+        quint32 board_id = response["board-id"];
+        quint32 old_list_id = response["old-list-id"];
+        quint32 new_list_id = response["new-list-id"];
+        quint32 card_id = response["card-id"];
+        int new_index = response["new-index"];
+
+        if (!m_board_menu->is_board_loaded(board_id)) {
+            return;
+        }
+
+        m_board_menu->move_command(
+            board_id, old_list_id, new_list_id, card_id, new_index
+        );
+    }
+    if (response_type == "connect" && response["status"] == "ok") {
+        board new_board = parser::parse_board(response["board"], m_user_id);
+        new_board.m_is_remote = true;
+        m_board_menu->create_board(new_board);
     }
 }
 
@@ -85,7 +142,7 @@ void Client::load_local_boards() {
     }
     QVector<board> avaliable_boards = db.get_user_boards(m_local_id);
     for (const auto &board : avaliable_boards) {
-        m_board_menu->add_board(board);
+        m_board_menu->create_board(board);
     };
     m_board_menu->is_local_loaded = true;
 }
@@ -95,7 +152,7 @@ void Client::load_remote_boards(const nlohmann::json &avaliable_boards) {
         QString name = QString::fromStdString(board["name"]);
         QString description = QString::fromStdString(board["description"]);
         quint32 id = board["id"];
-        m_board_menu->add_board(name, description, id, m_user_id);
+        m_board_menu->create_board(name, description, id, m_user_id);
     }
 }
 
@@ -131,9 +188,9 @@ void Client::create_list(QString name) {
 void Client::create_tag(int list_index, int card_index, QString name) {
     if (name == "") {
         name = "lol";
-    }    
-    //quint32 board_id = m_current_board->m_board_id;
-    //quint32 list_id = m_current_board->get_list_id(list_index);
+    }
+    // quint32 board_id = m_current_board->m_board_id;
+    // quint32 list_id = m_current_board->get_list_id(list_index);
     quint32 card_id = m_current_board->get_card_id(list_index, card_index);
     if (!m_current_board->m_is_remote) {
         quint32 tag_id = db.insert_tag(name);
@@ -167,7 +224,7 @@ void Client::create_card(int list_index, QString name, QString description) {
     }
 }
 
-void Client::add_board(QString name, QString description, QString type) {
+void Client::create_board(QString name, QString description, QString type) {
     if (name == "") {
         name = "New board";
     }
@@ -177,7 +234,7 @@ void Client::add_board(QString name, QString description, QString type) {
 
     if (type == "Local") {
         quint32 board_id = db.insert_board(m_local_id, name, description);
-        m_board_menu->add_board(name, description, board_id, m_local_id);
+        m_board_menu->create_board(name, description, board_id, m_local_id);
     } else {
         std::string request =
             parser::create_request("board", m_user_id, name, description);
@@ -186,8 +243,7 @@ void Client::add_board(QString name, QString description, QString type) {
 }
 
 void Client::delete_board(int board_index) {
-    const auto &[board_id, is_remote] =
-        m_board_menu->delete_board(board_index);  // TODO make afterwards?
+    const auto &[board_id, is_remote] = m_board_menu->delete_board(board_index);
     qDebug() << board_id;
     if (!is_remote) {
         db.delete_board(board_id);
@@ -201,33 +257,35 @@ void Client::delete_list(int list_index) {
     quint32 list_id = m_current_board->get_list_id(list_index);
     if (!m_current_board->m_is_remote) {
         db.delete_list(list_id);
+        m_current_board->delete_command(list_index, -1, -1);
     } else {
         std::string request = parser::delete_request(list_id, "list");
         write(request);
     }
-    m_current_board->delete_list(list_index);
 }
 
 void Client::delete_card(int list_index, int card_index) {
     quint32 card_id = m_current_board->get_card_id(list_index, card_index);
     if (!m_current_board->m_is_remote) {
         db.delete_card(card_id);
+        m_current_board->delete_command(list_index, card_index, -1);
     } else {
         std::string request = parser::delete_request(card_id, "card");
         write(request);
     }
-    m_current_board->delete_card(list_index, card_index);
 }
 
 void Client::delete_tag(int list_index, int card_index, int tag_index) {
     quint32 card_id = m_current_board->get_card_id(list_index, card_index);
-    quint32 tag_id = m_current_board->get_tag_id(list_index, card_index, tag_index);    
+    quint32 tag_id =
+        m_current_board->get_tag_id(list_index, card_index, tag_index);
     if (!m_current_board->m_is_remote) {
         db.delete_tag_from_card(card_id, tag_id);
-        m_current_board->delete_tag(list_index, card_index, tag_index);
+        m_current_board->delete_command(list_index, card_index, tag_index);
     } else {
-        std::string request = parser::delete_request(tag_id, "tag"); // PASS CARD_ID 
-        write(request);        
+        std::string request =
+            parser::delete_request(tag_id, "tag");  // PASS CARD_ID
+        write(request);
     }
 }
 
@@ -273,14 +331,11 @@ void Client::update_card(
     quint32 card_id = m_current_board->get_card_id(list_index, card_index);
     if (!m_current_board->m_is_remote &&
         db.update_command("card_signature", field, value, card_id)) {
-        m_current_board->update_card(list_index, card_index, field, value);
+        m_current_board->update_command(list_index, card_index, field, value);
     } else {
         std::string request =
             parser::update_request("card", card_id, field, value);
         write(request);
-        m_current_board->update_card(
-            list_index, card_index, field, value
-        );  // make afterwards?
     }
 }
 
@@ -288,12 +343,11 @@ void Client::update_list(int list_index, QString name) {
     quint32 list_id = m_current_board->get_list_id(list_index);
     if (!m_current_board->m_is_remote &&
         db.update_command("list_signature", "name", name, list_id)) {
-        m_current_board->update_list(list_index, name);
+        m_current_board->update_command(list_index, -1, "name", name);
     } else {
         std::string request =
             parser::update_request("list", list_id, "name", name);
         write(request);
-        m_current_board->update_list(list_index, name);
     }
 }
 
@@ -306,9 +360,6 @@ void Client::update_board(int board_index, QString field, QString value) {
         std::string request =
             parser::update_request("board", board_id, field, value);
         write(request);
-        m_board_menu->update_board(
-            board_index, field, value
-        );  // make afterwards?
     }
 }
 

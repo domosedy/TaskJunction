@@ -125,7 +125,6 @@ Rectangle {
                 anchors.topMargin: 10
                 font.pointSize: 16
                 font.family: "Poppins"
-                text: "New board"
 
                 background: Rectangle {
                     implicitWidth: createBoardContent.width - 20
@@ -204,7 +203,7 @@ Rectangle {
                 anchors.bottomMargin: 10
                 onClicked: {
                     createBoardPopup.close();
-                    mainClient.add_board(boardName.text, boardDescription.text, boardType.currentText);
+                    mainClient.create_board(boardName.text, boardDescription.text, boardType.currentText);
                     boardDescription.text = "";
                     boardName.text = "";
                 }

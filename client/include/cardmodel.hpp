@@ -31,6 +31,7 @@ public:
     void update_card(int tag_index, const QString &value);
     int get_count();
     quint32 get_tag_id(const int index) const;
+    int get_tag_idx(quint32 tag_id) const;
 signals:
     void countChanged();
 
@@ -40,7 +41,6 @@ private:
     enum TagRoles {
         NameRole = Qt::UserRole + 1,
     };
-
 };
 
 #endif  // CARDMODEL_HPP_

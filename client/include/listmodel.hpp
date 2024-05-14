@@ -5,8 +5,8 @@
 #include <QMap>
 #include <QVector>
 #include <nlohmann/json.hpp>
-#include "element_classes.hpp"
 #include "cardmodel.hpp"
+#include "element_classes.hpp"
 
 class ListModel : public QAbstractListModel, public list {
     Q_OBJECT
@@ -26,10 +26,9 @@ public:
     int rowCount(const QModelIndex &parent = {}) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole)
         const override;
-    
-    Q_INVOKABLE void create_card(CardModel* card, int index);
+
+    Q_INVOKABLE void create_card(CardModel *card, int index);
     Q_INVOKABLE void create_card(QString &name, QString &description);
-    Q_INVOKABLE void delete_card(int index);
     Q_INVOKABLE void move(int from, int to);
     void create_card(const card &new_card, const int index = -1);
     void
@@ -37,15 +36,17 @@ public:
     int get_count();
     quint32 get_card_id(const int index) const;
     quint32 get_tag_id(const int card_index, const int tag_index) const;
-    CardModel* remove(const int index);
+    CardModel *remove(const int index);
+    void create_tag(quint32 id, const tag &new_tag);
     void create_tag(int index, const tag &new_tag);
-    void delete_tag(const int card_index, const int tag_index);
+    std::pair<int, int> get_indices(quint32 card_id, quint32 tag_id) const;
+
+    void delete_command(const int card_index, const int tag_index);
 signals:
     void countChanged();
 
 private:
-    QVector<CardModel*> m_cards;
-    //QMap<quint32, int> m_index_by_id;
+    QVector<CardModel *> m_cards;
 
     enum CardRoles {
         NameRole = Qt::UserRole + 1,
@@ -53,7 +54,6 @@ private:
         CardIndex,
         ModelRole
     };
-
 };
 
 #endif  // LISTMODEL_HPP_

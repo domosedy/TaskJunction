@@ -35,7 +35,7 @@ QVariant BoardMenu::data(const QModelIndex &index, int role) const {
     }
 }
 
-void BoardMenu::add_board(
+void BoardMenu::create_board(
     QString &name,
     QString &description,
     quint32 id,
@@ -50,7 +50,7 @@ void BoardMenu::add_board(
     emit countChanged();
 }
 
-void BoardMenu::add_board(const board &board) {
+void BoardMenu::create_board(const board &board) {
     beginInsertRows(QModelIndex(), m_boards.size(), m_boards.size());
     m_boards.append(board);
     endInsertRows();
@@ -128,4 +128,71 @@ void BoardMenu::update_board(
             m_loaded_boards[id]->m_description = value;
         }
     }
+}
+
+bool BoardMenu::is_board_loaded(quint32 id) const {
+    return (m_loaded_boards.find(id) != m_loaded_boards.end());
+}
+
+void BoardMenu::create_list(quint32 board_id, const list &list) {
+    m_loaded_boards[board_id]->create_list(list);
+}
+
+void BoardMenu::create_card(
+    quint32 board_id,
+    quint32 list_id,
+    const card &card
+) {
+    m_loaded_boards[board_id]->create_card(list_id, card);
+}
+
+void BoardMenu::create_tag(
+    quint32 board_id,
+    quint32 list_id,
+    quint32 card_id,
+    const tag &tag
+) {
+    m_loaded_boards[board_id]->create_tag(list_id, card_id, tag);
+}
+
+void BoardMenu::delete_command(
+    quint32 board_id,
+    quint32 list_id,
+    quint32 card_id,
+    quint32 tag_id
+) {
+    auto [list_idx, card_idx, tag_idx] =
+        m_loaded_boards[board_id]->get_indices(list_id, card_id, tag_id);
+    m_loaded_boards[board_id]->delete_command(list_idx, card_idx, tag_idx);
+}
+
+void BoardMenu::update_command(
+    quint32 board_id,
+    quint32 list_id,
+    quint32 card_id,
+    const QString &field,
+    const QString &new_value
+) {
+    auto [list_idx, card_idx, _] =
+        m_loaded_boards[board_id]->get_indices(list_id, card_id, 0);
+    m_loaded_boards[board_id]->update_command(
+        list_idx, card_idx, field, new_value
+    );
+}
+
+void BoardMenu::move_command(
+    quint32 board_id,
+    quint32 old_list_id,
+    quint32 new_list_id,
+    quint32 card_id,
+    int new_idx
+) {
+    int old_list_idx, from_idx, new_list_idx;
+    std::tie(old_list_idx, from_idx, std::ignore) =
+        m_loaded_boards[board_id]->get_indices(old_list_id, card_id, 0);
+    std::tie(new_list_idx, std::ignore, std::ignore) =
+        m_loaded_boards[board_id]->get_indices(new_list_id, 0, 0);
+    m_loaded_boards[board_id]->move(
+        from_idx, new_idx, old_list_idx, new_list_idx
+    );
 }

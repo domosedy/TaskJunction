@@ -81,6 +81,12 @@ std::string connect_to_board_request(quint32 board_id, quint32 user_id) {
     return request.dump();
 }
 
+tag parse_tag(const json &object) {
+    QString name = QString::fromStdString(object["name"]);
+    quint32 id = object["id"];
+    return tag(id, name);
+}
+
 card parse_card(const json &object, quint32 m_parent_id) {
     QString name = QString::fromStdString(object["name"]);
     QString description = QString::fromStdString(object["description"]);

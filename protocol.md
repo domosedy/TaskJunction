@@ -151,14 +151,15 @@
     "board-id": 
     "list-id":
     "card-id":
+    "tag-id": 
     "object-json": один из предыдущих нужного типа.
 }
 ```
 
-8. Ответ на удаление
+8. Ответ на обновление
 ```
 {
-    "type": "delete",
+    "type": "update",
     "board-id": 
     "list-id":
     "card-id":   
@@ -167,13 +168,14 @@
 }
 ```
 
-9. Ответ на обновление
+9. Ответ на удаление
 ```
 {
     "type": "delete",
     "board-id": 
     "list-id":
-    "card-id":   
+    "card-id":
+    "tag-id":   
 }
 ```
 
@@ -195,7 +197,7 @@
 ```
 {
     "type": "connect"
-    "response": "ok" / "wrong"
+    "status": "ok" / "wrong"
     "board": json 
 }
 

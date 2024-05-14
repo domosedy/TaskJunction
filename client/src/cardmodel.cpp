@@ -99,13 +99,14 @@ quint32 CardModel::get_tag_id(const int index) const {
     return m_tags[index].m_tag_id;
 }
 
-void CardModel::update_card(
-    int tag_index,
-    const QString &value
-) {
+void CardModel::update_card(int tag_index, const QString &value) {
     m_tags[tag_index].m_name = value;
     emit dataChanged(
         this->index(tag_index, 0), this->index(tag_index, 0),
         {TagRoles::NameRole}
     );
+}
+
+int CardModel::get_tag_idx(quint32 tag_id) const {
+    return m_index_by_id[tag_id];
 }

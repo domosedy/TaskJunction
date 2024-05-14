@@ -234,7 +234,6 @@ Rectangle {
                     height: 40
                     anchors.centerIn: parent
                     onClicked: {
-                        console.log("click");
                         createCardPopup.open();
                     }
 

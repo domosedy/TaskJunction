@@ -36,6 +36,8 @@ std::string connect_to_board_request(quint32 group_id, quint32 user_id);
 
 std::string move_request(quint32 card_id, quint32 to_list_id, int new_pos);
 
+tag parse_tag(const json &object);
+
 card parse_card(const json &object, quint32 m_parent_id);
 
 list parse_list(const json &object, quint32 m_parent_id);
