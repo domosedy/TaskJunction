@@ -134,6 +134,8 @@ Rectangle {
         }
 
         Button {
+            id: newListBtn
+
             width: 110
             height: 36
             onClicked: {
@@ -144,6 +146,61 @@ Rectangle {
 
             Text {
                 text: "+ New list"
+                font.family: "Poppins"
+                font.pointSize: 16
+                color: "white"
+                anchors.centerIn: parent
+            }
+
+            background: Rectangle {
+                color: parent.down ? Qt.darker(style.headerBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.headerBackgroundColor, 1.2) : style.headerBackgroundColor)
+            }
+
+        }
+
+        TextField {
+            id: filterHolder
+
+            z: 1
+            placeholderText: ""
+            placeholderTextColor: "#bfbfbf"
+            anchors.right: filterBtn.left
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.topMargin: 10
+            font.pointSize: 16
+            font.family: "Poppins"
+            font.bold: true
+            clip: true
+
+            background: Rectangle {
+                implicitWidth: 120
+                implicitHeight: 36
+                radius: style.defaultRadius
+                color: style.textFormColor
+                border.color: style.listBackgroundColor
+                border.width: 1
+            }
+
+        }
+
+        Button {
+            id: filterBtn
+
+            width: 36
+            height: 36
+            onClicked: {
+                mainClient.set_filter(filterHolder.text);
+                for (var i = 0; i < listview.model.count; ++i) {
+                    listview.itemAtIndex(i).update_filter();
+                }
+            }
+            anchors.right: newListBtn.left
+            anchors.verticalCenter: parent.verticalCenter
+
+            Text {
+                id: filter
+
+                text: "flt"
                 font.family: "Poppins"
                 font.pointSize: 16
                 color: "white"

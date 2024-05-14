@@ -19,6 +19,10 @@ Rectangle {
         mainClient.update_card(index, card_index, "description", new_description);
     }
 
+    function update_filter() {
+        listVisualModel.update();
+    }
+
     width: style.listWidth
     height: Math.min(root.height - 80, 150 + (listmodel.count) * (style.cardHeight + style.cardSpacing))
     color: style.listBackgroundColor
@@ -28,7 +32,7 @@ Rectangle {
         id: createCardPopup
 
         width: 210
-        height: 210
+        height: 160
         z: 4
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
         focus: true
@@ -122,6 +126,7 @@ Rectangle {
 
                 background: Rectangle {
                     color: parent.down ? Qt.lighter(style.primaryColor, 1.2) : (parent.hovered ? Qt.lighter(style.primaryColor, 1.2) : style.primaryColor)
+                    radius: style.defaultRadius
                 }
 
             }
@@ -228,6 +233,7 @@ Rectangle {
                 width: listContent.width
                 height: 68
                 color: style.listBackgroundColor
+                radius: style.defaultRadius
 
                 Button {
                     width: style.listWidth - 40
@@ -268,7 +274,35 @@ Rectangle {
             model: DelegateModel {
                 id: listVisualModel
 
+                function update() {
+                    if (allItems.count == 0)
+                        return ;
+
+                    allItems.setGroups(0, allItems.count, ["all"]);
+                    for (let index = 0; index < allItems.count; index++) {
+                        if (mainClient.is_filtered(listIndex, index))
+                            allItems.setGroups(index, 1, ["all", "visible"]);
+
+                    }
+                }
+
                 model: listmodel
+                Component.onCompleted: Qt.callLater(update)
+                filterOnGroup: "visible"
+                groups: [
+                    DelegateModelGroup {
+                        id: allItems
+
+                        name: "all"
+                        includeByDefault: true
+                        onCountChanged: Qt.callLater(update)
+                    },
+                    DelegateModelGroup {
+                        id: visibleItems
+
+                        name: "visible"
+                    }
+                ]
 
                 delegate: DropArea {
                     id: delegateRoot

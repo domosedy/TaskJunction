@@ -368,16 +368,31 @@ QString Client::get_current_board_name() {
 }
 
 void Client::move(int from_card, int to_card, int from_list, int to_list) {
-    m_current_board->move(from_card, to_card, from_list, to_list);
+    qDebug() << "moving from: (" << from_list << ':' << from_card << ") to ("
+             << to_list << ":" << to_card << ')';
     quint32 to_list_id = m_current_board->get_list_id(to_list);
     quint32 card_id = m_current_board->get_card_id(from_list, from_card);
+    m_current_board->move(from_card, to_card, from_list, to_list);
+    qDebug() << "move(" << card_id << to_list_id << to_card << ")";
     if (!m_current_board->m_is_remote) {
-        db.move_card(card_id, to_list_id, to_card);
+        db.move_card(card_id, to_list_id, to_card + 1);
     } else {
         std::string request =
             parser::move_request(card_id, to_list_id, to_card);
         write(request);
     }
+}
+
+bool Client::is_filtered(int list_index, int card_index) const {
+    if (m_filter == "") {
+        return true;
+    }
+    quint32 card_id = m_current_board->get_card_id(list_index, card_index);
+    return m_filtered_cards.find(card_id) != m_filtered_cards.end();
+}
+
+void Client::set_filter(QString filter) {
+    m_filter = filter;
 }
 
 void Client::connect_board(QString link) {

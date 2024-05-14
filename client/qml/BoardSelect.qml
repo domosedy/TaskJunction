@@ -79,6 +79,7 @@ Rectangle {
 
                 background: Rectangle {
                     color: parent.down ? Qt.lighter(style.primaryColor, 1.2) : (parent.hovered ? Qt.lighter(style.primaryColor, 1.2) : style.primaryColor)
+                    radius: style.defaultRadius
                 }
 
             }
@@ -218,6 +219,7 @@ Rectangle {
 
                 background: Rectangle {
                     color: parent.down ? Qt.lighter(style.primaryColor, 1.2) : (parent.hovered ? Qt.lighter(style.primaryColor, 1.2) : style.primaryColor)
+                    radius: style.defaultRadius
                 }
 
             }
@@ -266,7 +268,7 @@ Rectangle {
         }
 
         Text {
-            text: "Welcome, master ^_^"
+            text: "Welcome ^_^"
             font.family: "Poppins"
             font.pointSize: 20
             color: "white"

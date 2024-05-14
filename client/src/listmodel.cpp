@@ -57,6 +57,7 @@ QHash<int, QByteArray> ListModel::roleNames() const {
         roles[CardRoles::DescriptionRole] = "description";
         roles[CardRoles::CardIndex] = "cardIndex";
         roles[CardRoles::ModelRole] = "cardModel";
+        roles[CardRoles::VisibleRole] = "isVisible";
     }
 
     return roles;
@@ -77,6 +78,8 @@ QVariant ListModel::data(const QModelIndex &index, int role) const {
             return {index.row()};
         case CardRoles::ModelRole:
             return QVariant::fromValue<QObject *>(card);
+        case CardRoles::VisibleRole:
+            return {card->m_is_visible};
         default:
             return {};
     }
@@ -211,4 +214,15 @@ std::pair<int, int> ListModel::get_indices(quint32 card_id, quint32 tag_id)
     );
     int tag_idx = (tag_id == 0 ? -1 : m_cards[card_idx]->get_tag_idx(tag_id));
     return {card_idx, tag_idx};
+}
+
+void ListModel::apply_filter() {
+    int idx = 0;
+    for (auto card : m_cards) {
+        card->change(idx % 2);
+        emit dataChanged(
+            this->index(idx, 0), this->index(idx, 0), {CardRoles::VisibleRole}
+        );
+        idx++;
+    }
 }

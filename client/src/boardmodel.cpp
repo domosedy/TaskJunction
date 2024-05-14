@@ -191,3 +191,9 @@ void BoardModel::create_tag(
 ) {
     m_lists[list_index]->create_tag(card_index, new_tag);
 }
+
+void BoardModel::apply_filter() {
+    for (auto list : m_lists) {
+        list->apply_filter();
+    }
+}

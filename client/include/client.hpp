@@ -62,6 +62,9 @@ public:
     Q_INVOKABLE void
     move(int from_card, int to_card, int from_list, int to_list);
 
+    Q_INVOKABLE bool is_filtered(int list_index, int card_index) const;
+    Q_INVOKABLE void set_filter(QString filter);
+
 signals:
     void boardChanged();
     void menuChanged();
@@ -83,6 +86,8 @@ private:
     quint32 m_local_id = 1;
     ConnectionStatus m_connection_status = ConnectionStatus::Unauthorized;
     int m_current_index = -1;
+    QSet<quint32> m_filtered_cards;
+    QString m_filter = "";
 
     void write(std::string &data);
     QString get_current_board_name();

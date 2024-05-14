@@ -49,6 +49,7 @@ public:
         const QString &field,
         const QString &new_value
     );
+    void apply_filter();
 
 signals:
     void countChanged();
