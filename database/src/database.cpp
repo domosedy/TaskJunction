@@ -595,11 +595,21 @@ QVector<quint32> db_manager::get_list_card_ids(quint32 list_id) {
     return result;
 }
 
+QString db_manager::convert_vector_to_string(const QVector<QString> &vector) {
+    std::stringstream ss;
+    ss << "{";
+    for (int i = 0; i < vector.size(); ++i) {
+        ss << vector[i].toStdString() << (i + 1 < vector.size() ? ", " : "");
+    }
+    ss << "}";
+    return QString::fromStdString(ss.str());
+}
+
 QVector<quint32>
-db_manager::filter_cards(quint32 board_id, const QVector<quint32> &tag_ids) {
+db_manager::filter_cards(quint32 board_id, const QVector<QString> &tag_names) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["filter_cards"].arg(m_schema));
-    query.bindValue(":tag_ids", convert_vector_to_string(tag_ids));
+    query.bindValue(":tag_ids", convert_vector_to_string(tag_names));
     query.bindValue(":board_id", board_id);
     if (!query.exec()) {
         qDebug() << "filter_cards:" << query.lastError().text();
