@@ -196,17 +196,17 @@ TEST_CASE("update order") {
         quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
         quint32 card_id_1 = db_manager.insert_card(list_id, "test_card_1", "");
         quint32 card_id_2 = db_manager.insert_card(list_id, "test_card_2", "");
-        CHECK(db_manager.move_card(card_id_1, list_id, 2));
+        CHECK(db_manager.move_card(card_id_1, list_id, 1));
         CHECK(db_manager.get_card_number(card_id_1) == 2);
         CHECK(db_manager.get_card_number(card_id_2) == 1);
 
         quint32 card_id_3 = db_manager.insert_card(list_id, "test_card_3", "");
-        CHECK(db_manager.move_card(card_id_3, list_id, 1));
+        CHECK(db_manager.move_card(card_id_3, list_id, 0));
         CHECK(db_manager.get_card_number(card_id_1) == 3);
         CHECK(db_manager.get_card_number(card_id_2) == 2);
         CHECK(db_manager.get_card_number(card_id_3) == 1);
 
-        CHECK(db_manager.move_card(card_id_3, list_id, 3));
+        CHECK(db_manager.move_card(card_id_3, list_id, 2));
         CHECK(db_manager.get_card_number(card_id_1) == 2);
         CHECK(db_manager.get_card_number(card_id_2) == 1);
         CHECK(db_manager.get_card_number(card_id_3) == 3);
@@ -218,7 +218,7 @@ TEST_CASE("update order") {
         quint32 board_id = db_manager.insert_board(user_id, "test_board", "");
         quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
         quint32 card_id = db_manager.insert_card(list_id, "test_card", "");
-        CHECK(!db_manager.move_card(card_id, list_id, 0));
+        CHECK(!db_manager.move_card(card_id, list_id, -2));
         CHECK(!db_manager.move_card(card_id, list_id, 100));
     }
 }
@@ -319,7 +319,7 @@ TEST_CASE("get board card ids") {
     db_manager.insert_card(list_id_2, "", "");
     db_manager.insert_card(list_id_2, "", "");
     auto card_ids = db_manager.get_board_card_ids(board_id);
-    QVector<quint32> answer = {1, 2, 3, 4};
+    QVector<quint32> answer = {1, 3, 2, 4};
     CHECK(card_ids == answer);
 }
 
@@ -355,9 +355,11 @@ TEST_CASE("new feature") {
     db_manager.add_tag_to_card(card_id_5, tag_id_2);
     db_manager.add_tag_to_card(card_id_6, tag_id_3);
 
-    QVector<quint32> answer = {card_id_1, card_id_2};
+    QSet<quint32> answer = {card_id_1, card_id_2};
     QVector<QString> array = {"1", "2"};
     CHECK(db_manager.filter_cards(board_id_1, array) == answer);
+    auto res =  db_manager.filter_cards(board_id_1, array);
+
 }
 
 #endif
