@@ -64,8 +64,7 @@ void db_manager::fill_query_name_to_sql_command() {
 
     query_name_to_sql_command["select_board"] =
         "SELECT id, user_id, name, description FROM %1.board_signature WHERE "
-        "id"
-        " = :key_value;";
+        "id = :key_value;";
 
     query_name_to_sql_command["select_list"] =
         "SELECT id, board_id, name, description FROM %1.list_signature "
@@ -104,16 +103,16 @@ void db_manager::fill_query_name_to_sql_command() {
         "END$$;";
 
     query_name_to_sql_command["select_board_ids_by_user_id"] =
-        "SELECT board_id FROM %1.user_to_board WHERE user_id = :id;";
+        "SELECT board_id FROM %1.user_to_board WHERE user_id = :id ORDER BY board_id;";
 
     query_name_to_sql_command["select_list_ids_by_board_id"] =
-        "SELECT id FROM %1.list_signature WHERE board_id = :id;";
+        "SELECT id FROM %1.list_signature WHERE board_id = :id ORDER BY id;";
 
     query_name_to_sql_command["get_list_cards"] =
-        "SELECT id FROM %1.card_signature WHERE list_id = :id;";
+        "SELECT id FROM %1.card_signature WHERE list_id = :id ORDER BY number";
 
     query_name_to_sql_command["get_card_tags"] =
-        "SELECT tag_id FROM %1.card_to_tags WHERE tag_id = :id;";
+        "SELECT tag_id FROM %1.card_to_tags WHERE tag_id = :id ORDER BY tag_id;";
 
     query_name_to_sql_command["check_user_rights"] =
         "SELECT exists (SELECT * FROM %1.user_to_board WHERE user_id = "
@@ -129,17 +128,17 @@ void db_manager::fill_query_name_to_sql_command() {
         "SELECT setval('%1.%2', %3, FALSE);";
 
     query_name_to_sql_command["get_board_user_ids"] =
-        "SELECT user_id FROM %1.user_to_board WHERE board_id = :board_id;";
+        "SELECT user_id FROM %1.user_to_board WHERE board_id = :board_id ORDER BY user_id;";
 
     query_name_to_sql_command["get_board_list_ids"] =
-        "SELECT id FROM %1.list_signature WHERE board_id = :board_id;";
+        "SELECT id FROM %1.list_signature WHERE board_id = :board_id ORDER BY id;";
 
     query_name_to_sql_command["get_board_card_ids"] =
         "SELECT id FROM %1.card_signature WHERE list_id = "
-        "ANY (SELECT id FROM %1.list_signature WHERE board_id = :board_id);";
+        "ANY (SELECT id FROM %1.list_signature WHERE board_id = :board_id) ORDER BY number;";
 
     query_name_to_sql_command["get_list_card_ids"] =
-        "SELECT id FROM %1.card_signature WHERE list_id = :list_id;";
+        "SELECT id FROM %1.card_signature WHERE list_id = :list_id ORDER BY number;";
 
     query_name_to_sql_command["filter_cards"] =
         "SELECT card_id FROM %1.card_to_tags WHERE tag_id  = ANY (:tag_ids) "
@@ -607,7 +606,7 @@ QString db_manager::convert_vector_to_string(const QVector<QString> &vector) {
     return QString::fromStdString(ss.str());
 }
 
-QVector<quint32>
+QSet<quint32>
 db_manager::filter_cards(quint32 board_id, const QVector<QString> &tag_names) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["filter_cards"].arg(m_schema));
@@ -617,9 +616,9 @@ db_manager::filter_cards(quint32 board_id, const QVector<QString> &tag_names) {
         qDebug() << "filter_cards:" << query.lastError().text();
         return {};
     }
-    QVector<quint32> result;
+    QSet<quint32> result;
     while (query.next()) {
-        result.push_back(query.value(0).toInt());
+        result.insert(query.value(0).toInt());
     }
     return result;
 }
