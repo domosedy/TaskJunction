@@ -4,6 +4,7 @@
 #include <QtSql>
 #include <iostream>
 #include <string>
+#include <sstream>
 #include "element_classes.hpp"
 
 namespace database {
@@ -132,6 +133,10 @@ void db_manager::fill_query_name_to_sql_command() {
 
     query_name_to_sql_command["get_board_list_ids"] =
         "SELECT id FROM %1.list_signature WHERE board_id = :board_id;";
+
+    query_name_to_sql_command["get_board_card_ids"] =
+        "SELECT id FROM %1.card_signature WHERE list_id = "
+        "ANY (SELECT id FROM %1.list_signature WHERE board_id = :board_id);";
 
     query_name_to_sql_command["get_list_card_ids"] =
         "SELECT id FROM %1.card_signature WHERE list_id = :list_id;";
@@ -587,10 +592,10 @@ QVector<quint32> db_manager::get_list_card_ids(quint32 list_id) {
 }
 
 QVector<quint32>
-db_manager::filter_cards(quint32 board_id, const QString &tag_ids) {
+db_manager::filter_cards(quint32 board_id, const QVector<quint32> &tag_ids) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["filter_cards"].arg(m_schema));
-    query.bindValue(":tag_ids", tag_ids);
+    query.bindValue(":tag_ids", convert_vector_to_string(tag_ids));
     query.bindValue(":board_id", board_id);
     if (!query.exec()) {
         qDebug() << "filter_cards:" << query.lastError().text();
@@ -604,10 +609,16 @@ db_manager::filter_cards(quint32 board_id, const QString &tag_ids) {
 }
 
 QVector<quint32> db_manager::get_board_card_ids(quint32 board_id) {
-    auto lists_ids = get_board_list_ids(board_id);
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["get_board_card_ids"].arg(m_schema));
+    query.bindValue(":board_id", board_id);
+    if (!query.exec()) {
+        qDebug() << "get_board_card_ids" << query.lastError().text();
+        return {};
+    }
     QVector<quint32> result;
-    for (auto list_id : lists_ids) {
-        result.append(get_list_card_ids(list_id));
+    while (query.next()) {
+        result.push_back(query.value(0).toInt());
     }
     return result;
 }

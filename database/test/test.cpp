@@ -356,10 +356,7 @@ TEST_CASE("new feature") {
     db_manager.add_tag_to_card(card_id_6, tag_id_3);
 
     QVector<quint32> answer = {card_id_1, card_id_2};
-    QString array =
-        QString::fromStdString((std::stringstream{} << '{' << tag_id_1 << ", "
-                                                    << tag_id_2 << '}')
-                                   .str());
+    QVector<quint32> array = {tag_id_1, tag_id_2};
     CHECK(db_manager.filter_cards(board_id_1, array) == answer);
 }
 
