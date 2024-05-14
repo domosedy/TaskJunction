@@ -30,16 +30,6 @@ const QVector<QString> sequences_names{
 
 const QString QT_DATABASE_DRIVER = "QPSQL";
 
-template <class T>
-QString convert_vector_to_string(const QVector<T> &vector) {
-    std::stringstream ss;
-    ss << "{";
-    for (int i = 0; i < vector.size(); ++i) {
-        ss << vector[i] << (i + 1 < vector.size() ? ", " : "");
-    }
-    ss << "}";
-    return QString::fromStdString(ss.str());
-}
 
 class db_manager {
     QString m_database_name;
@@ -52,6 +42,8 @@ class db_manager {
     QString m_schema = "public";
 
     bool delete_command(const QString &table_name, quint32 key_value);
+
+    static QString convert_vector_to_string(const QVector<QString> &vector);
 
     static void fill_query_name_to_sql_command();
     static QMap<QString, QString> query_name_to_sql_command;
@@ -124,7 +116,7 @@ public:
     QVector<quint32> get_board_card_ids(quint32 board_id);
     QVector<quint32> get_list_card_ids(quint32 list_id);
 
-    QVector<quint32> filter_cards(quint32 board_id, const QVector<quint32> &tag_ids);
+    QVector<quint32> filter_cards(quint32 board_id, const QVector<QString> &tag_names);
 
     bool check_user_rights(quint32 user_id, quint32 board_id);
 

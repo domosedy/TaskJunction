@@ -28,8 +28,8 @@ number int DEFAULT 1
 );
 
 CREATE TABLE tag_signature(
-id serial PRIMARY KEY,
-name varchar(50)
+name varchar(50) PRIMARY KEY,
+id serial UNIQUE
 );
 
 CREATE TABLE card_to_tags(
