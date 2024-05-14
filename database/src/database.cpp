@@ -109,10 +109,10 @@ void db_manager::fill_query_name_to_sql_command() {
     query_name_to_sql_command["select_list_ids_by_board_id"] =
         "SELECT id FROM %1.list_signature WHERE board_id = :id;";
 
-    query_name_to_sql_command["select_card_ids_by_list_id"] =
+    query_name_to_sql_command["get_list_cards"] =
         "SELECT id FROM %1.card_signature WHERE list_id = :id;";
 
-    query_name_to_sql_command["select_tag_ids_by_card_id"] =
+    query_name_to_sql_command["get_card_tags"] =
         "SELECT tag_id FROM %1.card_to_tags WHERE tag_id = :id;";
 
     query_name_to_sql_command["check_user_rights"] =
@@ -488,6 +488,7 @@ QVector<board> db_manager::get_user_boards(quint32 user_id) {
     query.bindValue(":id", user_id);
     if (!query.exec()) {
         qDebug() << "get_user_boards:" << query.lastError().text();
+        return {};
     }
     QVector<board> result;
     while (query.next()) {
@@ -504,6 +505,7 @@ QVector<list> db_manager::get_board_lists(quint32 board_id) {
     query.bindValue(":id", board_id);
     if (!query.exec()) {
         qDebug() << "get_board_lists:" << query.lastError().text();
+        return {};
     }
     QVector<list> result;
     while (query.next()) {
@@ -515,11 +517,12 @@ QVector<list> db_manager::get_board_lists(quint32 board_id) {
 QVector<card> db_manager::get_list_cards(quint32 list_id) {
     QSqlQuery query(m_database);
     query.prepare(
-        query_name_to_sql_command["select_card_ids_by_list_id"].arg(m_schema)
+        query_name_to_sql_command["get_list_cards"].arg(m_schema)
     );
     query.bindValue(":id", list_id);
     if (!query.exec()) {
         qDebug() << "get_list_cards:" << query.lastError().text();
+        return {};
     }
     QVector<card> result;
     while (query.next()) {
@@ -531,11 +534,12 @@ QVector<card> db_manager::get_list_cards(quint32 list_id) {
 QVector<tag> db_manager::get_card_tags(quint32 card_id) {
     QSqlQuery query(m_database);
     query.prepare(
-        query_name_to_sql_command["select_tag_ids_by_card_id"].arg(m_schema)
+        query_name_to_sql_command["get_card_tags"].arg(m_schema)
     );
     query.bindValue(":id", card_id);
     if (!query.exec()) {
         qDebug() << "get_card_tags:" << query.lastError().text();
+        return {};
     }
     QVector<tag> result;
     while (query.next()) {
