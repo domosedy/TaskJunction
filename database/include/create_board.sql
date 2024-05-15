@@ -34,7 +34,7 @@ id serial UNIQUE
 
 CREATE TABLE card_to_tags(
 card_id int REFERENCES card_signature ON DELETE CASCADE,
-tag_id int REFERENCES tag_signature ON DELETE CASCADE,
+tag_id int REFERENCES tag_signature (id) ON DELETE CASCADE,
 PRIMARY KEY(card_id, tag_id)
 );
 
@@ -87,7 +87,7 @@ $$ LANGUAGE plpgSQL;
 
 CREATE OR REPLACE FUNCTION insert_tag(name_ text, OUT tag_id_ int) AS $$
 BEGIN
-    INSERT INTO tag_signature VALUES (DEFAULT, name_);
+    INSERT INTO tag_signature VALUES (name_, DEFAULT);
     tag_id_ = last_value FROM tag_signature_id_seq;
 END;
 $$ LANGUAGE plpgSQL;
