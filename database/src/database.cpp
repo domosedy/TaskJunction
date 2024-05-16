@@ -4,9 +4,10 @@
 #include <QtSql>
 #include <iostream>
 #include <string>
+#include <sstream>
 #include "element_classes.hpp"
 
-namespace database {
+// namespace database {
 
 db_manager::db_manager(
     QString database_name,
@@ -31,29 +32,22 @@ db_manager::db_manager(
 QMap<QString, QString> db_manager::query_name_to_sql_command;
 
 void db_manager::fill_query_name_to_sql_command() {
-    query_name_to_sql_command["insert_user_data"] =
-        "INSERT INTO %1.user_authorization_data VALUES (:login, :password);";
-
-    query_name_to_sql_command["insert_user_signature"] =
-        "INSERT INTO %1.user_signature VALUES (DEFAULT, :login);";
+    query_name_to_sql_command["authorize_user"] =
+        "SELECT %1.authorize_user(:login, :password);";
 
     query_name_to_sql_command["add_user_to_board"] =
         "INSERT INTO %1.user_to_board VALUES (:user_id, :board_id);";
 
     query_name_to_sql_command["insert_board"] =
-        "INSERT INTO %1.board_signature VALUES (DEFAULT, :user_id, :name, "
-        ":description, DEFAULT);";
+        "SELECT %1.insert_board(:user_id, :name, :description)";
 
     query_name_to_sql_command["insert_list"] =
-        "INSERT INTO %1.list_signature VALUES (DEFAULT, :board_id, :name, "
-        ":description, DEFAULT);";
+        "SELECT %1.insert_list(:board_id, :name, :description)";
 
     query_name_to_sql_command["insert_card"] =
-        "INSERT INTO %1.card_signature VALUES (DEFAULT, :list_id, :name, "
-        ":description, DEFAULT);";
+        "SELECT %1.insert_card(:list_id, :name, :description)";
 
-    query_name_to_sql_command["insert_tag"] =
-        "INSERT INTO %1.tag_signature VALUES (DEFAULT, :name);";
+    query_name_to_sql_command["insert_tag"] = "SELECT %1.insert_tag(:name);";
 
     query_name_to_sql_command["insert_into_card_to_tags"] =
         "INSERT INTO %1.card_to_tags VALUES (:card_id, :tag_id);";
@@ -62,17 +56,15 @@ void db_manager::fill_query_name_to_sql_command() {
         "UPDATE %1.%2 SET %3 = :new_value WHERE id = "
         ":key_value;";
 
-    query_name_to_sql_command["update_order"] =
-        "UPDATE %1.%2 SET number = number + (%3) WHERE number > :left AND "
-        "number < :right;";
+    query_name_to_sql_command["move_card"] =
+        "SELECT %1.move_card(:id, :new_list_id, :new_number);";
 
     query_name_to_sql_command["select_user"] =
-        "SELECT id, name FROM %1.user_signature WHERE id = :key_value;";
+        "SELECT id, login FROM %1.user_signature WHERE id = :key_value;";
 
     query_name_to_sql_command["select_board"] =
         "SELECT id, user_id, name, description FROM %1.board_signature WHERE "
-        "id"
-        " = :key_value;";
+        "id = :key_value;";
 
     query_name_to_sql_command["select_list"] =
         "SELECT id, board_id, name, description FROM %1.list_signature "
@@ -87,6 +79,8 @@ void db_manager::fill_query_name_to_sql_command() {
 
     query_name_to_sql_command["delete_command"] =
         "DELETE FROM %1.%2 WHERE id = :key_value;";
+
+    query_name_to_sql_command["delete_card"] = "SELECT %1.delete_card(:id);";
 
     query_name_to_sql_command["delete_from_card_to_tags"] =
         "DELETE FROM %1.card_to_tags WHERE card_id = :card_id AND tag_id = "
@@ -109,50 +103,48 @@ void db_manager::fill_query_name_to_sql_command() {
         "END$$;";
 
     query_name_to_sql_command["select_board_ids_by_user_id"] =
-        "SELECT board_id FROM %1.user_to_board WHERE user_id = :id;";
-        // TODO "ORDER BY %1.board_signature.number;";
-    
-    query_name_to_sql_command["select_user_ids_by_board_id"] = 
-        "SELECT user_id FROM %1.user_to_board WHERE board_id = :id;";
+        "SELECT board_id FROM %1.user_to_board WHERE user_id = :id ORDER BY board_id;";
 
     query_name_to_sql_command["select_list_ids_by_board_id"] =
-        "SELECT id FROM %1.list_signature WHERE board_id = :id;";
+        "SELECT id FROM %1.list_signature WHERE board_id = :id ORDER BY id;";
 
-    query_name_to_sql_command["select_card_ids_by_list_id"] =
-        "SELECT id FROM %1.card_signature WHERE list_id = :id;";
+    query_name_to_sql_command["get_list_cards"] =
+        "SELECT id FROM %1.card_signature WHERE list_id = :id ORDER BY number";
 
-    query_name_to_sql_command["select_tag_ids_by_card_id"] =
-        "SELECT tag_id FROM %1.card_to_tags WHERE tag_id = :id;";
-
-    query_name_to_sql_command["select_last_value"] =
-        "SELECT last_value FROM %1";
+    query_name_to_sql_command["get_card_tags"] =
+        "SELECT tag_id FROM %1.card_to_tags WHERE tag_id = :id ORDER BY tag_id;";
 
     query_name_to_sql_command["check_user_rights"] =
         "SELECT exists (SELECT * FROM %1.user_to_board WHERE user_id = "
         ":user_id AND board_id = :board_id);";
 
-    query_name_to_sql_command["check_user_existence"] =
-        "SELECT exists (SELECT * FROM %1.user_authorization_data WHERE login = "
-        ":login LIMIT 1);";
-
-    query_name_to_sql_command["check_user_password"] =
-        "SELECT exists (SELECT * FROM %1.user_authorization_data WHERE login = "
-        ":login AND password = :password LIMIT 1);";
-
     query_name_to_sql_command["get_user_id_by_name"] =
         "SELECT id FROM %1.user_signature WHERE name = :name;";
 
-    query_name_to_sql_command["get_number"] =
-        "SELECT number FROM %1.%2 WHERE id = :id;";
+    query_name_to_sql_command["get_card_number"] =
+        "SELECT number FROM %1.card_signature WHERE id = :id;";
 
     query_name_to_sql_command["alter_sequence"] =
         "SELECT setval('%1.%2', %3, FALSE);";
 
-    query_name_to_sql_command["get_rows_number"] =
-        "SELECT count(*) FROM %1.%2;";
+    query_name_to_sql_command["get_board_user_ids"] =
+        "SELECT user_id FROM %1.user_to_board WHERE board_id = :board_id ORDER BY user_id;";
 
-    query_name_to_sql_command["get_board_users_id"] =
-        "SELECT user_id FROM %1.user_to_board WHERE board_id = :board_id;";
+    query_name_to_sql_command["get_board_list_ids"] =
+        "SELECT id FROM %1.list_signature WHERE board_id = :board_id ORDER BY id;";
+
+    query_name_to_sql_command["get_board_card_ids"] =
+        "SELECT id FROM %1.card_signature WHERE list_id = "
+        "ANY (SELECT id FROM %1.list_signature WHERE board_id = :board_id) ORDER BY number;";
+
+    query_name_to_sql_command["get_list_card_ids"] =
+        "SELECT id FROM %1.card_signature WHERE list_id = :list_id ORDER BY number;";
+
+    query_name_to_sql_command["filter_cards"] =
+        "SELECT card_id FROM %1.card_to_tags WHERE tag_id = ANY (SELECT id FROM tag_signature "
+        "WHERE name = ANY (:tag_names)) INTERSECT SELECT id FROM %1.card_signature "
+        "WHERE list_id = ANY (SELECT id FROM %1.list_signature "
+        "WHERE board_id = :board_id);";
 }
 
 void db_manager::drop_all_tables() {
@@ -173,13 +165,13 @@ void db_manager::print_all_tables() {
     }
 }
 
-void db_manager::clear_all_tables() {  // TODO reset sequences
+void db_manager::clear_all_tables() {
     QStringList all_tables = m_database.tables();
     QString command = "DELETE FROM %1;";
     foreach (QString str, all_tables) {
         QSqlQuery query(m_database);
         if (!query.exec(command.arg(str))) {
-            qDebug() << "clear_all_tables" << query.lastError().text();
+            qDebug() << "clear_all_tables:" << query.lastError().text();
         }
     }
 
@@ -202,82 +194,26 @@ void db_manager::set_schema(const QString &name) {
     m_schema = name;
 }
 
-quint32 db_manager::get_sequence_last_value(const QString &sequence) {
-    QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["select_last_value"].arg(sequence));
-    if (!query.exec()) {
-        qDebug() << "get_sequence_last_value:" << query.lastError().text();
-        return 0;
-    }
-    query.next();
-    return query.value(0).toInt();
-}
-
-int db_manager::get_rows_number(const QString &table_name) {
-    QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["get_rows_number"].arg(m_schema, table_name));
-    if (!query.exec()) {
-        qDebug() << "get_rows_number" << query.lastError().text();
-        return -1;
-    }
-    query.next();
-    return query.value(0).toInt();
-}
-
-quint32 db_manager::get_user_id_by_name(const QString &name) {
-    QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["get_user_id_by_name"].arg(m_schema)
-    );
-    query.bindValue(":name", name);
-    if (!query.exec()) {
-        qDebug() << "get_user_id_by_name:" << query.lastError().text();
-        return 0;
-    }
-    query.next();
-    return query.value(0).toInt();
-}
-
-bool db_manager::check_user_password(
-    const QString &login,
-    const QString &password
-) {
-    QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["check_user_password"].arg(m_schema)
-    );
-    query.bindValue(":login", login);
-    query.bindValue(":password", password);
-    if (!query.exec()) {
-        qDebug() << "check_user_password:" << query.lastError().text();
-        return false;
-    }
-    query.next();
-    return query.value(0).toBool();
-}
-
 quint32
 db_manager::authorize_user(const QString &login, const QString &password) {
     QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["check_user_existence"].arg(m_schema
-    ));
+    query.prepare(query_name_to_sql_command["authorize_user"].arg(m_schema));
     query.bindValue(":login", login);
+    query.bindValue(":password", password);
     if (!query.exec()) {
         qDebug() << "authorize_user:" << query.lastError().text();
         return 0;
     }
     query.next();
-    if (query.value(0).toBool()) {
-        if (check_user_password(login, password)) {
-            return get_user_id_by_name(login);
-        }
-        return 0;
-    }
-    return insert_user(login, password);
+    auto id = query.value(0).toInt();
+    add_user_to_board(id, 1);
+
+    return id;
 }
 
 bool db_manager::check_user_rights(quint32 user_id, quint32 board_id) {
     QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["check_user_rights"].arg(m_schema)
-    );
+    query.prepare(query_name_to_sql_command["check_user_rights"].arg(m_schema));
     query.bindValue(":user_id", user_id);
     query.bindValue(":board_id", board_id);
     if (!query.exec()) {
@@ -286,32 +222,6 @@ bool db_manager::check_user_rights(quint32 user_id, quint32 board_id) {
     }
     query.next();
     return query.value(0).toBool();
-}
-
-quint32 db_manager::insert_user(const QString &login, const QString &password) {
-    QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["insert_user_data"].arg(m_schema));
-    query.bindValue(":login", login);
-    query.bindValue(":password", password);
-    if (!query.exec()) {
-        qDebug() << "insert_user:" << query.lastError().text();
-        return 0;
-    }
-    query.prepare(
-        query_name_to_sql_command["insert_user_signature"].arg(m_schema)
-    );
-    query.bindValue(":login", login);
-    if (!query.exec()) {
-        qDebug() << "insert_user:" << query.lastError().text();
-        return 0;
-    }
-
-    // FIXME: delete it after testing2
-    auto id = get_sequence_last_value(USER_ID_SEQUENCE);
-    add_user_to_board(id, 4);
-    qDebug() << "it is easy peasy";
-
-    return id;
 }
 
 bool db_manager::add_user_to_board(quint32 user_id, quint32 board_id) {
@@ -340,9 +250,8 @@ quint32 db_manager::insert_board(
         qDebug() << "insert_board:" << query.lastError().text();
         return 0;
     }
-    auto board_id = get_sequence_last_value(BOARD_ID_SEQUENCE);
-    add_user_to_board(user_id, board_id);
-    return board_id;
+    query.next();
+    return query.value(0).toInt();
 }
 
 quint32 db_manager::insert_list(
@@ -359,7 +268,8 @@ quint32 db_manager::insert_list(
         qDebug() << "insert_list" << query.lastError().text();
         return 0;
     }
-    return get_sequence_last_value(LIST_ID_SEQUENCE);
+    query.next();
+    return query.value(0).toInt();
 }
 
 quint32 db_manager::insert_card(
@@ -376,7 +286,8 @@ quint32 db_manager::insert_card(
         qDebug() << "insert_card" << query.lastError().text();
         return 0;
     }
-    return get_sequence_last_value(CARD_ID_SEQUENCE);
+    query.next();
+    return query.value(0).toInt();
 }
 
 quint32 db_manager::insert_tag(const QString &name) {
@@ -387,7 +298,8 @@ quint32 db_manager::insert_tag(const QString &name) {
         qDebug() << "insert_tag" << query.lastError().text();
         return 0;
     }
-    return get_sequence_last_value(TAG_ID_SEQUENCE);
+    query.next();
+    return query.value(0).toInt();
 }
 
 bool db_manager::add_tag_to_card(quint32 card_id, quint32 tag_id) {
@@ -410,6 +322,10 @@ bool db_manager::update_command(
     const QString &new_value,
     quint32 key_value
 ) {
+    if (updating_field_name == "number" ||
+        updating_field_name == "cards_number") {
+        return false;
+    }
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["update_command"].arg(
         m_schema, table_name, updating_field_name
@@ -423,6 +339,20 @@ bool db_manager::update_command(
     return true;
 }
 
+bool db_manager::move_card(int id, int new_list_id, int new_number) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["move_card"].arg(m_schema));
+    query.bindValue(":id", id);
+    query.bindValue(":new_list_id", new_list_id);
+    query.bindValue(":new_number", new_number + 1);
+    if (!query.exec()) {
+        qDebug() << "move_card:" << query.lastError().text();
+        return false;
+    }
+    query.next();
+    return query.value(0).toBool();
+}
+
 bool db_manager::delete_command(const QString &table_name, quint32 key_value) {
     QSqlQuery query(m_database);
     query.prepare(
@@ -434,6 +364,33 @@ bool db_manager::delete_command(const QString &table_name, quint32 key_value) {
         return false;
     }
     return true;
+}
+
+bool db_manager::delete_user(quint32 id) {
+    return delete_command(USER_TABLE_NAME, id);
+}
+
+bool db_manager::delete_board(quint32 id) {
+    return delete_command(BOARD_TABLE_NAME, id);
+}
+
+bool db_manager::delete_list(quint32 id) {
+    return delete_command(LIST_TABLE_NAME, id);
+}
+
+bool db_manager::delete_card(quint32 id) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["delete_card"].arg(m_schema));
+    query.bindValue(":id", id);
+    if (!query.exec()) {
+        qDebug() << "delete_card:" << query.lastError().text();
+        return false;
+    }
+    return true;
+}
+
+bool db_manager::delete_tag(quint32 id) {
+    return delete_command(TAG_TABLE_NAME, id);
 }
 
 bool db_manager::delete_user_from_board(quint32 user_id, quint32 board_id) {
@@ -515,7 +472,9 @@ card db_manager::select_card(quint32 id) {
     quint32 list_id = data[1].toInt();
     QString name = data[2].toString();
     QString description = data[3].toString();
-    return card(card_id, list_id, name, description);
+    card card(card_id, list_id, name, description);
+    card.m_tags = get_card_tags(id);
+    return card;
 }
 
 tag db_manager::select_tag(quint32 id) {
@@ -533,6 +492,7 @@ QVector<board> db_manager::get_user_boards(quint32 user_id) {
     query.bindValue(":id", user_id);
     if (!query.exec()) {
         qDebug() << "get_user_boards:" << query.lastError().text();
+        return {};
     }
     QVector<board> result;
     while (query.next()) {
@@ -540,24 +500,6 @@ QVector<board> db_manager::get_user_boards(quint32 user_id) {
     }
     return result;
 }
-
-QVector<quint32> db_manager::get_board_users(quint32 board_id) {
-    QSqlQuery query(m_database);
-    query.prepare(
-        query_name_to_sql_command["select_user_ids_by_board_id"].arg(m_schema)
-    );
-    query.bindValue(":id", board_id);
-    if (!query.exec()) {
-        qDebug() << "get_board_users:" << query.lastError().text();
-    }
-
-    QVector<quint32> result;
-    while (query.next()) {
-        result.push_back(query.value(0).toInt());
-    }
-    return result;
-}
-
 
 QVector<list> db_manager::get_board_lists(quint32 board_id) {
     QSqlQuery query(m_database);
@@ -567,6 +509,7 @@ QVector<list> db_manager::get_board_lists(quint32 board_id) {
     query.bindValue(":id", board_id);
     if (!query.exec()) {
         qDebug() << "get_board_lists:" << query.lastError().text();
+        return {};
     }
     QVector<list> result;
     while (query.next()) {
@@ -577,13 +520,13 @@ QVector<list> db_manager::get_board_lists(quint32 board_id) {
 
 QVector<card> db_manager::get_list_cards(quint32 list_id) {
     QSqlQuery query(m_database);
-
     query.prepare(
-        query_name_to_sql_command["select_card_ids_by_list_id"].arg(m_schema)
+        query_name_to_sql_command["get_list_cards"].arg(m_schema)
     );
     query.bindValue(":id", list_id);
     if (!query.exec()) {
         qDebug() << "get_list_cards:" << query.lastError().text();
+        return {};
     }
     QVector<card> result;
     while (query.next()) {
@@ -595,11 +538,12 @@ QVector<card> db_manager::get_list_cards(quint32 list_id) {
 QVector<tag> db_manager::get_card_tags(quint32 card_id) {
     QSqlQuery query(m_database);
     query.prepare(
-        query_name_to_sql_command["select_tag_ids_by_card_id"].arg(m_schema)
+        query_name_to_sql_command["get_card_tags"].arg(m_schema)
     );
     query.bindValue(":id", card_id);
     if (!query.exec()) {
         qDebug() << "get_card_tags:" << query.lastError().text();
+        return {};
     }
     QVector<tag> result;
     while (query.next()) {
@@ -608,12 +552,86 @@ QVector<tag> db_manager::get_card_tags(quint32 card_id) {
     return result;
 }
 
-QVector<quint32> db_manager::get_board_users_id(quint32 board_id) {
+QVector<quint32> db_manager::get_board_user_ids(quint32 board_id) {
     QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["get_board_users_id"].arg(m_schema));
+    query.prepare(query_name_to_sql_command["get_board_user_ids"].arg(m_schema)
+    );
     query.bindValue(":board_id", board_id);
     if (!query.exec()) {
-        qDebug() << "get_board_users_id" << query.lastError().text();
+        qDebug() << "get_board_user_ids" << query.lastError().text();
+        return {};
+    }
+    QVector<quint32> result;
+    while (query.next()) {
+        result.push_back(query.value(0).toInt());
+    }
+    return result;
+}
+
+QVector<quint32> db_manager::get_board_list_ids(quint32 board_id) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["get_board_list_ids"].arg(m_schema)
+    );
+    query.bindValue(":board_id", board_id);
+    if (!query.exec()) {
+        qDebug() << "get_board_list_ids" << query.lastError().text();
+        return {};
+    }
+    QVector<quint32> result;
+    while (query.next()) {
+        result.push_back(query.value(0).toInt());
+    }
+    return result;
+}
+
+QVector<quint32> db_manager::get_list_card_ids(quint32 list_id) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["get_list_card_ids"].arg(m_schema));
+    query.bindValue(":list_id", list_id);
+    if (!query.exec()) {
+        qDebug() << "get_list_card_ids" << query.lastError().text();
+        return {};
+    }
+    QVector<quint32> result;
+    while (query.next()) {
+        result.push_back(query.value(0).toInt());
+    }
+    return result;
+}
+
+QString db_manager::convert_vector_to_string(const QVector<QString> &vector) {
+    std::stringstream ss;
+    ss << "{";
+    for (int i = 0; i < vector.size(); ++i) {
+        ss << "\"" << vector[i].toStdString() << "\"" << (i + 1 < vector.size() ? ", " : "");
+    }
+    ss << "}";
+    return QString::fromStdString(ss.str());
+}
+
+QSet<quint32>
+db_manager::filter_cards(quint32 board_id, const QStringList &tag_names) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["filter_cards"].arg(m_schema));
+    query.bindValue(":tag_names", convert_vector_to_string(tag_names));
+    query.bindValue(":board_id", board_id);
+    if (!query.exec()) {
+        qDebug() << "filter_cards:" << query.lastError().text();
+        return {};
+    }
+    QSet<quint32> result;
+    while (query.next()) {
+        result.insert(query.value(0).toInt());
+    }
+    return result;
+}
+
+QVector<quint32> db_manager::get_board_card_ids(quint32 board_id) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["get_board_card_ids"].arg(m_schema));
+    query.bindValue(":board_id", board_id);
+    if (!query.exec()) {
+        qDebug() << "get_board_card_ids" << query.lastError().text();
         return {};
     }
     QVector<quint32> result;
@@ -632,53 +650,16 @@ board db_manager::get_full_board(quint32 board_id) {
     return board;
 }
 
-quint32 db_manager::get_number(const QString &table_name, quint32 id) {
+quint32 db_manager::get_card_number(quint32 id) {
     QSqlQuery query(m_database);
-    query.prepare(
-        query_name_to_sql_command["get_number"].arg(m_schema, table_name)
-    );
+    query.prepare(query_name_to_sql_command["get_card_number"].arg(m_schema));
     query.bindValue(":id", id);
     if (!query.exec()) {
-        qDebug() << "get_number:" << query.lastError().text();
+        qDebug() << "get_card_number:" << query.lastError().text();
         return 0;
     }
     query.next();
     return query.value(0).toInt();
 }
 
-bool db_manager::update_order(
-    const QString &table_name,
-    quint32 id,
-    quint32 new_number
-) {
-    if (new_number == 0 || new_number > get_rows_number(table_name)) {
-        return false;
-    }
-    quint32 number = get_number(table_name, id);
-    if (number == new_number) {
-        return true;
-    }
-    QSqlQuery query(m_database);
-    if (new_number < number) {
-        query.prepare(query_name_to_sql_command["update_order"].arg(
-            m_schema, table_name, "1"
-        ));
-        query.bindValue(":left", new_number - 1);
-        query.bindValue(":right", number);
-    } else {
-        query.prepare(query_name_to_sql_command["update_order"].arg(
-            m_schema, table_name, "-1"
-        ));
-        query.bindValue(":left", number);
-        query.bindValue(":right", new_number + 1);
-    }
-    if (!query.exec()) {
-        qDebug() << "update_order:" << query.lastError().text();
-        return false;
-    }
-    return update_command(
-        table_name, "number", QString::number(new_number), id
-    );
-}
-
-}  // namespace database
+// }  // namespace database

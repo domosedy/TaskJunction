@@ -3,11 +3,16 @@
 
 #include <string>
 #include <variant>
+#include "element_classes.hpp"
+// struct a {
+    // std::size_t board_id;
+    // std::size_t list_id;
+    // std::size_t card_id;
+    // std::size_t tag_id;
+// };
 
 struct update_query {
-    std::size_t board_id;
-    std::size_t list_id;
-    std::size_t card_id;
+    all_ids all_id;
     std::size_t value_id;
     std::string new_value;
     std::string value_name;
@@ -15,17 +20,13 @@ struct update_query {
 };
 
 struct delete_query {
-    std::size_t board_id;
-    std::size_t list_id;
-    std::size_t card_id;
+    all_ids all_id;
     std::size_t value_id;
     std::string value_type;
 };
 
 struct create_query {
-    std::size_t board_id;
-    std::size_t list_id;
-    std::size_t card_id;
+    all_ids all_id;
     std::size_t parent_id;
     std::string value_type;
     std::string value_name;
@@ -37,6 +38,13 @@ struct login_query {
     std::string user_name;
 };
 
+struct move_query {
+    all_ids all_id;
+    std::size_t old_list_id;
+    std::size_t new_list_id;
+    std::size_t new_index;
+};
+
 struct get_boards_info_query {
     std::size_t id;
 };
@@ -46,6 +54,7 @@ using query_type = std::variant<
     delete_query,
     create_query,
     login_query,
+    move_query,
     get_boards_info_query>;
 
 #endif

@@ -2,38 +2,34 @@
 #include <map>
 #include <sstream>
 
-group::group(quint32 group_id, QString name)
-    : m_group_id(group_id), m_name(std::move(name)) {
-}
-
 user::user(quint32 user_id, QString name)
     : m_user_id(user_id), m_name(std::move(name)) {
 }
 
 board::board(
     quint32 board_id,
-    quint32 group_id,
+    quint32 user_id,
     QString name,
     QString description
 )
     : m_board_id(board_id),
-      m_group_id(group_id),
+      m_user_id(user_id),
       m_name(std::move(name)),
-      m_description(description) {
+      m_description(std::move(description)) {
 }
 
 list::list(quint32 list_id, quint32 board_id, QString name, QString description)
     : m_list_id(list_id),
       m_board_id(board_id),
       m_name(std::move(name)),
-      m_description(description) {
+      m_description(std::move(description)) {
 }
 
 card::card(quint32 card_id, quint32 list_id, QString name, QString description)
     : m_card_id(card_id),
       m_list_id(list_id),
       m_name(std::move(name)),
-      m_description(description) {
+      m_description(std::move(description)) {
 }
 
 tag::tag(quint32 tag_id, QString name)
@@ -53,6 +49,14 @@ static std::string array_to_json(const QVector<T> &data) {
         ss << data.back().to_json();
     }
 
+    return ss.str();
+}
+
+std::string all_ids::to_json() const {
+    std::stringstream ss;
+    ss << R"("board-id": ")" << board_id << R"(","list_id":")" << list_id 
+        << R"(","card-id":")" << card_id << R"(","tag_id":")" << tag_id << "\"";
+    
     return ss.str();
 }
 
@@ -127,20 +131,25 @@ std::string login::to_json() const {
 std::string create_response::to_json() const {
     std::stringstream ss;
 
-    std::map<std::string, quint32> all_ids;
-    all_ids["board-id"] = board_id;
-    all_ids["list-id"] = list_id;
-    all_ids["card-id"] = card_id;
+    ss << "{\"type\": \"create\",";
+    ss << ids.to_json();
+    ss << ",\"object-json\": " << jsoned_object << "}";
 
-    all_ids[object_type.toStdString() + "-id"] = id;
+    return ss.str();
+}
 
-    ss << "{\"type\": \"create-response\",";
+std::string update_response::to_json() const {
+    std::stringstream ss;
+    ss << R"({"type":"update",)";
+    ss << ids.to_json() << ",";
 
-    for (const auto &it : all_ids) {
-        ss << "\"" << it.first << "\": " << it.second << ",";
-    }
+    ss << R"("new-value":")" << new_value.toStdString() << R"(","field":")" << field.toStdString() << R"("})";
+    return ss.str();
+}
 
-    ss << "\"object-json\": " << jsoned_object << "}";
-
+std::string delete_response::to_json() const {
+    std::stringstream ss;
+    ss << R"({"type":"delete",)";
+    ss << ids.to_json() << "}";
     return ss.str();
 }

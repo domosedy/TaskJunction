@@ -10,8 +10,6 @@
 #include "logging.hpp"
 #include "query.hpp"
 
-using namespace database;
-
 // enum class ExecutedCode { SUCCESS, BAD_RIGHTS, ERROR };
 
 struct ReturnedValue {
@@ -35,6 +33,7 @@ class Server : public QObject {
     ReturnedValue execute_create_query(const create_query &query, quint32 id);
     ReturnedValue execute_delete_query(const delete_query &query, quint32 id);
     ReturnedValue execute_get_query(const get_boards_info_query &query, quint32 id);
+    ReturnedValue execute_move_query(const move_query &query, quint32 id);
 
     std::pair<QString, quint32> execute_login_query(const login_query &query);
 

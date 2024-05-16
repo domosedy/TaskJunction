@@ -13,7 +13,8 @@ enum class RequestType {
     DELETE,
     UPDATE,
     LOGIN,
-    GET_BOARDS_INFO
+    GET_BOARDS_INFO,
+    MOVE
 };
 
 // How to emit when my connection is not authorized?
@@ -77,6 +78,8 @@ void Server::execute_query(uint user_id, const query_type &query) {
                 return RequestType::LOGIN;
             } else if constexpr (std::is_same_v<T, get_boards_info_query>) {
                 return RequestType::GET_BOARDS_INFO;
+            } else if constexpr (std::is_same_v<T, move_query>) {
+                return RequestType::MOVE;
             }
             return RequestType::ERROR;
         },
@@ -105,6 +108,8 @@ void Server::execute_query(uint user_id, const query_type &query) {
         executed_result = execute_get_query(std::get<get_boards_info_query>(query), client_id);
         clientSocket->sendData(executed_result.jsoned_object);
         return;
+    } else if (result_code == RequestType::MOVE) {
+        executed_result = execute_move_query(std::get<move_query>(query), client_id);
     } else {
         executed_result = {false, 1, error{"Bad request format"}.to_json().c_str()};
     }
@@ -114,8 +119,10 @@ void Server::execute_query(uint user_id, const query_type &query) {
         return;
     }
 
-    for (auto &user_id : db.get_board_users(executed_result.board_id)) {
+    rDebug() << "Finding users in this board_id:";
+    for (auto &user_id : db.get_board_user_ids(executed_result.board_id)) {
         auto it = authorized_connections.find(user_id);
+        rDebug() << user_id;
         if (it != authorized_connections.end()) {
             rDebug() << it.value()->get_client_id();
             it.value()->sendData(executed_result.jsoned_object);
@@ -124,7 +131,7 @@ void Server::execute_query(uint user_id, const query_type &query) {
 }
 
 ReturnedValue Server::execute_update_query(const update_query &query, quint32 id) {
-    if (!db.check_user_rights(id, query.board_id)) {
+    if (!db.check_user_rights(id, query.all_id.board_id)) {
         return ReturnedValue{false, 0, error{"You have no rights"}.to_json().c_str()};
     }
 
@@ -133,12 +140,14 @@ ReturnedValue Server::execute_update_query(const update_query &query, quint32 id
         query.new_value.c_str(), query.value_id
     );
 
-    return result ? ReturnedValue{true, query.board_id, error{"Ok"}.to_json().c_str()}
+    update_response response{query.all_id, query.new_value.c_str(), query.value_name.c_str()};
+
+    return result ? ReturnedValue{true, query.all_id.board_id, response.to_json().c_str()}
                   : ReturnedValue{false, 0, error{"An error occured"}.to_json().c_str()};
 }
 
 ReturnedValue Server::execute_delete_query(const delete_query &query, quint32 id) {
-    if (!db.check_user_rights(id, query.board_id)) {
+    if (!db.check_user_rights(id, query.all_id.board_id)) {
         return ReturnedValue{false, 0, error{"You have no rights"}.to_json().c_str()};
     }
 
@@ -146,7 +155,9 @@ ReturnedValue Server::execute_delete_query(const delete_query &query, quint32 id
         (query.value_type + "_signature").c_str(), query.value_id
     );
 
-    return result ? ReturnedValue{true, query.board_id, error{"Ok"}.to_json().c_str()}
+    delete_response response{query.all_id};
+
+    return result ? ReturnedValue{true, query.all_id.board_id, response.to_json().c_str()}
                   : ReturnedValue{false, 0, error{"An error occured"}.to_json().c_str()};
 }
 
@@ -162,7 +173,8 @@ Server::execute_create_query(const create_query &query, quint32 user_id) {
     rDebug() << query.value_type.c_str();
 
     std::string jsoned_object = "";
-    quint32 board_id = query.board_id;
+    quint32 board_id = query.all_id.board_id;
+    auto all_ids = query.all_id;
 
     if (query.value_type == "board") {
         rDebug() << "Hello from board";
@@ -175,10 +187,11 @@ Server::execute_create_query(const create_query &query, quint32 user_id) {
 
         board_id = result;
         if (result != 0) {
+            all_ids.board_id = result;
             jsoned_object = db.select_board(result).to_json();
         }
     } else if (query.value_type == "list") {
-        if (!db.check_user_rights(user_id, query.board_id)) {
+        if (!db.check_user_rights(user_id, query.all_id.board_id)) {
             return ReturnedValue{false, 0, error{"You don't have rights on this group"}.to_json().c_str()};
         }
         result = db.insert_list(
@@ -187,10 +200,11 @@ Server::execute_create_query(const create_query &query, quint32 user_id) {
         );
 
         if (result != 0) {
+            all_ids.list_id = result;
             jsoned_object = db.select_list(result).to_json();
         }
     } else if (query.value_type == "card") {
-        if (!db.check_user_rights(user_id, query.board_id)) {
+        if (!db.check_user_rights(user_id, query.all_id.board_id)) {
             return ReturnedValue{false, 0, error{"You don't have rights on this group"}.to_json().c_str()};
         }
 
@@ -200,16 +214,15 @@ Server::execute_create_query(const create_query &query, quint32 user_id) {
         );
 
         if (result != 0) {
+            all_ids.card_id = result;
             jsoned_object = db.select_card(result).to_json();
         }
     }
 
+    
+    create_response response{all_ids, result, query.value_type.c_str(), jsoned_object};
     return result > 0
-               ? ReturnedValue{true, board_id, create_response{result, query.value_type.c_str(),
-                                 query.board_id, query.list_id,
-                                 query.card_id,  jsoned_object}
-                     .to_json()
-                     .c_str()}
+               ? ReturnedValue{true, board_id, response.to_json().c_str()}
                : ReturnedValue{false, 0, error{"An error occured"}.to_json().c_str()};
 }
 
@@ -221,7 +234,6 @@ std::pair<QString, quint32> Server::execute_login_query(const login_query &query
 
     rDebug() << "user id is: " << id;
     if (response.m_response) {
-        // auto all_groups = db.(id);
         for (auto &board : db.get_user_boards(id)) {
             response.m_boards.push_back(board);
         }
@@ -232,22 +244,26 @@ std::pair<QString, quint32> Server::execute_login_query(const login_query &query
     return {response.to_json().c_str(), id};
 }
 
+ReturnedValue Server::execute_move_query(const move_query &query, quint32 id) {
+    if (!db.check_user_rights(id, query.all_id.board_id)) {
+        return ReturnedValue{false, 0, error{"You have no rights"}.to_json().c_str()};
+    }
+
+    auto result = db.move_card(query.all_id.card_id, query.new_list_id, query.new_index);
+    rDebug() << query.all_id.card_id << ' ' << query.new_list_id << ' ' << query.new_index;
+    return {result, query.all_id.board_id, error{"Ok"}.to_json().c_str()};
+}
+
+
 ReturnedValue Server::execute_get_query(const get_boards_info_query &query, quint32 id) {
     if (!db.check_user_rights(id, query.id)) {
+        rDebug() << id << " " << query.id;
         return ReturnedValue{false, 0, error{"You have no rights"}.to_json().c_str()};
     }
 
     rDebug() << "Get query";
-    board result = db.select_board(query.id);
+    board result = db.get_full_board(query.id);
     rDebug() << query.id;
-    result.m_lists = db.get_board_lists(query.id);
-    for (auto &list : result.m_lists) {
-        list.m_cards = db.get_list_cards(list.m_list_id);
-
-        for (auto &card : list.m_cards) {
-            card.m_tags = db.get_card_tags(card.m_card_id);
-        }
-    }
 
     return ReturnedValue{true, 0, result.to_json().c_str()};
 }

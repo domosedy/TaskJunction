@@ -11,12 +11,6 @@ void ClientSocket::sendData(const QString &data) {
 }
 
 void ClientSocket::readData(const QString &data) {
-    // QDataStream size_data = socket->read(2);
-    // quint16 size;
-
-    // size_data >> size;
-    // rDebug() << "readed size " << size;
-
     rDebug() << "Received from " << socket->peerAddress().toString() << " "
              << data;
 
