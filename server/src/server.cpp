@@ -151,9 +151,17 @@ ReturnedValue Server::execute_delete_query(const delete_query &query, quint32 id
         return ReturnedValue{false, 0, error{"You have no rights"}.to_json().c_str()};
     }
 
-    auto result = db.delete_command(
-        (query.value_type + "_signature").c_str(), query.value_id
-    );
+    bool result = false;
+
+    if (query.value_type == "board") {
+        result = db.delete_board(query.value_id);    
+    } else if (query.value_type == "list") {
+        result = db.delete_card(query.value_id);
+    } else if (query.value_type == "card") {
+        result = db.delete_board(query.value_id);
+    } else if (query.value_type == "tag") {
+        result = db.delete_tag_from_card(query.all_id.card_id, query.value_id);
+    }
 
     delete_response response{query.all_id};
 
@@ -217,6 +225,17 @@ Server::execute_create_query(const create_query &query, quint32 user_id) {
             all_ids.card_id = result;
             jsoned_object = db.select_card(result).to_json();
         }
+    } else if (query.value_type == "tag") {
+        if (!db.check_user_rights(user_id, query.all_id.board_id)) {
+            return ReturnedValue{false, 0, error{"You don't have rights on this group"}.to_json().c_str()};
+        }
+
+        result = db.insert_tag(query.value_name.c_str());
+        if (result != 0 && db.add_tag_to_card(query.all_id.card_id, result)) {
+            jsoned_object = db.select_tag(result).to_json().c_str();
+        } else {
+            result = 0;
+        }
     }
 
     
@@ -250,8 +269,11 @@ ReturnedValue Server::execute_move_query(const move_query &query, quint32 id) {
     }
 
     auto result = db.move_card(query.all_id.card_id, query.new_list_id, query.new_index);
-    rDebug() << query.all_id.card_id << ' ' << query.new_list_id << ' ' << query.new_index;
-    return {result, query.all_id.board_id, error{"Ok"}.to_json().c_str()};
+    move_response response{query.all_id, query.old_list_id, query.new_list_id, query.new_index};
+    rDebug() << query.all_id.card_id << ' ' << query.new_list_id << ' ' << query.new_index << ' ' << result;
+    return result 
+                ? ReturnedValue{true, query.all_id.board_id, response.to_json().c_str()}
+                : ReturnedValue{false, query.all_id.board_id, error{"Error in moving"}.to_json().c_str()} ;
 }
 
 
