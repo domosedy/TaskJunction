@@ -15,13 +15,14 @@
 ```
 {
     "type": "create",
-    "parent-id": uint32,
     "board-id": uint32,
     "list-id": uint32,
     "card-id": uint32,
+    "tag-id": uint32,
+    "parent-id": uint32,
     "name": string,
     "description": string,
-    "object-type": json
+    "object-type": string
 }
 ```
 
@@ -38,9 +39,12 @@
 ```
 {
     "type": "delete",
-    "board-id": 
-    "list-id":
-    "card-id":  
+    "board-id": uint32,
+    "list-id": uint32,
+    "card-id": uint32,
+    "tag-id": uint32,
+    "id": uint32,
+    "object-type": string
 }
 ```
 
@@ -48,9 +52,12 @@
 ```
 {
     "type": "update",
-    "board-id": 
-    "list-id":
-    "card-id":   
+    "board-id": uint32,
+    "list-id": uint32,
+    "card-id": uint32,
+    "tag-id": uint32,   
+    "id": uint32,
+    "object-type": string,
     "new-value": string,
     "field": string,
 }
@@ -60,9 +67,11 @@
 ```
 {
     "type": "move",
-    "board-id": uint32
+    "board-id": uint32,
+    "list-id": uint32,
+    "card-id": uint32,
+    "tag-id": uint32,
     "old-list-id": uint32,
-    "card_id": uint32,
     "new_list-id": uint32
     "new_index": int
 }

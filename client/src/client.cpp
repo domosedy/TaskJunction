@@ -396,6 +396,7 @@ void Client::set_filter(QString filter) {
     if (filter == "") {
         m_filtered_cards.clear();
         m_filter.clear();
+        return;
     }
     m_filter = filter.split(", ");  // todo make better?
     m_filtered_cards = db.filter_cards(m_current_board->m_board_id, m_filter);
