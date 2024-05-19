@@ -10,8 +10,6 @@
 #include "logging.hpp"
 #include "query.hpp"
 
-// enum class ExecutedCode { SUCCESS, BAD_RIGHTS, ERROR };
-
 struct ReturnedValue {
     bool exit_code;
     quint32 board_id;
