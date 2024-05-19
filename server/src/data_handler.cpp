@@ -9,7 +9,7 @@
 
 using json = nlohmann::json;
 
-static std::optional<std::size_t>
+static std::optional<quint32>
 get_int_field_data(const json &data, const std::string &field) {
     auto field_it = data.find(field);
     if (field_it == data.end()) {
@@ -20,7 +20,7 @@ get_int_field_data(const json &data, const std::string &field) {
         return std::nullopt;
     }
 
-    return *field_it;
+    return static_cast<quint32>(*field_it);
 }
 
 static std::optional<all_ids>

@@ -82,6 +82,7 @@ struct board {
     QString m_name;
     QString m_description;
     QVector<list> m_lists;
+    bool m_is_remote = false;
 
     board() = default;
     explicit board(
