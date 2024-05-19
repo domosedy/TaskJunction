@@ -205,10 +205,7 @@ db_manager::authorize_user(const QString &login, const QString &password) {
         return 0;
     }
     query.next();
-    auto id = query.value(0).toInt();
-    add_user_to_board(id, 1);
-
-    return id;
+    return query.value(0).toInt();
 }
 
 bool db_manager::check_user_rights(quint32 user_id, quint32 board_id) {

@@ -42,7 +42,7 @@ static std::string array_to_json(const QVector<T> &data) {
     std::stringstream ss;
 
     for (qsizetype i = 0; i + 1 < data.size(); ++i) {
-        ss << data[i].to_json() << ", ";
+        ss << data[i].to_json() << ",";
     }
 
     if (!data.empty()) {
@@ -54,58 +54,58 @@ static std::string array_to_json(const QVector<T> &data) {
 
 std::string all_ids::to_json() const {
     std::stringstream ss;
-    ss << R"("board-id": ")" << board_id << R"(","list_id":")" << list_id 
-        << R"(","card-id":")" << card_id << R"(","tag_id":")" << tag_id << "\"";
+    ss << R"("board-id":)" << board_id << R"(,"list_id":)" << list_id 
+        << R"(,"card-id":)" << card_id << R"(","tag_id":)" << tag_id;
     
     return ss.str();
 }
 
 std::string tag::to_json() const {
     std::stringstream ss;
-    ss << "{ \"type\": \"tag\", \"id\": " << m_tag_id << ", \"name\": \""
-       << m_name.toStdString() << "\" }";
+    ss << "{ \"type\":\"tag\",\"id\":" << m_tag_id << ",\"name\":\""
+       << m_name.toStdString() << "\"}";
     return ss.str();
 }
 
 std::string card::to_json() const {
     std::stringstream ss;
-    ss << "{ \"type\": \"card\", \"tags\": [";
+    ss << "{\"type\":\"card\",\"tags\":[";
     ss << array_to_json(m_tags);
 
-    ss << "], \"id\": " << m_card_id << ", \"name\": \"" << m_name.toStdString()
+    ss << "],\"id\":" << m_card_id << ",\"name\":\"" << m_name.toStdString()
        << "\""
-       << ", \"description\": \"" << m_description.toStdString() << "\"}";
+       << ",\"description\":\"" << m_description.toStdString() << "\"}";
 
     return ss.str();
 }
 
 std::string list::to_json() const {
     std::stringstream ss;
-    ss << "{ \"type\": \"list\", \"cards\": [";
+    ss << "{\"type\":\"list\",\"cards\":[";
     ss << array_to_json(m_cards);
 
-    ss << "], \"id\": " << m_list_id << ", \"name\": \"" << m_name.toStdString()
+    ss << "],\"id\":" << m_list_id << ",\"name\":\"" << m_name.toStdString()
        << "\""
-       << ", \"description\": \"" << m_description.toStdString() << "\"}";
+       << ",\"description\":\"" << m_description.toStdString() << "\"}";
 
     return ss.str();
 }
 
 std::string board::to_json() const {
     std::stringstream ss;
-    ss << "{ \"type\": \"board\", \"lists\": [";
+    ss << "{\"type\":\"board\",\"lists\":[";
     ss << array_to_json(m_lists);
 
-    ss << "], \"id\": " << m_board_id << ", \"name\": \""
+    ss << "],\"id\":" << m_board_id << ",\"name\":\""
        << m_name.toStdString() << "\""
-       << ", \"description\": \"" << m_description.toStdString() << "\"}";
+       << ",\"description\":\"" << m_description.toStdString() << "\"}";
 
     return ss.str();
 }
 
 std::string error::to_json() const {
     std::stringstream ss;
-    ss << "{ \"type\": \"error\", \"msg\": \"" << error_message << "\" }";
+    ss << "{\"type\":\"error\",\"msg\":\"" << error_message << "\"}";
 
     return ss.str();
 }
@@ -113,14 +113,14 @@ std::string error::to_json() const {
 std::string login::to_json() const {
     std::stringstream ss;
 
-    ss << "{\"type\": \"authorization\", \"response\": \"";
+    ss << "{\"type\":\"authorization\",\"response\":\"";
     if (m_response) {
         ss << "ok";
     } else {
         ss << "wrong";
     }
 
-    ss << "\", \"boards\": [";
+    ss << "\",\"boards\":[";
 
     ss << array_to_json(m_boards);
 
@@ -131,9 +131,9 @@ std::string login::to_json() const {
 std::string create_response::to_json() const {
     std::stringstream ss;
 
-    ss << "{\"type\": \"create\",";
+    ss << "{\"type\":\"create\",";
     ss << ids.to_json();
-    ss << ",\"object-json\": " << jsoned_object << "}";
+    ss << ",\"object-json\":" << jsoned_object << "}";
 
     return ss.str();
 }
