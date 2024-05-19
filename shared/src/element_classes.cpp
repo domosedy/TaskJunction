@@ -153,3 +153,11 @@ std::string delete_response::to_json() const {
     ss << ids.to_json() << "}";
     return ss.str();
 }
+
+std::string move_response::to_json() const {
+    std::stringstream ss;
+    ss << R"({"type":"move",)";
+    ss << ids.to_json() << R"(,"old-list-id":)" << old_list_id << 
+    R"(,"new-list-id":)" << new_list_id << R"(,"new-index":)" << new_index << "}";
+    return ss.str();
+}

@@ -142,4 +142,13 @@ struct delete_response {
     std::string to_json() const;
 };
 
+struct move_response {
+    all_ids ids;
+    quint32 old_list_id;
+    quint32 new_list_id;
+    quint32 new_index;
+
+    std::string to_json() const;  
+};
+
 #endif  // ELEMENT_CLASSES_HPP_
