@@ -139,7 +139,7 @@ Rectangle {
         height: 160
         x: root.width / 2
         y: root.height / 2
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         focus: true
 
         background: Rectangle {

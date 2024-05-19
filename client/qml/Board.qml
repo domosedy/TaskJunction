@@ -86,9 +86,7 @@ Rectangle {
                 anchors.fill: parent
                 drag.target: parent
             }
-
         }
-
     }
 
     Rectangle {
@@ -190,8 +188,8 @@ Rectangle {
             height: 36
             onClicked: {
                 mainClient.set_filter(filterHolder.text);
-                for (var i = 0; i < listview.model.count; ++i) {
-                    listview.itemAtIndex(i).update_filter();
+                for (let i = 0; i < listview.model.count; ++i) {
+                    listview.itemAtIndex(i).update_filter(filterHolder.text);
                 }
             }
             anchors.right: newListBtn.left

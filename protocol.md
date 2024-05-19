@@ -186,9 +186,9 @@
     "type": "move",
     "board-id": uint32
     "old-list-id": uint32,
-    "card_id": uint32,
-    "new_list-id": uint32
-    "new_index": int
+    "card-id": uint32,
+    "new-list-id": uint32
+    "new-index": int
 }
 
 ```

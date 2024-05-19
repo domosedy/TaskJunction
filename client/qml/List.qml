@@ -19,7 +19,12 @@ Rectangle {
         mainClient.update_card(index, card_index, "description", new_description);
     }
 
-    function update_filter() {
+    function update_filter(filter: string) { 
+        if (filter != "") {
+            listVisualModel.filterOnGroup = "filtered";
+        } else {
+            listVisualModel.filterOnGroup = "all";
+        }
         listVisualModel.update();
     }
 
@@ -34,7 +39,7 @@ Rectangle {
         width: 210
         height: 160
         z: 4
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         focus: true
         onOpened: {
             x:
@@ -263,9 +268,12 @@ Rectangle {
 
                     anchors.fill: parent
                     onDropped: function(drag) {
-                        var from = drag.source.modelIndex;
+                        let from = drag.source.modelIndex;
                         drag.source.dragParent.clip = true;
                         mainClient.move(from, -1, drag.source.listIndex_, listIndex);
+                        if (listIndex == drag.source.listIndex_) {
+                            listVisualModel.groups[2].move(from, listmodel.count-1);
+                        }
                     }
                 }
 
@@ -281,14 +289,15 @@ Rectangle {
                     allItems.setGroups(0, allItems.count, ["all"]);
                     for (let index = 0; index < allItems.count; index++) {
                         if (mainClient.is_filtered(listIndex, index))
-                            allItems.setGroups(index, 1, ["all", "visible"]);
-
+                            allItems.setGroups(index, 1, ["all", "filtered"]);
                     }
                 }
 
                 model: listmodel
-                Component.onCompleted: Qt.callLater(update)
-                filterOnGroup: "visible"
+                Component.onCompleted: {
+                    Qt.callLater(update)
+                }
+                filterOnGroup: "all"
                 groups: [
                     DelegateModelGroup {
                         id: allItems
@@ -300,7 +309,7 @@ Rectangle {
                     DelegateModelGroup {
                         id: visibleItems
 
-                        name: "visible"
+                        name: "filtered"
                     }
                 ]
 
@@ -309,23 +318,25 @@ Rectangle {
 
                     property string name_: name
                     property string description_: description
-                    property int visualIndex: DelegateModel.itemsIndex
                     property int parentListIndex: listIndex
+                    property int visualIndex: DelegateModel.itemsIndex
                     property int modelIndex: cardIndex
 
                     width: style.cardWidth
                     height: style.cardHeight
                     anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
                     onEntered: function(drag) {
-                        var from = drag.source.visualIndex;
-                        var to = cardRoot.visualIndex;
-                        if (drag.source.listIndex_ == cardRoot.listIndex_)
-                            listVisualModel.items.move(from, to);
+                        let from = drag.source.visualIndex;
+                        let to = cardRoot.visualIndex;
 
+                        if (drag.source.listIndex_ == cardRoot.listIndex_) {
+                            console.log("moving", from, to)
+                            listVisualModel.groups[2].move(from, to);
+                        }
                     }
                     onDropped: function(drag) {
-                        var from = drag.source.modelIndex;
-                        var to = (drag.source.listIndex_ != cardRoot.listIndex_) ? visualIndex : drag.source.visualIndex;
+                        let from = drag.source.modelIndex;
+                        let to = (drag.source.listIndex_ != cardRoot.listIndex_) ? visualIndex : drag.source.visualIndex;
                         drag.source.dragParent.clip = true;
                         mainClient.move(from, to, drag.source.listIndex_, cardRoot.listIndex_);
                     }
@@ -343,10 +354,13 @@ Rectangle {
                         onPressed: {
                             thisList.clip = false;
                         }
+
+                        Component.onCompleted: {
+                            console.log(visualIndex)
+                        }
                     }
 
                 }
-
             }
 
             displaced: Transition {
