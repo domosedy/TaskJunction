@@ -26,6 +26,7 @@ BoardModel::BoardModel(const board &board_base, QObject *parent)
     m_board_id = board_base.m_board_id;
     m_name = board_base.m_name;
     m_description = board_base.m_description;
+    m_is_remote = board_base.m_is_remote;
     int index = 0;
     for (const auto &list : board_base.m_lists) {
         m_lists.push_back(new ListModel(this, list));

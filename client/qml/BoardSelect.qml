@@ -173,7 +173,7 @@ Rectangle {
                 anchors.topMargin: 10
                 anchors.bottomMargin: 10
                 Component.onCompleted: {
-                    if (mainClient.connection_status != Client.Authorized)
+                    if (mainClient.connection_status == Client.Authorized)
                         model.append({
                         "text": "Remote"
                     });

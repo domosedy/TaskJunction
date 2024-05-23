@@ -23,7 +23,8 @@ public:
         QString &name,
         QString &description,
         quint32 id,
-        quint32 user_id
+        quint32 user_id,
+        bool is_remote = false
     );
     void create_board(const board &board);
     std::pair<quint32, bool> get_info(int board_index) const;
