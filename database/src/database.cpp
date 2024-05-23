@@ -87,8 +87,8 @@ void db_manager::fill_query_name_to_sql_command() {
         ":tag_id;";
 
     query_name_to_sql_command["delete_user_from_board"] =
-        "DELETE FROM %1.user_to_board WHERE user_id = :user_id AND "
-        "board_id = :board_id;";
+        "WITH deleted AS (DELETE FROM %1.user_to_board WHERE user_id = :user_id AND "
+        "board_id = :board_id IS TRUE RETURNING *) SELECT count(*) FROM deleted;";
 
     query_name_to_sql_command["create_schema"] =
         "CREATE SCHEMA %1;"
@@ -403,7 +403,8 @@ bool db_manager::delete_user_from_board(quint32 user_id, quint32 board_id) {
         qDebug() << "delete_user_from_board" << query.lastError().text();
         return false;
     }
-    return true;
+    query.next();
+    return query.value(0).toInt() == 1;
 }
 
 bool db_manager::delete_tag_from_card(quint32 card_id, quint32 tag_id) {
