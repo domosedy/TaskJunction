@@ -10,12 +10,14 @@ board::board(
     quint32 board_id,
     quint32 user_id,
     QString name,
-    QString description
+    QString description,
+    QString link
 )
     : m_board_id(board_id),
       m_user_id(user_id),
       m_name(std::move(name)),
-      m_description(std::move(description)) {
+      m_description(std::move(description)),
+      m_link(std::move(link)) {
 }
 
 list::list(quint32 list_id, quint32 board_id, QString name, QString description)

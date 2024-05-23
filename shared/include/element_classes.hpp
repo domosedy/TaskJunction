@@ -72,6 +72,7 @@ struct board {
     quint32 m_user_id;
     QString m_name;
     QString m_description;
+    QString m_link;
     QVector<list> m_lists;
 
     board() = default;
@@ -79,7 +80,8 @@ struct board {
         quint32 board_id,
         quint32 user_id,
         QString name,
-        QString description
+        QString description,
+        QString m_link
     );
     board(QString name, QString description, quint32 id = 0);
     std::string to_json() const;
