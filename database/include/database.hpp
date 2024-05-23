@@ -31,13 +31,13 @@ const QVector<QString> sequences_names{
 
 const QString QT_DATABASE_DRIVER = "QPSQL";
 
-
 class db_manager {
     QString m_database_name;
     QString m_user_name;
     QString m_host_name;
     QString m_password;
     QSqlDatabase m_database = QSqlDatabase::addDatabase(QT_DATABASE_DRIVER);
+
     static QVector<QVariant> get_data(const QSqlRecord &record);
     QSqlRecord select_info_by_id(const QString &query_name, quint32 key_value);
     QString m_schema = "public";
@@ -56,6 +56,11 @@ public:
         QString host_name,
         QString password
     );
+    ~db_manager() = default;
+    db_manager(const db_manager &) = delete;
+    db_manager(db_manager &&) = delete;
+    db_manager &operator=(const db_manager &) = delete;
+    db_manager &operator=(db_manager &&) = delete;
 
     void print_all_tables();
     void clear_all_tables();
@@ -69,7 +74,8 @@ public:
     quint32 insert_board(
         quint32 user_id,
         const QString &name,
-        const QString &description
+        const QString &description,
+        const QString &link
     );
     quint32 insert_list(
         quint32 board_id,
