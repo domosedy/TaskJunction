@@ -14,7 +14,10 @@ class BoardModel : public QAbstractListModel, public board {
     Q_PROPERTY(int count READ get_count NOTIFY countChanged)
 public:
     explicit BoardModel(QObject *parent = nullptr);
-    BoardModel(const nlohmann::json &board_json, QObject *parent = nullptr);
+    BoardModel(
+        const nlohmann::json &board_json,
+        QObject *parent = nullptr
+    );  // TODO WHERE IT NEEDED?
     BoardModel(const board &board_base, QObject *parent = nullptr);
     QHash<int, QByteArray> roleNames() const override;
     int rowCount(const QModelIndex &parent = {}) const override;
@@ -52,11 +55,11 @@ public:
 
 signals:
     void countChanged();
-    void moveRequest(int, int, int, int);
+    // void moveRequest(int, int, int, int);
 
 private:
-    QVector<ListModel *> m_lists;
-    QMap<quint32, int> m_index_by_id;
+    QVector<quint32> m_ids;
+    std::unordered_map<quint32, std::unique_ptr<ListModel>> m_lists;
 
     enum ListRoles {
         NameRole = Qt::UserRole + 1,

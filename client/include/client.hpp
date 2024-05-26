@@ -86,7 +86,6 @@ private:
     quint32 m_user_id;
     quint32 m_local_id = 1;
     ConnectionStatus m_connection_status = ConnectionStatus::Unauthorized;
-    int m_current_index = -1;
     QSet<quint32> m_filtered_cards;
     QStringList m_filter;
 

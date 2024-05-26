@@ -8,6 +8,7 @@ Rectangle {
     id: root
 
     required property Item dragParent
+    required property Item dragList
     property int visualIndex: -1
     property int modelIndex: -1
     property int listIndex_: -1
@@ -24,6 +25,8 @@ Rectangle {
     Drag.hotSpot.x: root.width / 2
     Drag.hotSpot.y: root.height / 2
     radius: style.defaultRadius
+    border.width: style.defaultBorderSize + 1
+    border.color: style.listBackgroundColor
     states: [
         State {
             when: mouseArea.drag.active
@@ -136,8 +139,8 @@ Rectangle {
         id: createTagPopUp
 
         width: 210
-        height: 160
-        x: root.width / 2
+        height: 120
+        x: root.width / 2 - 50
         y: root.height / 2
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         focus: true
@@ -149,9 +152,10 @@ Rectangle {
         contentItem: Rectangle {
             id: tagContent
 
-            border.color: style.listBackgroundColor
+            border.color: style.cardBackgroundColor
             border.width: style.defaultBorderSize
             color: style.listBackgroundColor
+            radius: style.defaultRadius
             Drag.active: true
 
             TextField {
@@ -223,7 +227,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.bottomMargin: 15
         anchors.leftMargin: 10
-        color: style.cardBackgroundColor
+        color: style.primaryColor
 
         ListView {
             id: tagList

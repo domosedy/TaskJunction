@@ -14,8 +14,8 @@ Rectangle {
 
         width: 210
         height: 120
-        x: root.width / 2
-        y: root.height / 2
+        x: root.width - 260
+        y: style.headerHeight
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
         focus: true
 
@@ -26,9 +26,10 @@ Rectangle {
         contentItem: Rectangle {
             id: content
 
-            border.color: style.listBackgroundColor
+            border.color: style.primaryColor
             border.width: style.defaultBorderSize
             color: style.listBackgroundColor
+            radius: style.defaultRadius
             Drag.active: true
 
             TextField {
@@ -86,7 +87,9 @@ Rectangle {
                 anchors.fill: parent
                 drag.target: parent
             }
+
         }
+
     }
 
     Rectangle {
@@ -124,7 +127,7 @@ Rectangle {
         }
 
         Text {
-            text: mainClient.current_board_name
+            text: mainClient ? mainClient.current_board_name : ""
             font.family: "Poppins"
             font.pointSize: 20
             color: "white"
@@ -143,7 +146,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
 
             Text {
-                text: "+ New list"
+                text: "New list"
                 font.family: "Poppins"
                 font.pointSize: 16
                 color: "white"
@@ -222,12 +225,19 @@ Rectangle {
         anchors.top: boardMenuBar.bottom
         anchors.topMargin: 30
 
+        Item {
+            id: cardDragContainer
+
+            anchors.fill: parent
+            z: 3
+        }
+
         ListView {
             id: listview
 
             anchors.fill: parent
             anchors.leftMargin: 10
-            model: mainClient.current_board
+            model: mainClient ? mainClient.current_board : undefined
             orientation: ListView.Horizontal
             spacing: 30
 

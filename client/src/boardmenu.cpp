@@ -42,7 +42,6 @@ void BoardMenu::create_board(
     quint32 user_id,
     bool is_remote
 ) {
-    m_board_id_to_index[id] = m_boards.size();    
     beginInsertRows(QModelIndex(), m_boards.size(), m_boards.size());
     m_boards.append(board(id, user_id, name, description, is_remote));
     endInsertRows();
@@ -51,7 +50,6 @@ void BoardMenu::create_board(
 }
 
 void BoardMenu::create_board(const board &board) {
-    m_board_id_to_index[board.m_board_id] = m_boards.size();
     beginInsertRows(QModelIndex(), m_boards.size(), m_boards.size());
     m_boards.append(board);
     endInsertRows();
@@ -69,11 +67,12 @@ int BoardMenu::get_count() {
     return m_boards.count();
 }
 
-BoardModel *BoardMenu::load(int index, const board &loaded_board) {
+BoardModel *BoardMenu::load(const board &loaded_board) {
     quint32 id = loaded_board.m_board_id;
-
-    m_board_id_to_index[id] = index;
-    m_loaded_boards[id] = std::make_unique<BoardModel>(loaded_board);
+    if (m_loaded_boards.find(id) != m_loaded_boards.end()) {
+        m_loaded_boards.erase(id);
+    }
+    m_loaded_boards[id] = std::make_unique<BoardModel>(loaded_board, this);
     return m_loaded_boards[id].get();
 }
 
@@ -83,7 +82,6 @@ std::pair<quint32, bool> BoardMenu::delete_board(int board_index) {
     m_boards.remove(board_index);
     endRemoveRows();
 
-    m_board_id_to_index.remove(info.first);
     m_loaded_boards.erase(info.first);
 
     emit countChanged();
@@ -93,23 +91,20 @@ std::pair<quint32, bool> BoardMenu::delete_board(int board_index) {
 
 void BoardMenu::unload_remote_boards() {
     int index = 0;
-    qDebug() << "Unloading: " << m_boards.size();
     for (auto it = m_boards.begin(); it != m_boards.end();) {
-        qDebug() << it->m_board_id << ' ' << it->m_is_remote << ' ' << it->m_name;
+        qDebug() << it->m_board_id << ' ' << it->m_is_remote << ' '
+                 << it->m_name;
         if (it->m_is_remote) {
             quint32 id = it->m_board_id;
-            m_board_id_to_index.remove(id);
             m_loaded_boards.erase(id);
             beginRemoveRows(QModelIndex(), index, index);
             it = m_boards.erase(it);
             endRemoveRows();
         } else {
-            m_board_id_to_index[it->m_board_id] = index;
             it++;
             index++;
         }
     }
-    qDebug() << "END: " << m_boards.size();
     emit countChanged();
 }
 

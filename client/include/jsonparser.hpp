@@ -24,7 +24,14 @@ std::string create_request(
 
 std::string board_request(quint32 board_id);
 
-std::string delete_request(quint32 id, const QString &object_type, quint32 board_id, quint32 list_id = 0, quint32 card_id = 0, quint32 tag_id = 0);
+std::string delete_request(
+    quint32 id,
+    const QString &object_type,
+    quint32 board_id,
+    quint32 list_id = 0,
+    quint32 card_id = 0,
+    quint32 tag_id = 0
+);
 
 std::string update_request(
     const QString &object_type,
@@ -38,7 +45,13 @@ std::string update_request(
 
 std::string connect_to_board_request(quint32 group_id, quint32 user_id);
 
-std::string move_request(quint32 to_list_id, int new_pos, quint32 board_id, quint32 list_id, quint32 card_id);
+std::string move_request(
+    quint32 to_list_id,
+    int new_pos,
+    quint32 board_id,
+    quint32 list_id,
+    quint32 card_id
+);
 
 tag parse_tag(const json &object);
 

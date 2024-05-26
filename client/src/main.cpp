@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QQmlContext>
 #include <QtQml/QQmlApplicationEngine>
+#include <memory>
 #include "boardmenu.hpp"
 #include "boardmodel.hpp"
 #include "client.hpp"
@@ -25,8 +26,9 @@ int main(int argc, char *argv[]) {
     qmlRegisterType<BoardMenu>("Client", 1, 0, "ClientBoardMenu");
     qmlRegisterType<Client>("Client", 1, 0, "Client");
 
-    Client *client = new Client();
-    engine.rootContext()->setContextProperty("mainClient", client);
+    std::unique_ptr<Client> client = std::make_unique<Client>();
+    engine.rootContext()->setContextProperty("mainClient", client.get());
     engine.load(url);
+
     return app.exec();
 }

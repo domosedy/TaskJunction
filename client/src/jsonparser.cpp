@@ -44,14 +44,21 @@ std::string board_request(quint32 board_id) {
     return request.dump();
 }
 
-std::string delete_request(quint32 id, const QString &object_type, quint32 board_id, quint32 list_id, quint32 card_id, quint32 tag_id) {
+std::string delete_request(
+    quint32 id,
+    const QString &object_type,
+    quint32 board_id,
+    quint32 list_id,
+    quint32 card_id,
+    quint32 tag_id
+) {
     json request = {
         {"type", "delete"},
         {"id", id},
         {"board-id", board_id},
         {"list-id", list_id},
         {"card-id", card_id},
-        {"tag-id", tag_id},        
+        {"tag-id", tag_id},
         {"object-type", object_type.toStdString().c_str()}
     };
     return request.dump();
@@ -72,7 +79,7 @@ std::string update_request(
         {"board-id", board_id},
         {"list-id", list_id},
         {"card-id", card_id},
-        {"tag-id", 0},        
+        {"tag-id", 0},
         {"new-value", value.toStdString().c_str()},
         {"field", field.toStdString().c_str()},
         {"object-type", object_type.toStdString().c_str()}
@@ -80,13 +87,19 @@ std::string update_request(
     return request.dump();
 }
 
-std::string move_request(quint32 to_list_id, int new_pos, quint32 board_id, quint32 list_id, quint32 card_id) {
+std::string move_request(
+    quint32 to_list_id,
+    int new_pos,
+    quint32 board_id,
+    quint32 list_id,
+    quint32 card_id
+) {
     json request = {
         {"type", "move"},
         {"board-id", board_id},
         {"list-id", list_id},
         {"card-id", card_id},
-        {"tag-id", 0},        
+        {"tag-id", 0},
         {"old-list-id", list_id},
         {"new-list-id", to_list_id},
         {"new-index", new_pos}
@@ -95,9 +108,7 @@ std::string move_request(quint32 to_list_id, int new_pos, quint32 board_id, quin
 }
 
 std::string connect_to_board_request(const QString &link) {
-    json request = {
-        {"type", "connect"}, {"link", link.toStdString().c_str()}
-    };
+    json request = {{"type", "connect"}, {"link", link.toStdString().c_str()}};
     return request.dump();
 }
 

@@ -19,12 +19,11 @@ Rectangle {
         mainClient.update_card(index, card_index, "description", new_description);
     }
 
-    function update_filter(filter: string) { 
-        if (filter != "") {
+    function update_filter(filter: string) {
+        if (filter != "")
             listVisualModel.filterOnGroup = "filtered";
-        } else {
+        else
             listVisualModel.filterOnGroup = "all";
-        }
         listVisualModel.update();
     }
 
@@ -41,12 +40,8 @@ Rectangle {
         z: 4
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         focus: true
-        onOpened: {
-            x:
-            mapFromGlobal(root.width / 2, root.height / 2).x;
-            y:
-            mapFromGlobal(root.width / 2, root.height / 2).y;
-        }
+        x: 0
+        y: listMain.height - 160
 
         background: Rectangle {
             visible: false
@@ -269,11 +264,11 @@ Rectangle {
                     anchors.fill: parent
                     onDropped: function(drag) {
                         let from = drag.source.modelIndex;
-                        drag.source.dragParent.clip = true;
+                        drag.source.dragList.clip = true;
                         mainClient.move(from, -1, drag.source.listIndex_, listIndex);
-                        if (listIndex == drag.source.listIndex_) {
-                            listVisualModel.groups[2].move(from, listmodel.count-1);
-                        }
+                        if (listIndex == drag.source.listIndex_)
+                            listVisualModel.groups[2].move(from, listmodel.count - 1);
+
                     }
                 }
 
@@ -290,12 +285,13 @@ Rectangle {
                     for (let index = 0; index < allItems.count; index++) {
                         if (mainClient.is_filtered(listIndex, index))
                             allItems.setGroups(index, 1, ["all", "filtered"]);
+
                     }
                 }
 
                 model: listmodel
                 Component.onCompleted: {
-                    Qt.callLater(update)
+                    Qt.callLater(update);
                 }
                 filterOnGroup: "all"
                 groups: [
@@ -328,16 +324,14 @@ Rectangle {
                     onEntered: function(drag) {
                         let from = drag.source.visualIndex;
                         let to = cardRoot.visualIndex;
-
-                        if (drag.source.listIndex_ == cardRoot.listIndex_) {
-                            console.log("moving", from, to)
+                        if (drag.source.listIndex_ == cardRoot.listIndex_)
                             listVisualModel.groups[2].move(from, to);
-                        }
+
                     }
                     onDropped: function(drag) {
                         let from = drag.source.modelIndex;
                         let to = (drag.source.listIndex_ != cardRoot.listIndex_) ? visualIndex : drag.source.visualIndex;
-                        drag.source.dragParent.clip = true;
+                        drag.source.dragList.clip = true;
                         mainClient.move(from, to, drag.source.listIndex_, cardRoot.listIndex_);
                     }
 
@@ -347,20 +341,18 @@ Rectangle {
                         width: style.cardWidth
                         height: style.cardHeight
                         color: style.cardBackgroundColor
-                        dragParent: thisList
+                        dragParent: cardDragContainer
+                        dragList: thisList
                         visualIndex: delegateRoot.visualIndex
                         modelIndex: delegateRoot.modelIndex
                         listIndex_: parentListIndex
                         onPressed: {
                             thisList.clip = false;
                         }
-
-                        Component.onCompleted: {
-                            console.log(visualIndex)
-                        }
                     }
 
                 }
+
             }
 
             displaced: Transition {

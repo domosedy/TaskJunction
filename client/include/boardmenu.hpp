@@ -29,7 +29,7 @@ public:
     void create_board(const board &board);
     std::pair<quint32, bool> get_info(int board_index) const;
     std::pair<quint32, bool> delete_board(int board_index);
-    BoardModel *load(int index, const board &loaded_board);
+    BoardModel *load(const board &loaded_board);
     bool is_board_loaded(quint32 id) const;
     void unload_remote_boards();
     void update_board(int index, const QString &field, const QString &value);
@@ -69,10 +69,8 @@ signals:
 
 private:
     QVector<board> m_boards;
+    std::unordered_map<quint32, std::unique_ptr<BoardModel>> m_loaded_boards;
     bool is_local_loaded = false;
-    QMap<quint32, int> m_board_id_to_index;
-    std::unordered_map<quint32, std::unique_ptr<BoardModel>>
-        m_loaded_boards;  // check if really needed
 
     enum BoardRoles { NameRole = Qt::UserRole + 1, DescriptionRole };
 };

@@ -13,8 +13,8 @@ class ListModel : public QAbstractListModel, public list {
     Q_PROPERTY(int count READ get_count NOTIFY countChanged)
 public:
     explicit ListModel(QObject *parent = nullptr);
-    ListModel(QObject *parent, const nlohmann::json &list_json);
-    ListModel(QObject *parent, const list &list_base);
+    ListModel(const nlohmann::json &list_json, QObject *parent);
+    ListModel(const list &list_base, QObject *parent);
     ListModel(
         QObject *parent,
         QString name,

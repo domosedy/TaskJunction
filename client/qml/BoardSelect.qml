@@ -15,9 +15,9 @@ Rectangle {
         id: connectBoardPopUp
 
         width: 210
-        height: 160
-        x: root.width / 2
-        y: root.height / 2
+        height: 120
+        x: root.width - 260
+        y: style.headerHeight
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         focus: true
 
@@ -28,9 +28,10 @@ Rectangle {
         contentItem: Rectangle {
             id: boardPopUpContent
 
-            border.color: style.listBackgroundColor
+            border.color: style.primaryColor
             border.width: style.defaultBorderSize
             color: style.listBackgroundColor
+            radius: style.defaultRadius
             Drag.active: true
 
             TextField {
@@ -98,8 +99,8 @@ Rectangle {
 
         width: 210
         height: 210
-        x: root.width / 2
-        y: root.height / 2
+        x: root.width - 260
+        y: style.headerHeight
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         focus: true
 
@@ -113,6 +114,7 @@ Rectangle {
             border.color: style.primaryColor
             border.width: style.defaultBorderSize
             color: style.listBackgroundColor
+            radius: style.defaultRadius
             Drag.active: true
 
             TextField {
@@ -343,7 +345,7 @@ Rectangle {
             anchors.fill: parent
             anchors.leftMargin: 10
             anchors.topMargin: 30
-            model: mainClient.board_menu
+            model: mainClient ? mainClient.board_menu : undefined
             orientation: ListView.Vertical
             spacing: 5
             clip: true
@@ -360,12 +362,13 @@ Rectangle {
                 TextInput {
                     id: nameHolder
 
-                    width: parent.width - 30
+                    width: parent.width - 60
                     text: name
                     font.family: "Poppins"
                     font.pointSize: 16
                     font.bold: true
                     color: "white"
+                    maximumLength: 50
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.topMargin: 20
@@ -395,7 +398,7 @@ Rectangle {
                 TextInput {
                     id: descriptionHolder
 
-                    width: parent.width - 30
+                    width: parent.width - 40
                     height: parent.height - 70
                     text: description
                     font.family: "Poppins"

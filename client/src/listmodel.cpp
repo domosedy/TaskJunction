@@ -8,27 +8,23 @@
 ListModel::ListModel(QObject *parent) : QAbstractListModel(parent) {
 }
 
-ListModel::ListModel(QObject *parent, const nlohmann::json &list_json)
+ListModel::ListModel(const nlohmann::json &list_json, QObject *parent)
     : ListModel(parent) {
     m_list_id = list_json["id"];
     m_name = QString::fromStdString(list_json["name"]);
     const nlohmann::json &cards = list_json["cards"];
-    // int index = 0;
     for (const auto &card : cards) {
         m_cards.append(new CardModel(this, card));
-        // m_index_by_id[card_id] = index++;
     }
     emit countChanged();
 }
 
-ListModel::ListModel(QObject *parent, const list &list_base)
+ListModel::ListModel(const list &list_base, QObject *parent)
     : ListModel(parent) {
     m_list_id = list_base.m_list_id;
     m_board_id = list_base.m_board_id;
     m_name = list_base.m_name;
     m_description = list_base.m_description;
-    // m_cards = list_base.m_cards;
-    // int index = 0;
     for (auto &card : list_base.m_cards) {
         m_cards.append(new CardModel(this, card));
     }
@@ -94,7 +90,6 @@ void ListModel::create_card(QString &name, QString &description) {
 }
 
 void ListModel::create_card(const card &new_card, const int index) {
-    // m_index_by_id[new_card.m_card_id] = m_cards.size();
     const int pos = (index == -1 ? m_cards.size() : index);
     beginInsertRows(QModelIndex(), pos, pos);
     if (index == -1) {
@@ -160,15 +155,13 @@ CardModel *ListModel::remove(const int index) {
 }
 
 void ListModel::move(int from, int to) {
-    if (from >= 0 && from < rowCount() && to >= 0 && to < rowCount() &&
-        from != to) {
-        if (from == to - 1) {
-            to = from++;
-        }
-        beginResetModel();
-        m_cards.move(from, to);
-        endResetModel();
+    // qDebug() << "Moving " << from << "-->" << to;
+    if (to == -1) {
+        to = m_cards.size() - 1;
     }
+    beginResetModel();
+    m_cards.move(from, to);
+    endResetModel();
 }
 
 void ListModel::create_card(CardModel *card, int index) {
@@ -190,10 +183,10 @@ void ListModel::create_tag(int index, const tag &new_tag) {
 
 void ListModel::create_tag(quint32 id, const tag &new_tag) {
     int index = std::distance(
+        m_cards.begin(),
         std::ranges::find_if(
             m_cards, [id](auto card) { return card->m_card_id == id; }
-        ),
-        m_cards.begin()
+        )
     );
     m_cards[index]->create_tag(new_tag);
 }
@@ -204,10 +197,10 @@ std::pair<int, int> ListModel::get_indices(quint32 card_id, quint32 tag_id)
         return {-1, -1};
     }
     int card_idx = std::distance(
+        m_cards.begin(),
         std::ranges::find_if(
             m_cards, [card_id](auto card) { return card->m_card_id == card_id; }
-        ),
-        m_cards.begin()
+        )
     );
     int tag_idx = (tag_id == 0 ? -1 : m_cards[card_idx]->get_tag_idx(tag_id));
     return {card_idx, tag_idx};
