@@ -1,7 +1,10 @@
 // Copyright (C) 2016 Kurt Pattyn <pattyn.kurt@gmail.com>.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 #include "echoclient.h"
+#include <QtCore/QCoreApplication>
 #include <QtCore/QDebug>
+#include <QtCore/QFile>
+#include <QtWebSockets/QWebSocket>
 
 QT_USE_NAMESPACE
 
@@ -14,10 +17,29 @@ EchoClient::EchoClient(const QUrl &url, bool debug, QObject *parent) :
         qDebug() << "WebSocket server:" << url;
     connect(&m_webSocket, &QWebSocket::connected, this, &EchoClient::onConnected);
     connect(&m_webSocket, &QWebSocket::textMessageReceived, this, &EchoClient::onTextMessageReceived);
-    // connect(&m_webSocket, &QWebSocket::disconnected, this, &EchoClient::closed);
+
+    connect(&m_webSocket, QOverload<const QList<QSslError>&>::of(&QWebSocket::sslErrors),
+            this, &EchoClient::onSslErrors);
+
+    QSslConfiguration sslConfiguration;
+    QFile certFile(QStringLiteral(":/localhost.cert"));
+    certFile.open(QIODevice::ReadOnly);
+    QSslCertificate certificate(&certFile, QSsl::Pem);
+    certFile.close();
+    sslConfiguration.addCaCertificate(certificate);
+    m_webSocket.setSslConfiguration(sslConfiguration);
+
+    qDebug() << "Readed";
     m_webSocket.open(url);
+    // connect(&m_webSocket, &QWebSocket::disconnected, this, &EchoClient::closed);
 }
 //! [constructor]
+
+void EchoClient::onSslErrors(const QList<QSslError> &errors) {
+    qDebug() << "Errors: " << errors;
+    m_webSocket.ignoreSslErrors(errors);
+}
+
 
 void EchoClient::sendData(const QString &data) {
     m_webSocket.sendTextMessage(data);
@@ -28,6 +50,7 @@ EchoClient::~EchoClient() {
 }
 //! [onConnected]
 void EchoClient::onConnected() {
+    qDebug() << "Connected";
     sendData("{ \"type\": \"login\", \"password\": \"1\", \"username\": \"user 3\"}");
     sendData(R"({"type":"connect","link":"f@@ghf7POSToKML?"})");
     // sendData(R"({"type":"move","board-id":1,"list-id":3,"card-id":4,"tag-id":0,"old-list-id":3,"new-list-id":4,"new-index":0})");

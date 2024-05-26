@@ -1,6 +1,8 @@
 #include "server.hpp"
 #include <functional>
 #include <memory>
+#include <QtNetwork/QSslCertificate>
+#include <QtNetwork/QSslKey>
 #include "client_socket.hpp"
 #include "element_classes.hpp"
 #include "logging.hpp"
@@ -23,17 +25,38 @@ enum class RequestType {
 Server::Server(quint16 port)
     : port(port), db("postgres", "postgres", "localhost", "") {
     server = new QWebSocketServer(QStringLiteral("Task Server"),
-            QWebSocketServer::NonSecureMode, this);
-    // db.fill_query_name_to_sql_command();
-
-    connect(server, SIGNAL(newConnection()), this, SLOT(newConnection()));
+            QWebSocketServer::SecureMode, this);
+        
+    QSslConfiguration sslConfiguration;
+    QFile certFile(QStringLiteral(":/localhost.cert"));
+    QFile keyFile(QStringLiteral(":/localhost.key"));
+    certFile.open(QIODevice::ReadOnly);
+    keyFile.open(QIODevice::ReadOnly);
+    QSslCertificate certificate(&certFile, QSsl::Pem);
+    QSslKey sslKey(&keyFile, QSsl::Rsa, QSsl::Pem);
+    certFile.close();
+    keyFile.close();
+    sslConfiguration.setPeerVerifyMode(QSslSocket::VerifyNone);
+    sslConfiguration.setLocalCertificate(certificate);
+    sslConfiguration.setPrivateKey(sslKey);
+    server->setSslConfiguration(sslConfiguration);
 
     if (!server->listen(QHostAddress::Any, port)) {
         rDebug() << QObject::tr("Unable to start server: %1")
                         .arg(server->errorString());
         std::exit(1);
     }
+
+    rDebug() << "readed";
+    connect(server, SIGNAL(newConnection()), this, SLOT(newConnection()));
+    connect(server, &QWebSocketServer::sslErrors,
+                this, &Server::onSslErrors);
 }
+
+void Server::onSslErrors(const QList<QSslError> &) {
+    rDebug() << "Errors in Ssl";
+}
+
 
 Server::~Server() {
     server->close();
@@ -298,9 +321,10 @@ ReturnedValue Server::execute_access_query(const access_to_board &query, quint32
     auto board_link = db.select_board(query.board_id).m_link.toStdString();
 
     if (board_link == query.link) {
-        if (db.add_user_to_board(id, query.board_id)) {
-            return ReturnedValue{true, query.board_id, db.get_full_board(query.board_id).to_json().c_str()};
-        }
+        auto board = db.get_full_board(query.board_id);
+        board.m_link = code_string(board.m_link, board.m_board_id);
+        // rDebug() << board.m_link;
+        return ReturnedValue{true, query.board_id, board.to_json().c_str()};
     }
 
     return ReturnedValue{false, query.board_id, error{"Link is not valid"}.to_json().c_str()};
@@ -317,6 +341,7 @@ ReturnedValue Server::execute_get_query(const get_boards_info_query &query, quin
     rDebug() << query.id;
 
     result.m_link = code_string(result.m_link, query.id);
+    rDebug() << result.m_link;
 
     return ReturnedValue{true, 0, result.to_json().c_str()};
 }

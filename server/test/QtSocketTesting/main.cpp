@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
         return 1;
     }
     QUrl url;
-    url.setScheme(u"ws"_s);
+    url.setScheme(u"wss"_s);
     url.setHost("localhost");
     url.setPort(port);
     EchoClient client(url, true);

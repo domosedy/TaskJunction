@@ -41,6 +41,7 @@ public:
     ~Server();
 
 public slots:
+    void onSslErrors(const QList<QSslError> &);
     void newConnection();
     void removeConnection();
     void execute_query(uint user_id, const query_type &query);

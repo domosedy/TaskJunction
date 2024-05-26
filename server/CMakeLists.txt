@@ -12,7 +12,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt6 REQUIRED COMPONENTS Core Network Sql)
 find_package(Qt6 REQUIRED COMPONENTS WebSockets)
 
-add_executable(server 
+set(INSTALL_EXAMPLEDIR "./build")
+
+qt_add_executable(server 
 include/client_socket.hpp 
 include/data_handler.hpp
 include/json.hpp
@@ -32,6 +34,24 @@ src/data_handler.cpp
 # src/datas.cpp
 src/server_main.cpp
 src/server.cpp)
+
+set(securesocketclient_resource_files
+    "localhost.cert"
+    "localhost.key"
+)
+
+qt6_add_resources(server "securesocketclient"
+    PREFIX
+        "/"
+    FILES
+        ${securesocketclient_resource_files}
+)
+
+install(TARGETS server
+    RUNTIME DESTINATION "${INSTALL_EXAMPLEDIR}"
+    BUNDLE DESTINATION "${INSTALL_EXAMPLEDIR}"
+    LIBRARY DESTINATION "${INSTALL_EXAMPLEDIR}"
+)
 
 
 target_include_directories(server PUBLIC include)

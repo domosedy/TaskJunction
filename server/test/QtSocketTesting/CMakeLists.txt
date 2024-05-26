@@ -14,7 +14,7 @@ if(NOT DEFINED INSTALL_EXAMPLESDIR)
     set(INSTALL_EXAMPLESDIR "examples")
 endif()
 
-set(INSTALL_EXAMPLEDIR "${INSTALL_EXAMPLESDIR}/websockets/echoclient")
+set(INSTALL_EXAMPLEDIR "./build")
 
 find_package(Qt6 REQUIRED COMPONENTS Core WebSockets)
 
@@ -31,6 +31,16 @@ set_target_properties(echoclient PROPERTIES
 target_link_libraries(echoclient PUBLIC
     Qt::Core
     Qt::WebSockets
+)
+
+qt_add_resources(echoclient "cert"
+    BASE ../..
+    FILES ../../localhost.cert
+)
+
+set_target_properties(echoclient PROPERTIES
+    WIN32_EXECUTABLE FALSE
+    MACOSX_BUNDLE FALSE
 )
 
 install(TARGETS echoclient
