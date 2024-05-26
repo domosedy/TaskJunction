@@ -7,7 +7,7 @@
 #include <sstream>
 #include "element_classes.hpp"
 
-// namespace database {
+namespace database {
 
 db_manager::db_manager(
     QString database_name,
@@ -24,7 +24,7 @@ db_manager::db_manager(
     m_database.setHostName(m_host_name);
     m_database.setPassword(m_password);
     if (!m_database.open()) {
-        qDebug() << "Cannot open database:" << m_database.lastError();
+        qDebug() << "Cannot open database:" << m_database.lastError().text();
     }
     fill_query_name_to_sql_command();
 }
@@ -39,7 +39,7 @@ void db_manager::fill_query_name_to_sql_command() {
         "INSERT INTO %1.user_to_board VALUES (:user_id, :board_id);";
 
     query_name_to_sql_command["insert_board"] =
-        "SELECT %1.insert_board(:user_id, :name, :description)";
+        "SELECT %1.insert_board(:user_id, :name, :description, :link)";
 
     query_name_to_sql_command["insert_list"] =
         "SELECT %1.insert_list(:board_id, :name, :description)";
@@ -63,7 +63,7 @@ void db_manager::fill_query_name_to_sql_command() {
         "SELECT id, login FROM %1.user_signature WHERE id = :key_value;";
 
     query_name_to_sql_command["select_board"] =
-        "SELECT id, user_id, name, description FROM %1.board_signature WHERE "
+        "SELECT id, user_id, name, description, link FROM %1.board_signature WHERE "
         "id = :key_value;";
 
     query_name_to_sql_command["select_list"] =
@@ -87,8 +87,8 @@ void db_manager::fill_query_name_to_sql_command() {
         ":tag_id;";
 
     query_name_to_sql_command["delete_user_from_board"] =
-        "DELETE FROM %1.user_to_board WHERE user_id = :user_id AND "
-        "board_id = :board_id;";
+        "WITH deleted AS (DELETE FROM %1.user_to_board WHERE user_id = :user_id AND "
+        "board_id = :board_id IS TRUE RETURNING *) SELECT count(*) FROM deleted;";
 
     query_name_to_sql_command["create_schema"] =
         "CREATE SCHEMA %1;"
@@ -236,13 +236,15 @@ bool db_manager::add_user_to_board(quint32 user_id, quint32 board_id) {
 quint32 db_manager::insert_board(
     quint32 user_id,
     const QString &name,
-    const QString &description
+    const QString &description,
+    const QString &link
 ) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["insert_board"].arg(m_schema));
     query.bindValue(":user_id", user_id);
     query.bindValue(":name", name);
     query.bindValue(":description", description);
+    query.bindValue(":link", link);
     if (!query.exec()) {
         qDebug() << "insert_board:" << query.lastError().text();
         return 0;
@@ -401,7 +403,8 @@ bool db_manager::delete_user_from_board(quint32 user_id, quint32 board_id) {
         qDebug() << "delete_user_from_board" << query.lastError().text();
         return false;
     }
-    return true;
+    query.next();
+    return query.value(0).toInt() == 1;
 }
 
 bool db_manager::delete_tag_from_card(quint32 card_id, quint32 tag_id) {
@@ -451,7 +454,8 @@ board db_manager::select_board(quint32 id) {
     quint32 user_id = data[1].toInt();
     QString name = data[2].toString();
     QString description = data[3].toString();
-    return board(board_id, user_id, name, description);
+    QString link = data[4].toString();
+    return board(board_id, user_id, name, description, link);
 }
 
 list db_manager::select_list(quint32 id) {
@@ -659,4 +663,4 @@ quint32 db_manager::get_card_number(quint32 id) {
     return query.value(0).toInt();
 }
 
-// }  // namespace database
+}  // namespace database

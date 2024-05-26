@@ -49,12 +49,18 @@ struct get_boards_info_query {
     quint32 id;
 };
 
+struct access_to_board {
+    quint32 board_id;
+    std::string link;
+};
+
 using query_type = std::variant<
     update_query,
     delete_query,
     create_query,
     login_query,
     move_query,
-    get_boards_info_query>;
+    get_boards_info_query,
+    access_to_board>;
 
 #endif

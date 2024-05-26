@@ -2,7 +2,7 @@
 database='test_database'
 user='test_user'
 password='test_password'
-path='./include/create_board.sql'
+path='./database/include/create_board.sql'
 
 export PGPASSWORD="1"
 sudo -u postgres psql -c "CREATE DATABASE $database;"

@@ -23,7 +23,7 @@ class Server : public QObject {
 
     QWebSocketServer *server;
     quint16 port;
-    db_manager db;
+    database::db_manager db;
     QMap<quint32, ClientSocket *> authorized_connections;
     QList<ClientSocket*> unauthorized_connections;
 
@@ -31,6 +31,7 @@ class Server : public QObject {
     ReturnedValue execute_create_query(const create_query &query, quint32 id);
     ReturnedValue execute_delete_query(const delete_query &query, quint32 id);
     ReturnedValue execute_get_query(const get_boards_info_query &query, quint32 id);
+    ReturnedValue execute_access_query(const access_to_board &query, quint32 id);
     ReturnedValue execute_move_query(const move_query &query, quint32 id);
 
     std::pair<QString, quint32> execute_login_query(const login_query &query);

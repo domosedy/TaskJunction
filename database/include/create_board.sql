@@ -1,14 +1,16 @@
 CREATE TABLE user_signature(
 login varchar(50) PRIMARY KEY,
 password text,
-id serial UNIQUE
+id serial UNIQUE,
+salt varchar(10)
 );
 
 CREATE TABLE board_signature(
 id serial PRIMARY KEY,
 user_id int REFERENCES user_signature (id) ON DELETE CASCADE,
 name varchar(50),
-description text
+description text,
+link varchar(20)
 );
 
 CREATE TABLE list_signature(
@@ -46,7 +48,7 @@ PRIMARY KEY(user_id, board_id)
 
 CREATE OR REPLACE FUNCTION insert_user(login_ text, password_ text) RETURNS int AS $$
 BEGIN
-    INSERT INTO user_signature VALUES (login_, password_, DEFAULT);
+    INSERT INTO user_signature VALUES (login_, password_, DEFAULT, '');
     return last_value FROM user_signature_id_seq;
 END;
 $$ LANGUAGE plpgSQL;
@@ -63,9 +65,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION insert_board(user_id_ int, name_ text, description_ text, OUT board_id_ int) AS $$
+CREATE OR REPLACE FUNCTION insert_board(user_id_ int, name_ text, description_ text, link_ varchar(20), OUT board_id_ int) AS $$
 BEGIN
-    INSERT INTO board_signature VALUES (DEFAULT, user_id_, name_, description_);
+    INSERT INTO board_signature VALUES (DEFAULT, user_id_, name_, description_, link_);
     board_id_ = last_value FROM board_signature_id_seq;
     INSERT INTO user_to_board VALUES (user_id_, board_id_);
 END;
@@ -167,4 +169,4 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER card_invariant BEFORE INSERT OR UPDATE ON card_signature
      FOR EACH ROW EXECUTE PROCEDURE card_invariant();
 
-INSERT INTO user_signature VALUES ('default', 'default', DEFAULT);
+INSERT INTO user_signature VALUES ('default', 'default', DEFAULT, '');

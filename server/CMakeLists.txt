@@ -22,9 +22,11 @@ include/server.hpp
 # include/datas.hpp
 ../database/include/database.hpp
 ../shared/include/element_classes.hpp
+../shared/include/hashes.hpp
 
 ../database/src/database.cpp
 ../shared/src/element_classes.cpp
+../shared/src/hashes.cpp
 src/client_socket.cpp
 src/data_handler.cpp
 # src/datas.cpp

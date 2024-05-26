@@ -1,6 +1,5 @@
-#ifndef DATABASE_HPP
-#define DATABASE_HPP
-
+#ifndef DATABASE_HPP_
+#define DATABASE_HPP_
 #include <QVector>
 #include <QtCore>
 #include <QtSql>
@@ -8,7 +7,8 @@
 #include <utility>
 #include "element_classes.hpp"
 
-// namespace database {
+namespace database {
+
 const QString BOARD_TABLE_NAME = "board_signature";
 const QString BOARD_PRIMARY_KEY = "board_id";
 const QString LIST_TABLE_NAME = "list_signature";
@@ -31,17 +31,18 @@ const QVector<QString> sequences_names{
 
 const QString QT_DATABASE_DRIVER = "QPSQL";
 
-
 class db_manager {
     QString m_database_name;
     QString m_user_name;
     QString m_host_name;
     QString m_password;
     QSqlDatabase m_database = QSqlDatabase::addDatabase(QT_DATABASE_DRIVER);
+
     static QVector<QVariant> get_data(const QSqlRecord &record);
     QSqlRecord select_info_by_id(const QString &query_name, quint32 key_value);
     QString m_schema = "public";
 
+    bool delete_command(const QString &table_name, quint32 key_value);
 
     static QString convert_vector_to_string(const QVector<QString> &vector);
 
@@ -55,6 +56,11 @@ public:
         QString host_name,
         QString password
     );
+    ~db_manager() = default;
+    db_manager(const db_manager &) = delete;
+    db_manager(db_manager &&) = delete;
+    db_manager &operator=(const db_manager &) = delete;
+    db_manager &operator=(db_manager &&) = delete;
 
     void print_all_tables();
     void clear_all_tables();
@@ -68,7 +74,8 @@ public:
     quint32 insert_board(
         quint32 user_id,
         const QString &name,
-        const QString &description
+        const QString &description,
+        const QString &link
     );
     quint32 insert_list(
         quint32 board_id,
@@ -98,7 +105,6 @@ public:
     card select_card(quint32 id);
     tag select_tag(quint32 id);
 
-    bool delete_command(const QString &table_name, quint32 key_value);
     bool delete_user(quint32 id);
     bool delete_board(quint32 id);
     bool delete_list(quint32 id);
@@ -126,6 +132,6 @@ public:
     board get_full_board(quint32 board_id);
 };
 
-// }  // namespace database
+}  // namespace database
 
 #endif  // DATABASE_HPP_

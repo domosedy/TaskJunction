@@ -4,6 +4,8 @@
 #include <optional>
 #include <string>
 #include <variant>
+#include <sstream>
+#include "hashes.hpp"
 #include "json.hpp"
 #include "logging.hpp"
 
@@ -136,6 +138,18 @@ static std::optional<move_query> parseMoveQuery(const json &json_data) {
                 new_list_id.value(), new_index.value()};
 }
 
+static std::optional<access_to_board> parseAccessQuery(const json &json_data) {
+    auto board_link = get_string_field_data(json_data, "link");
+
+    if (!board_link.has_value()) {
+        return std::nullopt;
+    }
+
+    auto result = decode_string(board_link.value().c_str());
+    rDebug() << result.first << ' ' << result.second;
+    return access_to_board{result.second, result.first.toStdString()};
+}
+
 std::optional<query_type> parseData(const QString &data) {
     if (!json::accept(data.toStdString())) {
         rDebug() << "Bebra";
@@ -165,6 +179,8 @@ std::optional<query_type> parseData(const QString &data) {
         result = parseGetQuery(parsedData);
     } else if (request == "move") {
         result = parseMoveQuery(parsedData);
+    } else if (request == "connect") {
+        result = parseAccessQuery(parsedData);
     }
 
     return result;

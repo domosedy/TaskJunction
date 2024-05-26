@@ -5,6 +5,7 @@
 #include "element_classes.hpp"
 #include "logging.hpp"
 #include "query.hpp"
+#include "hashes.hpp"
 // #include "datas.hpp"
 
 enum class RequestType {
@@ -14,7 +15,8 @@ enum class RequestType {
     UPDATE,
     LOGIN,
     GET_BOARDS_INFO,
-    MOVE
+    MOVE,
+    ACCESS
 };
 
 // How to emit when my connection is not authorized?
@@ -80,6 +82,8 @@ void Server::execute_query(uint user_id, const query_type &query) {
                 return RequestType::GET_BOARDS_INFO;
             } else if constexpr (std::is_same_v<T, move_query>) {
                 return RequestType::MOVE;
+            } else if constexpr (std::is_same_v<T, access_to_board>) {
+                return RequestType::ACCESS;
             }
             return RequestType::ERROR;
         },
@@ -110,6 +114,12 @@ void Server::execute_query(uint user_id, const query_type &query) {
         return;
     } else if (result_code == RequestType::MOVE) {
         executed_result = execute_move_query(std::get<move_query>(query), client_id);
+    } else if (result_code == RequestType::ACCESS) {
+        auto res = execute_access_query(std::get<access_to_board>(query), client_id);
+
+        auto result = res.jsoned_object;
+        clientSocket->sendData(result);
+        return;
     } else {
         executed_result = {false, 1, error{"Bad request format"}.to_json().c_str()};
     }
@@ -190,13 +200,17 @@ Server::execute_create_query(const create_query &query, quint32 user_id) {
         rDebug() << query.value_description.c_str();
 
         result = db.insert_board(
-            user_id, query.value_name.c_str(), query.value_description.c_str()
+            user_id, query.value_name.c_str(), query.value_description.c_str(),
+            generate_string()
         );
 
         board_id = result;
         if (result != 0) {
             all_ids.board_id = result;
-            jsoned_object = db.select_board(result).to_json();
+            auto res = db.select_board(result);
+            res.m_link = code_string(res.m_link, result);
+            // QString::number(result) + " " + res.m_link;
+            jsoned_object = res.to_json();
         }
     } else if (query.value_type == "list") {
         if (!db.check_user_rights(user_id, query.all_id.board_id)) {
@@ -254,7 +268,10 @@ std::pair<QString, quint32> Server::execute_login_query(const login_query &query
 
     rDebug() << "user id is: " << id;
     if (response.m_response) {
-        for (auto &board : db.get_user_boards(id)) {
+        for (auto board : db.get_user_boards(id)) {
+            board.m_link = code_string(board.m_link, board.m_board_id);
+            //  QString::number(board.m_board_id) + " " + board.m_link;
+            rDebug() << "This is board link " << board.m_link << board.m_board_id;
             response.m_boards.push_back(board);
         }
 
@@ -269,7 +286,7 @@ ReturnedValue Server::execute_move_query(const move_query &query, quint32 id) {
         return ReturnedValue{false, 0, error{"You have no rights"}.to_json().c_str()};
     }
 
-    auto result = db.move_card(query.all_id.card_id, query.new_list_id, query.new_index);
+    auto result = db.move_card(query.all_id.card_id, query.new_list_id, static_cast<int>(query.new_index) - 1);
     move_response response{query.all_id, query.old_list_id, query.new_list_id, query.new_index};
     rDebug() << query.all_id.card_id << ' ' << query.new_list_id << ' ' << query.new_index << ' ' << result;
     return result 
@@ -277,6 +294,17 @@ ReturnedValue Server::execute_move_query(const move_query &query, quint32 id) {
                 : ReturnedValue{false, query.all_id.board_id, error{"Error in moving"}.to_json().c_str()} ;
 }
 
+ReturnedValue Server::execute_access_query(const access_to_board &query, quint32 id) {
+    auto board_link = db.select_board(query.board_id).m_link.toStdString();
+
+    if (board_link == query.link) {
+        if (db.add_user_to_board(id, query.board_id)) {
+            return ReturnedValue{true, query.board_id, db.get_full_board(query.board_id).to_json().c_str()};
+        }
+    }
+
+    return ReturnedValue{false, query.board_id, error{"Link is not valid"}.to_json().c_str()};
+}
 
 ReturnedValue Server::execute_get_query(const get_boards_info_query &query, quint32 id) {
     if (!db.check_user_rights(id, query.id)) {
@@ -287,6 +315,8 @@ ReturnedValue Server::execute_get_query(const get_boards_info_query &query, quin
     rDebug() << "Get query";
     board result = db.get_full_board(query.id);
     rDebug() << query.id;
+
+    result.m_link = code_string(result.m_link, query.id);
 
     return ReturnedValue{true, 0, result.to_json().c_str()};
 }
