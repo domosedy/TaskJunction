@@ -156,9 +156,9 @@ ReturnedValue Server::execute_delete_query(const delete_query &query, quint32 id
     if (query.value_type == "board") {
         result = db.delete_board(query.value_id);    
     } else if (query.value_type == "list") {
-        result = db.delete_card(query.value_id);
+        result = db.delete_list(query.value_id);
     } else if (query.value_type == "card") {
-        result = db.delete_board(query.value_id);
+        result = db.delete_card(query.value_id);
     } else if (query.value_type == "tag") {
         result = db.delete_tag_from_card(query.all_id.card_id, query.value_id);
     }
@@ -232,6 +232,7 @@ Server::execute_create_query(const create_query &query, quint32 user_id) {
 
         result = db.insert_tag(query.value_name.c_str());
         if (result != 0 && db.add_tag_to_card(query.all_id.card_id, result)) {
+            all_ids.tag_id = result;
             jsoned_object = db.select_tag(result).to_json().c_str();
         } else {
             result = 0;

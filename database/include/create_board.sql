@@ -123,7 +123,7 @@ BEGIN
     ELSEIF new_number_ > 1 + cards_number FROM list_signature WHERE id = new_list_id_ THEN
        RETURN FALSE;
     END IF;
-    IF new_number_ == 0 THEN
+    IF new_number_ = 0 THEN
         new_number_ = cards_number FROM list_signature WHERE id = new_list_id_;
         IF list_id_ <> new_list_id_ THEN
            new_number_ = new_number_ + 1;

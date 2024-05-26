@@ -54,8 +54,8 @@ static std::string array_to_json(const QVector<T> &data) {
 
 std::string all_ids::to_json() const {
     std::stringstream ss;
-    ss << R"("board-id":)" << board_id << R"(,"list_id":)" << list_id 
-        << R"(,"card-id":)" << card_id << R"(,"tag_id":)" << tag_id;
+    ss << R"("board-id":)" << board_id << R"(,"list-id":)" << list_id 
+        << R"(,"card-id":)" << card_id << R"(,"tag-id":)" << tag_id;
     
     return ss.str();
 }

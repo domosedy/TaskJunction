@@ -102,7 +102,7 @@ static std::optional<create_query> parseCreateQuery(const json &json_data) {
 }
 
 static std::optional<login_query> parseLoginQuery(const json &json_data) {
-    auto username = get_string_field_data(json_data, "user-name");
+    auto username = get_string_field_data(json_data, "username");
     auto password = get_string_field_data(json_data, "password");
 
     if (!username.has_value() || !password.has_value()) {
