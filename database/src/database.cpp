@@ -1,4 +1,5 @@
 #include "database.hpp"
+#include <algorithm>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QtSql>
@@ -53,8 +54,7 @@ void db_manager::fill_query_name_to_sql_command() {
         "INSERT INTO %1.card_to_tags VALUES (:card_id, :tag_id);";
 
     query_name_to_sql_command["update_command"] =
-        "UPDATE %1.%2 SET %3 = :new_value WHERE id = "
-        ":key_value;";
+        "UPDATE %1.%2 SET %3 = :new_value WHERE id = :key_value;";
 
     query_name_to_sql_command["move_card"] =
         "SELECT %1.move_card(:id, :new_list_id, :new_number);";
@@ -145,6 +145,9 @@ void db_manager::fill_query_name_to_sql_command() {
         "WHERE name = ANY (:tag_names)) INTERSECT SELECT id FROM %1.card_signature "
         "WHERE list_id = ANY (SELECT id FROM %1.list_signature "
         "WHERE board_id = :board_id);";
+
+    query_name_to_sql_command["get_board_by_link"] =
+            "SELECT id FROM %1.board_signature WHERE link = :link;";
 }
 
 void db_manager::drop_all_tables() {
@@ -516,6 +519,9 @@ QVector<list> db_manager::get_board_lists(quint32 board_id) {
     while (query.next()) {
         result.push_back(select_list(query.value(0).toInt()));
     }
+    std::sort(result.begin(), result.end(), [](const list &lhs, const list &rhs){
+        return lhs.m_list_id < rhs.m_list_id;
+    });
     return result;
 }
 
@@ -582,6 +588,9 @@ QVector<quint32> db_manager::get_board_list_ids(quint32 board_id) {
     while (query.next()) {
         result.push_back(query.value(0).toInt());
     }
+    std::sort(result.begin(), result.end(), [](quint32 lhs, quint32 rhs) {
+        return lhs < rhs;
+    });
     return result;
 }
 
@@ -657,6 +666,18 @@ quint32 db_manager::get_card_number(quint32 id) {
     query.bindValue(":id", id);
     if (!query.exec()) {
         qDebug() << "get_card_number:" << query.lastError().text();
+        return 0;
+    }
+    query.next();
+    return query.value(0).toInt();
+}
+
+quint32 db_manager::get_board_by_link(const QString &link) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["get_board_by_link"].arg(m_schema));
+    query.bindValue(":link", link);
+    if (!query.exec()) {
+        qDebug() << "get_board_by_link:" << query.lastError().text();
         return 0;
     }
     query.next();

@@ -167,6 +167,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER card_invariant BEFORE INSERT OR UPDATE ON card_signature
-     FOR EACH ROW EXECUTE PROCEDURE card_invariant();
+    FOR EACH ROW EXECUTE PROCEDURE card_invariant();
 
 INSERT INTO user_signature VALUES ('default', 'default', DEFAULT, '');
