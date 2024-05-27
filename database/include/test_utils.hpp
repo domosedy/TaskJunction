@@ -4,6 +4,4 @@
 #define DEFAULT_TESTS
 #define TEST_NEW_FEATURE
 
-// #define PROHIBITED_UPDATE_
-
 #endif  // TEST_UTILS_HPP_

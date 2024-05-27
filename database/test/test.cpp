@@ -29,8 +29,9 @@ TEST_CASE("create") {
     }
     {
         for (int i = 1; i < N; ++i) {
-            quint32 id =
-                db_manager.insert_board(1, "test_board", "test description", "");
+            quint32 id = db_manager.insert_board(
+                1, "test_board", "test description", ""
+            );
             CHECK(id == i);
         }
     }
@@ -63,8 +64,9 @@ TEST_CASE("select") {
     db_manager.clear_all_tables();
 
     quint32 user_id = db_manager.authorize_user("test_user", "test_password");
-    quint32 board_id =
-        db_manager.insert_board(user_id, "test_board", "test description", "test link");
+    quint32 board_id = db_manager.insert_board(
+        user_id, "test_board", "test description", "test link"
+    );
     quint32 list_id =
         db_manager.insert_list(board_id, "test_list", "test description");
     quint32 card_id =
@@ -118,7 +120,8 @@ TEST_CASE("delete") {
         db_manager.clear_all_tables();
         quint32 user_id =
             db_manager.authorize_user("test_user", "test_password");
-        quint32 board_id = db_manager.insert_board(user_id, "test_board", "", "");
+        quint32 board_id =
+            db_manager.insert_board(user_id, "test_board", "", "");
         quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
         quint32 card_id = db_manager.insert_card(list_id, "test_card", "");
         quint32 tag_id = db_manager.insert_tag("test_name");
@@ -177,8 +180,7 @@ TEST_CASE("update order") {
     );
     db_manager.clear_all_tables();
 
-    quint32 user_id =
-            db_manager.authorize_user("test_user", "test_password");
+    quint32 user_id = db_manager.authorize_user("test_user", "test_password");
     quint32 board_id = db_manager.insert_board(user_id, "test_board", "", "");
     quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
 
@@ -201,7 +203,7 @@ TEST_CASE("update order") {
         CHECK(db_manager.get_card_number(card_id_3) == 3);
     }
 
-    SUBCASE("prohibited changes") {
+    SUBCASE("prohibited update") {
         quint32 card_id = db_manager.insert_card(list_id, "test_card", "");
         CHECK(!db_manager.move_card(card_id, list_id, -2));
         CHECK(!db_manager.move_card(card_id, list_id, 100));
@@ -232,8 +234,10 @@ TEST_CASE("update command") {
     );
     db_manager.clear_all_tables();
 
-        quint32 user_id = db_manager.authorize_user("test_user", "test_password");
-        quint32 board_id = db_manager.insert_board(user_id, "test_board", "test_description", "test_link");
+    quint32 user_id = db_manager.authorize_user("test_user", "test_password");
+    quint32 board_id = db_manager.insert_board(
+        user_id, "test_board", "test_description", "test_link"
+    );
     SUBCASE("update board") {
         QString new_name = "new_board_name";
         QString new_description = "new_board_description";
@@ -241,31 +245,33 @@ TEST_CASE("update command") {
 
         SUBCASE("normal update") {
             CHECK(db_manager.update_command(
-                    BOARD_TABLE_NAME, "name", new_name, board_id
+                BOARD_TABLE_NAME, "name", new_name, board_id
             ));
             CHECK(db_manager.select_board(board_id).m_name == new_name);
 
             CHECK(db_manager.update_command(
-                    BOARD_TABLE_NAME, "description", new_description, board_id
+                BOARD_TABLE_NAME, "description", new_description, board_id
             ));
             CHECK(
-                    db_manager.select_board(board_id).m_description == new_description
+                db_manager.select_board(board_id).m_description ==
+                new_description
             );
 
             CHECK(db_manager.update_command(
-                    BOARD_TABLE_NAME, "link", new_link, board_id
+                BOARD_TABLE_NAME, "link", new_link, board_id
             ));
             CHECK(db_manager.select_board(board_id).m_link == new_link);
         }
 
         SUBCASE("prohibited update") {
             CHECK(!db_manager.update_command(
-                    BOARD_TABLE_NAME, "id", "0", board_id
+                BOARD_TABLE_NAME, "id", "0", board_id
             ));
         }
     }
 
-    quint32 list_id = db_manager.insert_list(board_id, "test_list", "test_description");
+    quint32 list_id =
+        db_manager.insert_list(board_id, "test_list", "test_description");
 
     SUBCASE("update list") {
         SUBCASE("normal update") {
@@ -273,31 +279,30 @@ TEST_CASE("update command") {
             QString new_description = "new_list_description";
 
             CHECK(db_manager.update_command(
-                    LIST_TABLE_NAME, "name", new_name, list_id
+                LIST_TABLE_NAME, "name", new_name, list_id
             ));
             CHECK(db_manager.select_list(list_id).m_name == new_name);
 
             CHECK(db_manager.update_command(
-                    LIST_TABLE_NAME, "description", new_description, list_id
+                LIST_TABLE_NAME, "description", new_description, list_id
             ));
             CHECK(
-                    db_manager.select_list(list_id).m_description == new_description
+                db_manager.select_list(list_id).m_description == new_description
             );
+        }
 
-        }
-#ifdef PROHIBITED_UPDATE_
         SUBCASE("prohibited update") {
+            CHECK(
+                !db_manager.update_command(LIST_TABLE_NAME, "id", "0", list_id)
+            );
             CHECK(!db_manager.update_command(
-                    LIST_TABLE_NAME, "id", "0", list_id
-            ));
-            CHECK(!db_manager.update_command(
-                    LIST_TABLE_NAME, "cards_number", "0", list_id
+                LIST_TABLE_NAME, "cards_number", "0", list_id
             ));
         }
-#endif // PROHIBITED_UPDATE_
     }
 
-    quint32 card_id = db_manager.insert_card(list_id, "test_card", "test_description");
+    quint32 card_id =
+        db_manager.insert_card(list_id, "test_card", "test_description");
 
     SUBCASE("update card") {
         SUBCASE("normal update") {
@@ -305,27 +310,26 @@ TEST_CASE("update command") {
             QString new_description = "new_card_description";
 
             CHECK(db_manager.update_command(
-                    CARD_TABLE_NAME, "name", new_name, card_id
+                CARD_TABLE_NAME, "name", new_name, card_id
             ));
             CHECK(db_manager.select_card(card_id).m_name == new_name);
 
             CHECK(db_manager.update_command(
-                    CARD_TABLE_NAME, "description", new_description, card_id
+                CARD_TABLE_NAME, "description", new_description, card_id
             ));
             CHECK(
-                    db_manager.select_card(card_id).m_description == new_description
+                db_manager.select_card(card_id).m_description == new_description
             );
         }
-#ifdef PROHIBITED_UPDATE_
+
         SUBCASE("prohibited update") {
+            CHECK(
+                !db_manager.update_command(CARD_TABLE_NAME, "id", "0", card_id)
+            );
             CHECK(!db_manager.update_command(
-                    CARD_TABLE_NAME, "id", "0", card_id
-            ));
-            CHECK(!db_manager.update_command(
-                    CARD_TABLE_NAME, "number", "0", card_id
+                CARD_TABLE_NAME, "number", "0", card_id
             ));
         }
-#endif  // PROHIBITED_UPDATE_
     }
     quint32 tag_id = db_manager.insert_tag("tag_name");
 
@@ -334,17 +338,15 @@ TEST_CASE("update command") {
             QString new_name = "new_tag_name";
 
             CHECK(db_manager.update_command(
-                    TAG_TABLE_NAME, "name", new_name, tag_id
+                TAG_TABLE_NAME, "name", new_name, tag_id
             ));
             CHECK(db_manager.select_tag(tag_id).m_name == new_name);
         }
-#ifdef PROHIBITED_UPDATE_
+
         SUBCASE("prohibited update") {
-            CHECK(!db_manager.update_command(
-                    CARD_TABLE_NAME, "id", "0", tag_id
-            ));
+            CHECK(!db_manager.update_command(CARD_TABLE_NAME, "id", "0", tag_id)
+            );
         }
-#endif // PROHIBITED_UPDATE_
     }
 }
 
@@ -386,9 +388,9 @@ TEST_CASE("delete user from board") {
     QVector<quint32> user_ids = {
         db_manager.authorize_user("test_user_1", "test_password"),
         db_manager.authorize_user("test_user_2", "test_password"),
-        db_manager.authorize_user("test_user_3", "test_password")
-    };
-    quint32 board_id = db_manager.insert_board(user_ids[0], "test_board", "", "");
+        db_manager.authorize_user("test_user_3", "test_password")};
+    quint32 board_id =
+        db_manager.insert_board(user_ids[0], "test_board", "", "");
 
     CHECK(db_manager.add_user_to_board(user_ids[1], board_id));
     CHECK(db_manager.add_user_to_board(user_ids[2], board_id));
@@ -401,7 +403,6 @@ TEST_CASE("delete user from board") {
     }
 
     SUBCASE("non-existent board or user") {
-
         CHECK(!db_manager.delete_user_from_board(user_ids[0], 0));
         CHECK(!db_manager.delete_user_from_board(0, board_id));
 
@@ -431,7 +432,7 @@ TEST_CASE("get board card ids") {
 
 TEST_CASE("cards filter") {
     db_manager db_manager(
-            arguments[0], arguments[1], arguments[2], arguments[3]
+        arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
     auto user_id = db_manager.authorize_user("test_user", "test_password");
@@ -462,45 +463,44 @@ TEST_CASE("cards filter") {
 
 TEST_CASE("get board_id by link") {
     db_manager db_manager(
-            arguments[0], arguments[1], arguments[2], arguments[3]
+        arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
 
     quint32 user_id = db_manager.authorize_user("test_user", "test_password");
 
     quint32 board_id_1 =
-            db_manager.insert_board(user_id, "board 1", "", "link_1");
+        db_manager.insert_board(user_id, "board 1", "", "link_1");
     quint32 board_id_2 =
-            db_manager.insert_board(user_id, "board 2", "", "link_2");
+        db_manager.insert_board(user_id, "board 2", "", "link_2");
     quint32 board_id_3 =
-            db_manager.insert_board(user_id, "board 3", "", "link_3");
+        db_manager.insert_board(user_id, "board 3", "", "link_3");
 
     CHECK(db_manager.get_board_id_by_link("link_1") == board_id_1);
     CHECK(db_manager.get_board_id_by_link("link_2") == board_id_2);
     CHECK(db_manager.get_board_id_by_link("link_3") == board_id_3);
 }
 
-// TODO trouble with updating order, id, etc fields (must be banned)
-
-#endif
+#endif  // DEFAULT_TESTS
 
 #ifdef TEST_NEW_FEATURE
 
 TEST_CASE("new feature") {
     db_manager db_manager(
-            arguments[0], arguments[1], arguments[2], arguments[3]
+        arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
 
     quint32 user_id = db_manager.authorize_user("test_user", "test_password");
-    quint32 board_id =
-            db_manager.insert_board(user_id, "test_board", "test description", "test link");
+    quint32 board_id = db_manager.insert_board(
+        user_id, "test_board", "test description", "test link"
+    );
     quint32 list_id_1 =
-            db_manager.insert_list(board_id, "test_list_1", "test description");
+        db_manager.insert_list(board_id, "test_list_1", "test description");
     quint32 list_id_2 =
-            db_manager.insert_list(board_id, "test_list_2", "test description");
+        db_manager.insert_list(board_id, "test_list_2", "test description");
     quint32 list_id_3 =
-            db_manager.insert_list(board_id, "test_list_3", "test description");
+        db_manager.insert_list(board_id, "test_list_3", "test description");
 
     db_manager.update_command(LIST_TABLE_NAME, "name", "new_name", list_id_3);
 
@@ -519,4 +519,4 @@ TEST_CASE("new feature") {
     }
 }
 
-#endif
+#endif  // TEST_NEW_FEATURE

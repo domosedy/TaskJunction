@@ -1,9 +1,9 @@
 #ifndef DATABASE_HPP_
 #define DATABASE_HPP_
+#include <QStringList>
 #include <QVector>
 #include <QtCore>
 #include <QtSql>
-#include <QStringList>
 #include <utility>
 #include "element_classes.hpp"
 
@@ -26,8 +26,7 @@ const QString TAG_ID_SEQUENCE = "tag_signature_id_seq";
 
 const QVector<QString> sequences_names{
     USER_ID_SEQUENCE, BOARD_ID_SEQUENCE, LIST_ID_SEQUENCE, CARD_ID_SEQUENCE,
-    TAG_ID_SEQUENCE
-};
+    TAG_ID_SEQUENCE};
 
 const QString QT_DATABASE_DRIVER = "QPSQL";
 
@@ -124,7 +123,6 @@ public:
     QVector<quint32> get_board_list_ids(quint32 board_id);
     QVector<quint32> get_board_card_ids(quint32 board_id);
     QVector<quint32> get_list_card_ids(quint32 list_id);
-
 
     QSet<quint32> filter_cards(quint32 board_id, const QStringList &tag_names);
 
