@@ -2,23 +2,62 @@
 #include <QCryptographicHash>
 #include <chrono>
 #include <random>
+#include <iostream>
 
-QString generate_salt() {
+QString code_string(const QString &link, quint32 id) {
+    std::mt19937 rnd(std::chrono::system_clock::now().time_since_epoch().count()
+    );
+    QString coded_link = "";
+    QString number = QString::number(id);
+
+    quint32 link_pos = 0;
+    quint32 number_pos = 0;
+    auto summary_size = link.size() + number.size();
+
+    while (link_pos < link.size() || number_pos < number.size()) {
+        if (link_pos == link.size()) {
+            coded_link += number[number_pos++];
+        } else if (number_pos == number.size())  {
+            coded_link += link[link_pos++];
+        } else if (rnd() % summary_size < link.size()) {
+            coded_link += link[link_pos++];
+        } else {
+            coded_link += number[number_pos++];
+        }
+    }
+
+    return coded_link;
+}
+
+std::pair<QString, quint32> decode_string(const QString &coded_link) {
+    QString link = "";
+    quint32 id = 0;
+
+    for (auto &it : coded_link) {
+        if (it.isNumber()) {
+            // QDebug() << it;
+            id = id * 10 + it.digitValue();
+            std::cout << id << std::endl;
+        } else {
+            link += it;
+        }
+    }
+
+    return {link, id};
+}
+
+QString generate_string() {
     std::mt19937 rnd(std::chrono::system_clock::now().time_since_epoch().count()
     );
 
-    QByteArray byte_data;
+    static const QString all_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&()*+-/:;<=>?@";
+    QString data;
 
-    for (int i = 0; i < 10; ++i) {
-        auto character = static_cast<unsigned char>(rnd());
-        while (character == '\n') {
-            character = static_cast<unsigned char>(rnd());
-        }
-
-        byte_data.push_back(character);
+    for (int i = 0; i < 15; ++i) {
+        data += all_characters[rnd() % all_characters.size()];
     }
 
-    return byte_data.toStdString().c_str();
+    return data;
 }
 
 QString hash_string(const QString &word, const QString &salt) {
