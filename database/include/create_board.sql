@@ -89,8 +89,12 @@ $$ LANGUAGE plpgSQL;
 
 CREATE OR REPLACE FUNCTION insert_tag(name_ text, OUT tag_id_ int) AS $$
 BEGIN
-    INSERT INTO tag_signature VALUES (name_, DEFAULT);
-    tag_id_ = last_value FROM tag_signature_id_seq;
+    IF exists (SELECT * FROM tag_signature WHERE name = name_) THEN
+        tag_id_ =  id FROM tag_signature WHERE name = name_;
+    ELSE
+        INSERT INTO tag_signature VALUES (name_, DEFAULT);
+        tag_id_ = last_value FROM tag_signature_id_seq;
+    END IF;
 END;
 $$ LANGUAGE plpgSQL;
 
