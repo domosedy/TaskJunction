@@ -15,6 +15,8 @@ find_package(PostgreSQL REQUIRED)
 add_executable(database src/database.cpp
         ../shared/include/element_classes.hpp
         ../shared/src/element_classes.cpp
+        ../shared/include/hashes.hpp
+        ../shared/src/hashes.cpp
         test/test.cpp
         test/dotest_main.cpp
         #src/database_main.cpp
