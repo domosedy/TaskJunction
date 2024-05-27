@@ -44,6 +44,8 @@ class db_manager {
 
     bool delete_command(const QString &table_name, quint32 key_value);
 
+    QString get_salt(const QString &login);
+
     static QString convert_vector_to_string(const QVector<QString> &vector);
 
     static void fill_query_name_to_sql_command();
@@ -129,7 +131,7 @@ public:
     bool check_user_rights(quint32 user_id, quint32 board_id);
 
     quint32 get_card_number(quint32 id);
-    quint32 get_board_by_link(const QString &link);
+    quint32 get_board_id_by_link(const QString &link);
 
     board get_full_board(quint32 board_id);
 };

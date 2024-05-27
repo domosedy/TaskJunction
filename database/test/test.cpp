@@ -475,9 +475,9 @@ TEST_CASE("get board_id by link") {
     quint32 board_id_3 =
             db_manager.insert_board(user_id, "board 3", "", "link_3");
 
-    CHECK(db_manager.get_board_by_link("link_1") == board_id_1);
-    CHECK(db_manager.get_board_by_link("link_2") == board_id_2);
-    CHECK(db_manager.get_board_by_link("link_3") == board_id_3);
+    CHECK(db_manager.get_board_id_by_link("link_1") == board_id_1);
+    CHECK(db_manager.get_board_id_by_link("link_2") == board_id_2);
+    CHECK(db_manager.get_board_id_by_link("link_3") == board_id_3);
 }
 
 // TODO trouble with updating order, id, etc fields (must be banned)
@@ -488,7 +488,7 @@ TEST_CASE("get board_id by link") {
 
 TEST_CASE("new feature") {
     db_manager db_manager(
-        arguments[0], arguments[1], arguments[2], arguments[3]
+            arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
 

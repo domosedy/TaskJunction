@@ -1,4 +1,5 @@
 #include "database.hpp"
+#include "hashes.hpp"
 #include <algorithm>
 #include <QCoreApplication>
 #include <QDebug>
@@ -34,7 +35,7 @@ QMap<QString, QString> db_manager::query_name_to_sql_command;
 
 void db_manager::fill_query_name_to_sql_command() {
     query_name_to_sql_command["authorize_user"] =
-        "SELECT %1.authorize_user(:login, :password);";
+        "SELECT %1.authorize_user(:login, :password, :salt);";
 
     query_name_to_sql_command["add_user_to_board"] =
         "INSERT INTO %1.user_to_board VALUES (:user_id, :board_id);";
@@ -146,8 +147,11 @@ void db_manager::fill_query_name_to_sql_command() {
         "WHERE list_id = ANY (SELECT id FROM %1.list_signature "
         "WHERE board_id = :board_id);";
 
-    query_name_to_sql_command["get_board_by_link"] =
-            "SELECT id FROM %1.board_signature WHERE link = :link;";
+    query_name_to_sql_command["get_board_id_by_link"] =
+        "SELECT id FROM %1.board_signature WHERE link = :link;";
+
+    query_name_to_sql_command["get_salt"] =
+        "SELECT salt FROM %1.user_signature WHERE login = :login;";
 }
 
 void db_manager::drop_all_tables() {
@@ -197,12 +201,28 @@ void db_manager::set_schema(const QString &name) {
     m_schema = name;
 }
 
+QString db_manager::get_salt(const QString &login) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["get_salt"].arg(m_schema));
+    query.bindValue(":login", login);
+    if (!query.exec()) {
+        qDebug() << "get_salt:" << query.lastError().text();
+        return "";
+    }
+    if (!query.next()) {
+        return generate_string();
+    }
+    return query.value(0).toString();;
+}
+
 quint32
 db_manager::authorize_user(const QString &login, const QString &password) {
+    QString salt = get_salt(login);
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["authorize_user"].arg(m_schema));
     query.bindValue(":login", login);
-    query.bindValue(":password", password);
+    query.bindValue(":password", hash_string(password, salt));
+    query.bindValue(":salt", salt);
     if (!query.exec()) {
         qDebug() << "authorize_user:" << query.lastError().text();
         return 0;
@@ -672,12 +692,12 @@ quint32 db_manager::get_card_number(quint32 id) {
     return query.value(0).toInt();
 }
 
-quint32 db_manager::get_board_by_link(const QString &link) {
+quint32 db_manager::get_board_id_by_link(const QString &link) {
     QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["get_board_by_link"].arg(m_schema));
+    query.prepare(query_name_to_sql_command["get_board_id_by_link"].arg(m_schema));
     query.bindValue(":link", link);
     if (!query.exec()) {
-        qDebug() << "get_board_by_link:" << query.lastError().text();
+        qDebug() << "get_board_id_by_link:" << query.lastError().text();
         return 0;
     }
     query.next();

@@ -2,7 +2,7 @@ CREATE TABLE user_signature(
 login varchar(50) PRIMARY KEY,
 password text,
 id serial UNIQUE,
-salt varchar(10)
+salt varchar(15)
 );
 
 CREATE TABLE board_signature(
@@ -46,21 +46,21 @@ board_id int REFERENCES board_signature ON DELETE CASCADE,
 PRIMARY KEY(user_id, board_id)
 );
 
-CREATE OR REPLACE FUNCTION insert_user(login_ text, password_ text) RETURNS int AS $$
+CREATE OR REPLACE FUNCTION insert_user(login_ text, password_ text, salt_ varchar(15)) RETURNS int AS $$
 BEGIN
-    INSERT INTO user_signature VALUES (login_, password_, DEFAULT, '');
+    INSERT INTO user_signature VALUES (login_, password_, DEFAULT, salt_);
     return last_value FROM user_signature_id_seq;
 END;
 $$ LANGUAGE plpgSQL;
 
-CREATE OR REPLACE FUNCTION authorize_user(login_ text, password_ text) RETURNS int AS $$
+CREATE OR REPLACE FUNCTION authorize_user(login_ text, password_ text, salt_ varchar(15)) RETURNS int AS $$
 BEGIN
     IF exists (SELECT * FROM user_signature WHERE login = login_ LIMIT 1) THEN
          IF exists (SELECT * FROM user_signature WHERE login = login_ AND password = password_ LIMIT 1) THEN
             return id FROM user_signature WHERE login = login_;
          ELSE return 0;
          END IF;
-    ELSE return insert_user(login_, password_);
+    ELSE return insert_user(login_, password_, salt_);
     END IF;
 END;
 $$ LANGUAGE plpgsql;
