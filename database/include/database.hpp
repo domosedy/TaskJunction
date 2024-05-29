@@ -124,7 +124,11 @@ public:
     QVector<quint32> get_board_card_ids(quint32 board_id);
     QVector<quint32> get_list_card_ids(quint32 list_id);
 
-    QSet<quint32> filter_cards(quint32 board_id, const QStringList &tag_names);
+    QSet<quint32>
+    any_filter_cards(quint32 board_id, const QStringList &tag_names);
+
+    QSet<quint32>
+    all_filter_cards(quint32 board_id, const QStringList &tag_names);
 
     bool check_user_rights(quint32 user_id, quint32 board_id);
 

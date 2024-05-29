@@ -149,11 +149,46 @@ void db_manager::fill_query_name_to_sql_command() {
         "SELECT id FROM %1.card_signature WHERE list_id = :list_id "
         "ORDER BY number;";
 
-    query_name_to_sql_command["filter_cards"] =
+    query_name_to_sql_command["any_filter_cards"] =
         "SELECT card_id FROM %1.card_to_tags WHERE tag_id = ANY (SELECT id "
         "FROM tag_signature WHERE name = ANY (:tag_names)) "
         "INTERSECT SELECT id FROM %1.card_signature WHERE list_id = "
         "ANY (SELECT id FROM %1.list_signature WHERE board_id = :board_id);";
+
+    query_name_to_sql_command["all_filter_cards"] =
+        "WITH tag_ids AS ( SELECT id FROM tag_signature "
+        "WHERE name = ANY (:tag_names)), "
+        "card_tag_counts AS ( SELECT card_id, COUNT(tag_id) AS tag_count "
+        "FROM card_to_tags WHERE tag_id IN (SELECT id FROM tag_ids) "
+        "GROUP BY card_id ) "
+        "SELECT card_id FROM card_tag_counts WHERE tag_count = "
+        "(SELECT COUNT(*) FROM tag_ids)"
+        "INTERSECT SELECT id FROM %1.card_signature WHERE list_id = "
+        "ANY (SELECT id FROM %1.list_signature WHERE board_id = :board_id);";
+    //        ""
+    //        " WITH tag_ids AS (    "
+    //        "   SELECT id    "
+    //        "   FROM tag_signature    "
+    //        "   WHERE name = ANY(:tag_names)   "
+    //        "),"
+    //        "card_tag_counts AS (    "
+    //        "   SELECT    "
+    //        "   card_id,    "
+    //        "   COUNT(tag_id) AS tag_count    "
+    //        "   FROM card_to_tags    "
+    //        "        WHERE tag_id IN (SELECT id FROM tag_ids)    "
+    //        "            GROUP BY    "
+    //        "             card_id    "
+    //        "   )    "
+    //        "   SELECT    "
+    //        "       card_id    "
+    //        "   FROM    "
+    //        "       card_tag_counts    "
+    //        "   WHERE    "
+    //        "       tag_count = :size"
+    //        "INTERSECT SELECT id FROM %1.card_signature WHERE list_id = "
+    //        "ANY (SELECT id FROM %1.list_signature WHERE board_id =
+    //        :board_id);";
 
     query_name_to_sql_command["get_board_id_by_link"] =
         "SELECT id FROM %1.board_signature WHERE link = :link;";
@@ -197,7 +232,7 @@ void db_manager::clear_all_tables() {
         ));
         if (!query.exec()) {
             qDebug() << "clear_all_tables::alter_sequence"
-                     << query.lastError().text() << '\n'
+                     << query.lastError().text() << ' '
                      << query_name_to_sql_command["alter_sequence"].arg(
                             m_schema, sequence_name, "1"
                         );
@@ -648,13 +683,32 @@ QString db_manager::convert_vector_to_string(const QVector<QString> &vector) {
 }
 
 QSet<quint32>
-db_manager::filter_cards(quint32 board_id, const QStringList &tag_names) {
+db_manager::any_filter_cards(quint32 board_id, const QStringList &tag_names) {
     QSqlQuery query(m_database);
-    query.prepare(query_name_to_sql_command["filter_cards"].arg(m_schema));
+    query.prepare(query_name_to_sql_command["any_filter_cards"].arg(m_schema));
     query.bindValue(":tag_names", convert_vector_to_string(tag_names));
     query.bindValue(":board_id", board_id);
     if (!query.exec()) {
-        qDebug() << "filter_cards:" << query.lastError().text();
+        qDebug() << "any_filter_cards:" << query.lastError().text();
+        return {};
+    }
+    QSet<quint32> result;
+    while (query.next()) {
+        result.insert(query.value(0).toInt());
+    }
+    return result;
+}
+
+QSet<quint32>
+db_manager::all_filter_cards(quint32 board_id, const QStringList &tag_names) {
+    QSqlQuery query(m_database);
+    query.prepare(query_name_to_sql_command["all_filter_cards"].arg(m_schema));
+    auto data = convert_vector_to_string(tag_names);
+    query.bindValue(":tag_names", data);
+    query.bindValue(":size", data.size());
+    query.bindValue(":board_id", board_id);
+    if (!query.exec()) {
+        qDebug() << "all_filter_cards:" << query.lastError().text();
         return {};
     }
     QSet<quint32> result;

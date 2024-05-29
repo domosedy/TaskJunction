@@ -1,4 +1,3 @@
-#include <iostream>
 #include <sstream>
 #include "database.hpp"
 #include "doctest.h"
@@ -458,7 +457,7 @@ TEST_CASE("cards filter") {
 
     QSet<quint32> answer = {card_id_1, card_id_2};
     QVector<QString> array = {"1", "2"};
-    CHECK(db_manager.filter_cards(board_id_1, array) == answer);
+    CHECK(db_manager.any_filter_cards(board_id_1, array) == answer);
 }
 
 TEST_CASE("get board_id by link") {
@@ -517,6 +516,45 @@ TEST_CASE("new feature") {
         CHECK(result[1] == list_id_2);
         CHECK(result[2] == list_id_3);
     }
+}
+
+TEST_CASE("cards filter") {
+    db_manager db_manager(
+        arguments[0], arguments[1], arguments[2], arguments[3]
+    );
+    db_manager.clear_all_tables();
+    auto user_id = db_manager.authorize_user("test_user", "test_password");
+    auto board_id = db_manager.insert_board(user_id, "", "", "");
+    auto list_id_1 = db_manager.insert_list(board_id, "", "");
+    auto list_id_2 = db_manager.insert_list(board_id, "", "");
+    auto card_id_1 = db_manager.insert_card(list_id_1, "", "");
+    auto card_id_2 = db_manager.insert_card(list_id_1, "", "");
+    auto card_id_3 = db_manager.insert_card(list_id_1, "", "");
+    auto card_id_4 = db_manager.insert_card(list_id_1, "", "");
+    auto card_id_5 = db_manager.insert_card(list_id_2, "", "");
+    auto card_id_6 = db_manager.insert_card(list_id_2, "", "");
+    auto card_id_7 = db_manager.insert_card(list_id_2, "", "");
+    auto card_id_8 = db_manager.insert_card(list_id_2, "", "");
+    auto tag_id_1 = db_manager.insert_tag("1");
+    auto tag_id_2 = db_manager.insert_tag("2");
+    auto tag_id_3 = db_manager.insert_tag("3");
+    db_manager.add_tag_to_card(card_id_1, tag_id_1);
+    db_manager.add_tag_to_card(card_id_2, tag_id_2);
+    db_manager.add_tag_to_card(card_id_3, tag_id_3);
+    db_manager.add_tag_to_card(card_id_4, tag_id_1);
+    db_manager.add_tag_to_card(card_id_4, tag_id_2);
+    db_manager.add_tag_to_card(card_id_5, tag_id_1);
+    db_manager.add_tag_to_card(card_id_5, tag_id_3);
+    db_manager.add_tag_to_card(card_id_6, tag_id_2);
+    db_manager.add_tag_to_card(card_id_6, tag_id_3);
+    db_manager.add_tag_to_card(card_id_7, tag_id_1);
+    db_manager.add_tag_to_card(card_id_7, tag_id_2);
+    db_manager.add_tag_to_card(card_id_7, tag_id_3);
+
+    QSet<quint32> answer = {card_id_4, card_id_7};
+    QVector<QString> array = {"1", "2"};
+    auto result = db_manager.all_filter_cards(board_id, array);
+    CHECK(result == answer);
 }
 
 #endif  // TEST_NEW_FEATURE
