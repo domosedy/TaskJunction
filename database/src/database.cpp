@@ -742,4 +742,18 @@ quint32 db_manager::get_board_id_by_link(const QString &link) {
     return query.value(0).toInt();
 }
 
+board db_manager::copy_board(const board &board) { // TODO trouble with cards order
+    quint32 board_id = insert_board(board.m_user_id, board.m_name, board.m_description, board.m_link);
+    for (const auto &list: board.m_lists) {
+        quint32 list_id = insert_list(board_id, list.m_name, list.m_description);
+        for (const auto &card: list.m_cards) {
+            quint32 card_id = insert_card(list_id, card.m_name, card.m_description);
+            for (const auto &tag: card.m_tags) {
+                quint32 tag_id = insert_tag(tag.m_name);
+                add_tag_to_card(card_id, tag_id);
+            }
+        }
+    }
+}
+
 }  // namespace database

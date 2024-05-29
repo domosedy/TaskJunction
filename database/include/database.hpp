@@ -136,6 +136,7 @@ public:
     quint32 get_board_id_by_link(const QString &link);
 
     board get_full_board(quint32 board_id);
+    board copy_board(const board &board);
 };
 
 }  // namespace database
