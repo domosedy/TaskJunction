@@ -43,7 +43,7 @@ void BoardMenu::create_board(
     bool is_remote
 ) {
     beginInsertRows(QModelIndex(), m_boards.size(), m_boards.size());
-    m_boards.append(board(id, user_id, name, description, is_remote));
+    m_boards.append(board(id, user_id, name, description, "", is_remote));
     endInsertRows();
 
     emit countChanged();

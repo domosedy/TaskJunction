@@ -35,7 +35,6 @@ set(PROJECT_SOURCES
         include/jsonparser.hpp
         ../shared/include/element_classes.hpp
         ../shared/include/hashes.hpp
-        ../shared/include/logging.hpp
         ../shared/src/element_classes.cpp
         ../shared/src/hashes.cpp
         ../database/include/database.hpp

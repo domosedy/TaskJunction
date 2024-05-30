@@ -8,7 +8,6 @@
 #include "database.hpp"
 #include "element_classes.hpp"
 #include "jsonparser.hpp"
-#include "logging.hpp"
 
 Client::Client(QObject *parent)
     : QObject(parent),
@@ -239,7 +238,7 @@ void Client::create_board(QString name, QString description, QString type) {
     }
 
     if (type == "Local") {
-        quint32 board_id = db.insert_board(m_local_id, name, description);
+        quint32 board_id = db.insert_board(m_local_id, name, description, "");
         m_board_menu->create_board(name, description, board_id, m_local_id);
     } else {
         std::string request =
@@ -422,7 +421,7 @@ void Client::set_filter(QString filter) {
         return;
     }
     m_filter = filter.split(", ");  // todo make better?
-    m_filtered_cards = db.filter_cards(m_current_board->m_board_id, m_filter);
+    m_filtered_cards = db.all_filter_cards(m_current_board->m_board_id, m_filter);
 }
 
 void Client::connect_board(QString link) {
