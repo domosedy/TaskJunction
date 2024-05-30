@@ -43,7 +43,7 @@ std::string update_request(
     quint32 card_id = 0
 );
 
-std::string connect_to_board_request(quint32 group_id, quint32 user_id);
+std::string connect_to_board_request(const QString &link);
 
 std::string move_request(
     quint32 to_list_id,

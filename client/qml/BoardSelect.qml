@@ -468,6 +468,7 @@ Rectangle {
                     anchors.topMargin: 10
                     onClicked: {
                         console.log("Lol there is nothing yet");
+                        mainClient.upload_board(index);
                     }
 
                     Text {

@@ -193,3 +193,8 @@ void BoardMenu::move_command(
         from_idx, new_idx, old_list_idx, new_list_idx
     );
 }
+
+nlohmann::json BoardMenu::board_to_json(int index) const {
+    quint32 id = m_boards[index].m_board_id;
+    return m_loaded_boards.at(id)->to_json();
+}

@@ -205,3 +205,17 @@ std::pair<int, int> ListModel::get_indices(quint32 card_id, quint32 tag_id)
     int tag_idx = (tag_id == 0 ? -1 : m_cards[card_idx]->get_tag_idx(tag_id));
     return {card_idx, tag_idx};
 }
+
+nlohmann::json ListModel::to_json() const {
+    nlohmann::json data = {
+        {"type", "list"},
+        {"id", m_list_id},
+        {"name", m_name.toStdString().c_str()},
+        {"description", ""},
+        {"cards", nlohmann::json::array()}
+    };
+    for (auto& card : m_cards) {
+        data["cards"].push_back(card->to_json());
+    }
+    return data;    
+}

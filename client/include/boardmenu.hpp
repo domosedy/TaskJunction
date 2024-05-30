@@ -6,6 +6,7 @@
 #include <QVector>
 #include <memory>
 #include <unordered_map>
+#include <nlohmann/json.hpp>
 #include "boardmodel.hpp"
 #include "element_classes.hpp"
 
@@ -62,6 +63,7 @@ public:
         quint32 card_id,
         int new_index
     );
+    nlohmann::json board_to_json(int index) const;
 
     friend class Client;
 signals:

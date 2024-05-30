@@ -65,6 +65,7 @@ public:
 
     Q_INVOKABLE bool is_filtered(int list_index, int card_index) const;
     Q_INVOKABLE void set_filter(QString filter);
+    Q_INVOKABLE void upload_board(int board_index) const;
 
 signals:
     void boardChanged();

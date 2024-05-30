@@ -143,6 +143,7 @@ board parse_board(const json &object, quint32 m_parent_id) {
     QString name = QString::fromStdString(object["name"]);
     QString description = QString::fromStdString(object["description"]);
     quint32 id = object["id"];
+    QString link = QString::fromStdString(object["link"]);
     board board(id, m_parent_id, name, description);
     QVector<list> lists;
     for (const auto &list_json : object["lists"]) {

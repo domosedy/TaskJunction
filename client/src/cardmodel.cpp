@@ -111,3 +111,17 @@ void CardModel::update_card(int tag_index, const QString &value) {
 int CardModel::get_tag_idx(quint32 tag_id) const {
     return m_index_by_id[tag_id];
 }
+
+nlohmann::json CardModel::to_json() const {
+    nlohmann::json data = {
+        {"type", "card"},
+        {"id", m_card_id},
+        {"name", m_name.toStdString().c_str()},
+        {"description", m_description.toStdString().c_str()},
+        {"tags", nlohmann::json::array()}
+    };
+    for (auto& tag : m_tags) {
+        data["tags"].push_back(nlohmann::json::parse(tag.to_json()));
+    }
+    return data;    
+}

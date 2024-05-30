@@ -32,6 +32,7 @@ public:
     int get_count();
     quint32 get_tag_id(const int index) const;
     int get_tag_idx(quint32 tag_id) const;
+    nlohmann::json to_json() const;
 
 signals:
     void countChanged();

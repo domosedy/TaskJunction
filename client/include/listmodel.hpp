@@ -42,6 +42,7 @@ public:
     std::pair<int, int> get_indices(quint32 card_id, quint32 tag_id) const;
 
     void delete_command(const int card_index, const int tag_index);
+    nlohmann::json to_json() const;
 signals:
     void countChanged();
 

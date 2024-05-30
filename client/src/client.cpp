@@ -426,6 +426,15 @@ void Client::set_filter(QString filter) {
 }
 
 void Client::connect_board(QString link) {
-    Q_UNUSED(link);
-    qDebug() << "Still nothing here";
+    std::string request = parser::connect_to_board_request(link);
+    write(request);
+}
+
+void Client::upload_board(int board_index) const {
+    qDebug() << "Printing " << board_index;
+    // if (!m_board_menu->is_board_loaded(board_index)) {
+    //     load_board(board_index);
+    // }
+    nlohmann::json data = m_board_menu->board_to_json(board_index);
+    qDebug() << data.dump().c_str();
 }

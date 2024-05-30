@@ -52,6 +52,7 @@ public:
         const QString &field,
         const QString &new_value
     );
+    nlohmann::json to_json() const;
 
 signals:
     void countChanged();
