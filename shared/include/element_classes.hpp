@@ -91,7 +91,8 @@ struct board {
         quint32 user_id,
         QString name,
         QString description,
-        QString m_link
+        QString m_link = "",
+        bool is_remote = false
     );
     board(QString name, QString description, quint32 id = 0);
     std::string to_json() const;

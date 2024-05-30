@@ -19,7 +19,7 @@ QString code_string(const QString &link, quint32 id) {
             coded_link += number[number_pos++];
         } else if (number_pos == number.size())  {
             coded_link += link[link_pos++];
-        } else if (rnd() % summary_size < link.size()) {
+        } else if (static_cast<quint32>(rnd() % summary_size) < link.size()) {
           coded_link += link[link_pos++];
         } else {
             coded_link += number[number_pos++];
