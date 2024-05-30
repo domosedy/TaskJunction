@@ -25,14 +25,14 @@ set(PROJECT_SOURCES
         src/listmodel.cpp
         src/boardmenu.cpp
         src/cardmodel.cpp
-        src/jsonparser.cpp
         src/qml.qrc
         include/client.hpp
         include/boardmodel.hpp
         include/listmodel.hpp
         include/cardmodel.hpp
         include/boardmenu.hpp
-        include/jsonparser.hpp
+        ../shared/include/jsonparser.hpp
+        ../shared/src/jsonparser.cpp
         ../shared/include/element_classes.hpp
         ../shared/include/hashes.hpp
         ../shared/src/element_classes.cpp
