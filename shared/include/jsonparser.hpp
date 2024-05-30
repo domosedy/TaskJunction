@@ -53,6 +53,8 @@ std::string move_request(
     quint32 card_id
 );
 
+std::string upload_request(const nlohmann::json &board_data);
+
 tag parse_tag(const json &object);
 
 card parse_card(const json &object, quint32 m_parent_id);
@@ -60,6 +62,7 @@ card parse_card(const json &object, quint32 m_parent_id);
 list parse_list(const json &object, quint32 m_parent_id);
 
 board parse_board(const json &object, quint32 m_parent_id);
+
 
 }  // namespace parser
 

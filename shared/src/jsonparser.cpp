@@ -112,6 +112,11 @@ std::string connect_to_board_request(const QString &link) {
     return request.dump();
 }
 
+std::string upload_request(const nlohmann::json &board_data) {
+    json request = {{"type", "upload"}, {"object-json", board_data}};
+    return request.dump();
+}
+
 tag parse_tag(const json &object) {
     QString name = QString::fromStdString(object["name"]);
     quint32 id = object["id"];
@@ -147,7 +152,7 @@ board parse_board(const json &object, quint32 m_parent_id) {
     QString description = QString::fromStdString(object["description"]);
     quint32 id = object["id"];
     QString link = QString::fromStdString(object["link"]);
-    board board(id, m_parent_id, name, description);
+    board board(id, m_parent_id, name, description, link);
     for (const auto &list_json : object["lists"]) {
         list list = parse_list(list_json, id);
         board.m_lists.push_back(list);

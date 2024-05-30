@@ -12,7 +12,7 @@ Rectangle {
     color: style.primaryColor
 
     Popup {
-        id: connectBoardPopUp
+        id: connectBoardPopup
 
         width: 210
         height: 120
@@ -65,7 +65,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottomMargin: 10
                 onClicked: {
-                    connectBoardPopUp.close();
+                    connectBoardPopup.close();
                     mainClient.connect_board(groupLink.text);
                     groupLink.text = "";
                 }
@@ -310,7 +310,7 @@ Rectangle {
             //visible: (mainClient.connection_status == Client.Authorized)
             visible: true
             onClicked: {
-                connectBoardPopUp.open();
+                connectBoardPopup.open();
             }
 
             Text {
@@ -467,8 +467,9 @@ Rectangle {
                     anchors.rightMargin: 20
                     anchors.topMargin: 10
                     onClicked: {
-                        console.log("Lol there is nothing yet");
-                        mainClient.upload_board(index);
+                        linkPopup.open();
+                        createBoardPopup.close();
+                        connectBoardPopup.close();
                     }
 
                     Text {
@@ -508,6 +509,60 @@ Rectangle {
                     background: Rectangle {
                         color: parent.down ? Qt.lighter(style.primaryColor, 1.4) : (parent.hovered ? Qt.lighter(style.primaryColor, 1.2) : style.primaryColor)
                         radius: style.defaultRadius
+                    }
+
+                }
+
+                Popup {
+                    id: linkPopup
+
+                    width: 210
+                    height: 60
+                    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                    focus: true
+
+                    background: Rectangle {
+                        visible: false
+                    }
+
+                    contentItem: Rectangle {
+                        id: linkPopUpContent
+
+                        border.color: style.primaryColor
+                        border.width: style.defaultBorderSize
+                        color: style.listBackgroundColor
+                        radius: style.defaultRadius
+                        anchors.centerIn: parent
+                        Drag.active: true
+
+                        TextField {
+                            id: linkHolder
+
+                            z: 1
+                            anchors.top: parent.top
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.topMargin: 10
+                            font.pointSize: 16
+                            font.family: "Poppins"
+                            readOnly: true
+                            text: link
+
+                            background: Rectangle {
+                                implicitWidth: linkPopUpContent.width - 20
+                                implicitHeight: 36
+                                radius: style.defaultRadius
+                                color: style.textFormColor
+                                border.color: style.listBackgroundColor
+                                border.width: 1
+                            }
+
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            drag.target: parent
+                        }
+
                     }
 
                 }

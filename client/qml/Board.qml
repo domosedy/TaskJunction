@@ -143,10 +143,37 @@ Rectangle {
                 createListPopup.open();
             }
             anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
+            //anchors.verticalCenter: parent.verticalCenter
+            anchors.top: copyBtn.bottom
+            anchors.topMargin: 5
 
             Text {
                 text: "New list"
+                font.family: "Poppins"
+                font.pointSize: 16
+                color: "white"
+                anchors.centerIn: parent
+            }
+
+            background: Rectangle {
+                color: parent.down ? Qt.darker(style.headerBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.headerBackgroundColor, 1.2) : style.headerBackgroundColor)
+            }
+
+        }
+
+        Button {
+            id: copyBtn
+
+            width: 110
+            height: 36
+            onClicked: {
+                mainClient.copy_board(0);
+            }
+            anchors.right: parent.right
+            anchors.top: parent.top
+
+            Text {
+                text: mainClient.current_board.is_remote ? "Copy" : "Upload"
                 font.family: "Poppins"
                 font.pointSize: 16
                 color: "white"

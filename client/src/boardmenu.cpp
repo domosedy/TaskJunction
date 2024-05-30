@@ -14,6 +14,7 @@ QHash<int, QByteArray> BoardMenu::roleNames() const {
     if (roles.empty()) {
         roles[BoardRoles::NameRole] = "name";
         roles[BoardRoles::DescriptionRole] = "description";
+        roles[BoardRoles::LinkRole] = "link";
     }
 
     return roles;
@@ -30,20 +31,23 @@ QVariant BoardMenu::data(const QModelIndex &index, int role) const {
             return {board.m_name};
         case BoardRoles::DescriptionRole:
             return {board.m_description};
+        case BoardRoles::LinkRole:
+            return {board.m_link};
         default:
             return {};
     }
 }
 
 void BoardMenu::create_board(
-    QString &name,
-    QString &description,
+    const QString &name,
+    const QString &description,
     quint32 id,
     quint32 user_id,
+    const QString &link,
     bool is_remote
 ) {
     beginInsertRows(QModelIndex(), m_boards.size(), m_boards.size());
-    m_boards.append(board(id, user_id, name, description, "", is_remote));
+    m_boards.append(board(id, user_id, name, description, link, is_remote));
     endInsertRows();
 
     emit countChanged();

@@ -155,7 +155,8 @@ void Client::load_remote_boards(const nlohmann::json &avaliable_boards) {
         QString name = QString::fromStdString(board["name"]);
         QString description = QString::fromStdString(board["description"]);
         quint32 id = board["id"];
-        m_board_menu->create_board(name, description, id, m_user_id, true);
+        QString link = QString::fromStdString(board["link"]);
+        m_board_menu->create_board(name, description, id, m_user_id, link, true);
     }
 }
 
@@ -429,11 +430,17 @@ void Client::connect_board(QString link) {
     write(request);
 }
 
-void Client::upload_board(int board_index) const {
-    qDebug() << "Printing " << board_index;
-    // if (!m_board_menu->is_board_loaded(board_index)) {
-    //     load_board(board_index);
-    // }
-    nlohmann::json data = m_board_menu->board_to_json(board_index);
-    qDebug() << data.dump().c_str();
+void Client::upload_board(int board_index) {
+    nlohmann::json board_data = m_board_menu->board_to_json(board_index);
+    std::string request = parser::upload_request(board_data);
+    write(request);
+}
+
+void Client::copy_board(int board_index) {
+    const nlohmann::json board_data_json = m_board_menu->board_to_json(board_index);
+    const board board_data = parser::parse_board(board_data_json, m_local_id);
+    board copy_board = db.copy_board(board_data);
+    copy_board.m_name.append(" copy");
+    qDebug() << (copy_board.m_is_remote ? "remote" : "noo");
+    m_board_menu->create_board(copy_board);
 }

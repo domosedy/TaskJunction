@@ -21,10 +21,11 @@ public:
         const override;
     int get_count();
     void create_board(
-        QString &name,
-        QString &description,
+        const QString &name,
+        const QString &description,
         quint32 id,
         quint32 user_id,
+        const QString &link = "",
         bool is_remote = false
     );
     void create_board(const board &board);
@@ -74,7 +75,7 @@ private:
     std::unordered_map<quint32, std::unique_ptr<BoardModel>> m_loaded_boards;
     bool is_local_loaded = false;
 
-    enum BoardRoles { NameRole = Qt::UserRole + 1, DescriptionRole };
+    enum BoardRoles { NameRole = Qt::UserRole + 1, DescriptionRole, LinkRole };
 };
 
 #endif  // BOARDMENU_HPP_

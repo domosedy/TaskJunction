@@ -12,6 +12,7 @@ BoardModel::BoardModel(const nlohmann::json &board_json, QObject *parent)
     m_board_id = board_json["id"];
     m_name = QString::fromStdString(board_json["name"]);
     m_description = QString::fromStdString(board_json["description"]);
+    m_link = QString::fromStdString(board_json["link"]);
     const nlohmann::json &lists = board_json["lists"];
     for (const auto &list : lists) {
         quint32 m_list_id = list["id"];
@@ -26,6 +27,7 @@ BoardModel::BoardModel(const board &board_base, QObject *parent)
     m_name = board_base.m_name;
     m_description = board_base.m_description;
     m_is_remote = board_base.m_is_remote;
+    m_link = board_base.m_link;
     for (const auto &list : board_base.m_lists) {
         m_ids.push_back(list.m_list_id);
         m_lists[list.m_list_id] = std::make_unique<ListModel>(list, this);
