@@ -122,7 +122,12 @@ card parse_card(const json &object, quint32 m_parent_id) {
     QString name = QString::fromStdString(object["name"]);
     QString description = QString::fromStdString(object["description"]);
     quint32 id = object["id"];
-    return card(id, m_parent_id, name, description);
+    card card(id, m_parent_id, name, description);
+    for (const auto &tag_json : object["tags"]) {
+        tag tag = parse_tag(tag_json);
+        card.m_tags.push_back(tag);
+    }
+    return card;
 }
 
 list parse_list(const json &object, quint32 m_parent_id) {
@@ -130,12 +135,10 @@ list parse_list(const json &object, quint32 m_parent_id) {
     QString description = QString::fromStdString(object["description"]);
     quint32 id = object["id"];
     list list(id, m_parent_id, name, description);
-    QVector<card> cards;
     for (const auto &card_json : object["cards"]) {
         card card = parse_card(card_json, id);
-        cards.push_back(card);
+        list.m_cards.push_back(card);
     }
-    list.m_cards = cards;
     return list;
 }
 
@@ -145,12 +148,10 @@ board parse_board(const json &object, quint32 m_parent_id) {
     quint32 id = object["id"];
     QString link = QString::fromStdString(object["link"]);
     board board(id, m_parent_id, name, description);
-    QVector<list> lists;
     for (const auto &list_json : object["lists"]) {
         list list = parse_list(list_json, id);
-        lists.push_back(list);
+        board.m_lists.push_back(list);
     }
-    board.m_lists = lists;
     return board;
 }
 
