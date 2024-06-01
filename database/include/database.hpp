@@ -68,7 +68,6 @@ public:
     void drop_all_tables();
 
     void set_schema(const QString &name);
-    // void create_schema(const QString &schema_name);
 
     quint32 authorize_user(const QString &login, const QString &password);
 

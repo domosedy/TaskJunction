@@ -115,42 +115,46 @@ TEST_CASE("delete") {
         arguments[0], arguments[1], arguments[2], arguments[3]
     );
 
-    auto create = [&]() {
-        db_manager.clear_all_tables();
-        quint32 user_id =
-            db_manager.authorize_user("test_user", "test_password");
-        quint32 board_id =
-            db_manager.insert_board(user_id, "test_board", "", "");
-        quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
-        quint32 card_id = db_manager.insert_card(list_id, "test_card", "");
-        quint32 tag_id = db_manager.insert_tag("test_name");
-        db_manager.add_tag_to_card(card_id, tag_id);
-        return QVector<quint32>{user_id, board_id, list_id, card_id, tag_id};
-    };
+    db_manager.clear_all_tables();
+    quint32 user_id =
+        db_manager.authorize_user("test_user", "test_password");
+    quint32 board_id =
+        db_manager.insert_board(user_id, "test_board", "", "");
+    quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
+    quint32 card_id = db_manager.insert_card(list_id, "test_card", "");
+    quint32 tag_id = db_manager.insert_tag("test_name");
+    db_manager.add_tag_to_card(card_id, tag_id);
 
-    SUBCASE("delete card") {
-        auto ids = create();
-        db_manager.delete_card(ids[3]);
-        auto result = db_manager.get_full_board(ids[1]);
-        CHECK(result.m_user_id == ids[0]);
-        CHECK(result.m_board_id == ids[1]);
-        CHECK(result.m_lists[0].m_list_id == ids[2]);
-        CHECK(result.m_lists[0].m_cards.empty());
-    }
-
-    SUBCASE("delete list") {
-        auto ids = create();
-        db_manager.delete_list(ids[2]);
-        auto result = db_manager.get_full_board(ids[1]);
-        CHECK(result.m_user_id == ids[0]);
-        CHECK(result.m_board_id == ids[1]);
-        CHECK(result.m_lists.empty());
+    SUBCASE("delete user") {
+        CHECK(db_manager.delete_user(user_id));
+        CHECK(db_manager.get_user_boards(user_id).empty());
     }
 
     SUBCASE("delete board") {
-        auto ids = create();
-        db_manager.delete_board(ids[1]);
-        CHECK(db_manager.get_user_boards(ids[0]).empty());
+        CHECK(db_manager.delete_board(board_id));
+        CHECK(db_manager.get_user_boards(user_id).empty());
+    }
+
+    SUBCASE("delete list") {
+        CHECK(db_manager.delete_list(list_id));
+        auto result = db_manager.get_full_board(board_id);
+        CHECK(result.m_user_id == user_id);
+        CHECK(result.m_board_id == board_id);
+        CHECK(result.m_lists.empty());
+    }
+
+    SUBCASE("delete card") {
+        CHECK(db_manager.delete_card(card_id));
+        auto result = db_manager.get_full_board(board_id);
+        CHECK(result.m_user_id == user_id);
+        CHECK(result.m_board_id == board_id);
+        CHECK(result.m_lists[0].m_list_id == list_id);
+        CHECK(result.m_lists[0].m_cards.empty());
+    }
+
+    SUBCASE("delete tag") {
+        CHECK(db_manager.delete_tag(tag_id));
+        CHECK(db_manager.get_card_tags(card_id).empty());
     }
 }
 
@@ -241,7 +245,7 @@ TEST_CASE("get card tags") {
     CHECK(db_manager.add_tag_to_card(card_id, tag_id_1));
     CHECK(db_manager.add_tag_to_card(card_id, tag_id_2));
     CHECK(db_manager.add_tag_to_card(card_id, tag_id_3));
-    
+
     QVector<quint32> answer = {tag_id_1, tag_id_2, tag_id_3};
 
     auto result = db_manager.get_card_tags(card_id);
