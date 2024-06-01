@@ -65,8 +65,7 @@ void db_manager::fill_query_name_to_sql_command() {
 
     query_name_to_sql_command["select_board"] =
         "SELECT id, user_id, name, description, link FROM %1.board_signature "
-        "WHERE "
-        "id = :key_value;";
+        "WHERE id = :key_value;";
 
     query_name_to_sql_command["select_list"] =
         "SELECT id, board_id, name, description FROM %1.list_signature "
@@ -85,8 +84,9 @@ void db_manager::fill_query_name_to_sql_command() {
     query_name_to_sql_command["delete_card"] = "SELECT %1.delete_card(:id);";
 
     query_name_to_sql_command["delete_from_card_to_tags"] =
-        "DELETE FROM %1.card_to_tags WHERE card_id = :card_id AND tag_id = "
-        ":tag_id;";
+        "WITH deleted AS (DELETE FROM %1.card_to_tags WHERE "
+        "card_id = :card_id AND tag_id = :tag_id IS TRUE RETURNING *)"
+        "SELECT count(*) FROM deleted;";
 
     query_name_to_sql_command["delete_user_from_board"] =
         "WITH deleted AS (DELETE FROM %1.user_to_board WHERE "
@@ -460,7 +460,8 @@ bool db_manager::delete_tag_from_card(quint32 card_id, quint32 tag_id) {
         qDebug() << "delete_tag_from_card: " << query.lastError().text();
         return false;
     }
-    return true;
+    query.next();
+    return query.value(0).toInt() == 1;
 }
 
 QVector<QVariant> db_manager::get_data(const QSqlRecord &record) {

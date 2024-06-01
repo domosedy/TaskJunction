@@ -349,7 +349,7 @@ TEST_CASE("update command") {
     }
 }
 
-TEST_CASE("adding a user to a board") {
+TEST_CASE("add user to board") {
     db_manager db_manager(
         arguments[0], arguments[1], arguments[2], arguments[3]
     );
@@ -410,6 +410,83 @@ TEST_CASE("delete user from board") {
     }
 }
 
+TEST_CASE("add tag to card") {
+    db_manager db_manager(
+        arguments[0], arguments[1], arguments[2], arguments[3]
+    );
+    db_manager.clear_all_tables();
+
+    quint32 user_id =
+        db_manager.authorize_user("test_user", "test_password");
+    quint32 board_id = db_manager.insert_board(user_id, "test_board", "", "");
+    quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
+    quint32 card_id_1 = db_manager.insert_card(list_id, "test_card_1", "");
+    quint32 card_id_2 = db_manager.insert_card(list_id, "test_card_2", "");
+    quint32 tag_id_1 = db_manager.insert_tag("test_tag_1");
+    quint32 tag_id_2 = db_manager.insert_tag("test_tag_2");
+    SUBCASE("normal adding") {
+        CHECK(db_manager.add_tag_to_card(card_id_1, tag_id_1));
+        CHECK(db_manager.add_tag_to_card(card_id_2, tag_id_2));
+
+        CHECK(!db_manager.add_tag_to_card(card_id_1, tag_id_1));
+        CHECK(!db_manager.add_tag_to_card(card_id_2, tag_id_2));
+
+        auto result_1 = db_manager.get_card_tags(card_id_1);
+        auto result_2 = db_manager.get_card_tags(card_id_2);
+
+        CHECK((result_1.size() == 1 && result_1[0].m_tag_id == tag_id_1));
+        CHECK((result_2.size() == 1 && result_2[0].m_tag_id == tag_id_2));
+    }
+
+    SUBCASE("non-existent board or user") {
+        CHECK(!db_manager.add_tag_to_card(card_id_1, 0));
+        CHECK(!db_manager.add_tag_to_card(0, card_id_1));
+
+        CHECK(!db_manager.add_tag_to_card(card_id_1, 100));
+        CHECK(!db_manager.add_tag_to_card(100, card_id_1));
+    }
+}
+
+TEST_CASE("delete tag from card") {
+    db_manager db_manager(
+        arguments[0], arguments[1], arguments[2], arguments[3]
+    );
+    db_manager.clear_all_tables();
+
+    quint32 user_id =
+        db_manager.authorize_user("test_user", "test_password");
+    quint32 board_id = db_manager.insert_board(user_id, "test_board", "", "");
+    quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
+    quint32 card_id = db_manager.insert_card(list_id, "test_card", "");
+
+    QVector<quint32> tag_ids = {
+        db_manager.insert_tag("test_tag_1"),
+        db_manager.insert_tag("test_tag_2"),
+        db_manager.insert_tag("test_tag_3")
+    };
+
+    CHECK(db_manager.add_tag_to_card(card_id, tag_ids[0]));
+    CHECK(db_manager.add_tag_to_card(card_id, tag_ids[1]));
+    CHECK(db_manager.add_tag_to_card(card_id, tag_ids[2]));
+
+    SUBCASE("normal deletion") {
+        db_manager.delete_tag_from_card(card_id, tag_ids[2]);
+
+        auto result = db_manager.get_card_tags(board_id);
+        CHECK(result.size() == 2);
+        CHECK(result[0].m_tag_id == tag_ids[0]);
+        CHECK(result[1].m_tag_id == tag_ids[1]);
+    }
+
+    SUBCASE("non-existent board or user") {
+        CHECK(!db_manager.delete_tag_from_card(card_id, 0));
+        CHECK(!db_manager.delete_tag_from_card(0, tag_ids[0]));
+
+        CHECK(!db_manager.delete_tag_from_card(card_id, 100));
+        CHECK(!db_manager.delete_tag_from_card(100, tag_ids[0]));
+    }
+}
+
 TEST_CASE("get board card ids") {
     db_manager db_manager(
         arguments[0], arguments[1], arguments[2], arguments[3]
@@ -429,7 +506,7 @@ TEST_CASE("get board card ids") {
     CHECK(card_ids == answer);
 }
 
-TEST_CASE("cards filter") {
+TEST_CASE("any_filter") {
     db_manager db_manager(
         arguments[0], arguments[1], arguments[2], arguments[3]
     );
@@ -480,45 +557,7 @@ TEST_CASE("get board_id by link") {
     CHECK(db_manager.get_board_id_by_link("link_3") == board_id_3);
 }
 
-#endif  // DEFAULT_TESTS
-
-#ifdef TEST_NEW_FEATURE
-
-TEST_CASE("new feature") {
-    db_manager db_manager(
-        arguments[0], arguments[1], arguments[2], arguments[3]
-    );
-    db_manager.clear_all_tables();
-
-    quint32 user_id = db_manager.authorize_user("test_user", "test_password");
-    quint32 board_id = db_manager.insert_board(
-        user_id, "test_board", "test description", "test link"
-    );
-    quint32 list_id_1 =
-        db_manager.insert_list(board_id, "test_list_1", "test description");
-    quint32 list_id_2 =
-        db_manager.insert_list(board_id, "test_list_2", "test description");
-    quint32 list_id_3 =
-        db_manager.insert_list(board_id, "test_list_3", "test description");
-
-    db_manager.update_command(LIST_TABLE_NAME, "name", "new_name", list_id_3);
-
-    {
-        auto result = db_manager.get_board_lists(board_id);
-        CHECK(result[0].m_list_id == list_id_1);
-        CHECK(result[1].m_list_id == list_id_2);
-        CHECK(result[2].m_list_id == list_id_3);
-    }
-
-    {
-        auto result = db_manager.get_board_list_ids(board_id);
-        CHECK(result[0] == list_id_1);
-        CHECK(result[1] == list_id_2);
-        CHECK(result[2] == list_id_3);
-    }
-}
-
-TEST_CASE("cards filter") {
+TEST_CASE("all_filter") {
     db_manager db_manager(
         arguments[0], arguments[1], arguments[2], arguments[3]
     );
@@ -625,6 +664,44 @@ TEST_CASE("copy board") {
 
     CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_tag_id == tag_id);
     CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_name == "test_tag");
+}
+
+#endif  // DEFAULT_TESTS
+
+#ifdef TEST_NEW_FEATURE
+
+TEST_CASE("new feature") {
+    db_manager db_manager(
+        arguments[0], arguments[1], arguments[2], arguments[3]
+    );
+    db_manager.clear_all_tables();
+
+    quint32 user_id = db_manager.authorize_user("test_user", "test_password");
+    quint32 board_id = db_manager.insert_board(
+        user_id, "test_board", "test description", "test link"
+    );
+    quint32 list_id_1 =
+        db_manager.insert_list(board_id, "test_list_1", "test description");
+    quint32 list_id_2 =
+        db_manager.insert_list(board_id, "test_list_2", "test description");
+    quint32 list_id_3 =
+        db_manager.insert_list(board_id, "test_list_3", "test description");
+
+    db_manager.update_command(LIST_TABLE_NAME, "name", "new_name", list_id_3);
+
+    {
+        auto result = db_manager.get_board_lists(board_id);
+        CHECK(result[0].m_list_id == list_id_1);
+        CHECK(result[1].m_list_id == list_id_2);
+        CHECK(result[2].m_list_id == list_id_3);
+    }
+
+    {
+        auto result = db_manager.get_board_list_ids(board_id);
+        CHECK(result[0] == list_id_1);
+        CHECK(result[1] == list_id_2);
+        CHECK(result[2] == list_id_3);
+    }
 }
 
 #endif  // TEST_NEW_FEATURE
