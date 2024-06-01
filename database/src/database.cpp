@@ -116,7 +116,7 @@ void db_manager::fill_query_name_to_sql_command() {
         "SELECT id FROM %1.card_signature WHERE list_id = :id ORDER BY number";
 
     query_name_to_sql_command["get_card_tags"] =
-        "SELECT tag_id FROM %1.card_to_tags WHERE tag_id = :id ORDER BY "
+        "SELECT tag_id FROM %1.card_to_tags WHERE card_id = :id ORDER BY "
         "tag_id;";
 
     query_name_to_sql_command["check_user_rights"] =
@@ -597,6 +597,18 @@ QVector<tag> db_manager::get_card_tags(quint32 card_id) {
     return result;
 }
 
+board db_manager::get_full_board(quint32 board_id) {
+    board board = select_board(board_id);
+    board.m_lists = get_board_lists(board_id);
+    for (auto &list : board.m_lists) {
+        list.m_cards = get_list_cards(list.m_list_id);
+        for (auto &card: list.m_cards) {
+            card.m_tags = get_card_tags(card.m_card_id);
+        }
+    }
+    return board;
+}
+
 QVector<quint32> db_manager::get_board_user_ids(quint32 board_id) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["get_board_user_ids"].arg(m_schema)
@@ -708,15 +720,6 @@ QVector<quint32> db_manager::get_board_card_ids(quint32 board_id) {
     return result;
 }
 
-board db_manager::get_full_board(quint32 board_id) {
-    board board = select_board(board_id);
-    board.m_lists = get_board_lists(board_id);
-    for (auto &list : board.m_lists) {
-        list.m_cards = get_list_cards(list.m_list_id);
-    }
-    return board;
-}
-
 quint32 db_manager::get_card_number(quint32 id) {
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["get_card_number"].arg(m_schema));
@@ -742,8 +745,8 @@ quint32 db_manager::get_board_id_by_link(const QString &link) {
     return query.value(0).toInt();
 }
 
-board db_manager::copy_board(const board &board) { // TODO trouble with cards order
-    quint32 board_id = insert_board(board.m_user_id, board.m_name, board.m_description, board.m_link);
+board db_manager::copy_board(const board &board, quint32 user_id) { // TODO trouble with cards order, must be only 1 query
+    quint32 board_id = insert_board(user_id, board.m_name, board.m_description, board.m_link);
     for (const auto &list: board.m_lists) {
         quint32 list_id = insert_list(board_id, list.m_name, list.m_description);
         for (const auto &card: list.m_cards) {
@@ -754,6 +757,7 @@ board db_manager::copy_board(const board &board) { // TODO trouble with cards or
             }
         }
     }
+    return get_full_board(board_id);
 }
 
 }  // namespace database

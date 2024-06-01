@@ -100,6 +100,7 @@ public:
         quint32 key_value
     );
     bool move_card(int id, int new_list_id, int new_number);
+
     user select_user(quint32 id);
     board select_board(quint32 id);
     list select_list(quint32 id);
@@ -126,7 +127,6 @@ public:
 
     QSet<quint32>
     any_filter_cards(quint32 board_id, const QStringList &tag_names);
-
     QSet<quint32>
     all_filter_cards(quint32 board_id, const QStringList &tag_names);
 
@@ -136,7 +136,7 @@ public:
     quint32 get_board_id_by_link(const QString &link);
 
     board get_full_board(quint32 board_id);
-    board copy_board(const board &board);
+    board copy_board(const board &board, quint32 user_id);
 };
 
 }  // namespace database

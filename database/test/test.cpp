@@ -523,6 +523,7 @@ TEST_CASE("cards filter") {
         arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
+
     auto user_id = db_manager.authorize_user("test_user", "test_password");
     auto board_id = db_manager.insert_board(user_id, "", "", "");
     auto list_id_1 = db_manager.insert_list(board_id, "", "");
@@ -551,10 +552,79 @@ TEST_CASE("cards filter") {
     db_manager.add_tag_to_card(card_id_7, tag_id_2);
     db_manager.add_tag_to_card(card_id_7, tag_id_3);
 
-    QSet<quint32> answer = {card_id_4, card_id_7};
-    QVector<QString> array = {"1", "2"};
-    auto result = db_manager.all_filter_cards(board_id, array);
-    CHECK(result == answer);
+    SUBCASE("zero tags") {
+        QVector<QString> array = {};
+        auto result = db_manager.all_filter_cards(board_id, array);
+        CHECK(result.empty());
+    }
+
+    SUBCASE("one tag") {
+        QVector<QString> array = {"1"};
+        QSet<quint32> answer = {card_id_1, card_id_4, card_id_5, card_id_7};
+        auto result = db_manager.all_filter_cards(board_id, array);
+        CHECK(result == answer);
+    }
+
+    SUBCASE("two tags") {
+        QVector<QString> array = {"1", "2"};
+        QSet<quint32> answer = {card_id_4, card_id_7};
+        auto result = db_manager.all_filter_cards(board_id, array);
+        CHECK(result == answer);
+    }
+
+    SUBCASE("three tags") {
+        QVector<QString> array = {"1", "2", "3"};
+        QSet<quint32> answer = {card_id_7};
+        auto result = db_manager.all_filter_cards(board_id, array);
+        CHECK(result == answer);
+    }
+
+    SUBCASE("too many tags") {
+        db_manager.insert_tag("4");
+        QSet<quint32> answer = {};
+        QVector<QString> array = {"1", "2", "3", "4"};
+        auto result = db_manager.all_filter_cards(board_id, array);
+        CHECK(result.empty());
+        for (auto item: result)
+            qDebug() << item;
+    }
+}
+
+TEST_CASE("copy board") {
+    db_manager db_manager(
+        arguments[0], arguments[1], arguments[2], arguments[3]
+    );
+    db_manager.clear_all_tables();
+
+    quint32 user_id = db_manager.authorize_user("test_user", "test_password");
+    quint32 board_id = db_manager.insert_board(
+        user_id, "test_board", "test description", "test link"
+    );
+    quint32 list_id =
+        db_manager.insert_list(board_id, "test_list", "test description");
+    quint32 card_id =
+        db_manager.insert_card(list_id, "test_card", "test description");
+    quint32 tag_id = db_manager.insert_tag("test_tag");
+    db_manager.add_tag_to_card(card_id, tag_id);
+
+    board board = db_manager.copy_board(db_manager.get_full_board(board_id), user_id);
+
+    CHECK(board.m_user_id == user_id);
+    CHECK(board.m_name == "test_board");
+    CHECK(board.m_description == "test description");
+    CHECK(board.m_link == "test link");
+
+    CHECK(!board.m_lists.empty());
+    CHECK(board.m_lists[0].m_board_id == board.m_board_id);
+    CHECK(board.m_lists[0].m_name == "test_list");
+    CHECK(board.m_lists[0].m_description == "test description");
+
+    CHECK(board.m_lists[0].m_cards[0].m_list_id == board.m_lists[0].m_list_id);
+    CHECK(board.m_lists[0].m_cards[0].m_name == "test_card");
+    CHECK(board.m_lists[0].m_cards[0].m_description == "test description");
+
+    CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_tag_id == tag_id);
+    CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_name == "test_tag");
 }
 
 #endif  // TEST_NEW_FEATURE
