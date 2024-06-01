@@ -173,6 +173,102 @@ TEST_CASE("get user boards") {
     }
 }
 
+TEST_CASE("get board lists") {
+    db_manager db_manager(
+        arguments[0], arguments[1], arguments[2], arguments[3]
+    );
+    db_manager.clear_all_tables();
+
+    quint32 user_id = db_manager.authorize_user("test_user", "test_password");
+    quint32 board_id = db_manager.insert_board(user_id, "test_board", "", "");
+    quint32 list_id_1 = db_manager.insert_list(board_id, "test_list_1", "");
+    quint32 list_id_2 = db_manager.insert_list(board_id, "test_list_2", "");
+    quint32 list_id_3 = db_manager.insert_list(board_id, "test_list_2", "");
+    QVector<quint32> answer = {list_id_1, list_id_2, list_id_3};
+
+    SUBCASE("get board lists") {
+        auto result = db_manager.get_board_lists(board_id);
+        CHECK(answer.size() == result.size());
+        for (int i = 0; i < answer.size(); ++i) {
+            CHECK(answer[i] == result[i].m_list_id);
+        }
+    }
+    SUBCASE("get board list ids") {
+        CHECK(answer == db_manager.get_board_list_ids(board_id));
+    }
+}
+
+TEST_CASE("get list cards") {
+    db_manager db_manager(
+        arguments[0], arguments[1], arguments[2], arguments[3]
+    );
+    db_manager.clear_all_tables();
+
+    quint32 user_id = db_manager.authorize_user("test_user", "test_password");
+    quint32 board_id = db_manager.insert_board(user_id, "test_board", "", "");
+    quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
+    quint32 card_id_1 = db_manager.insert_card(list_id, "test_card_1", "");
+    quint32 card_id_2 = db_manager.insert_card(list_id, "test_card_2", "");
+    quint32 card_id_3 = db_manager.insert_card(list_id, "test_card_2", "");
+    QVector<quint32> answer = {card_id_1, card_id_2, card_id_3};
+
+    SUBCASE("get list cards") {
+        auto result = db_manager.get_list_cards(list_id);
+        CHECK(answer.size() == result.size());
+        for (int i = 0; i < answer.size(); ++i) {
+            CHECK(answer[i] == result[i].m_card_id);
+        }
+    }
+    SUBCASE("get list card ids") {
+        CHECK(answer == db_manager.get_list_card_ids(list_id));
+    }
+}
+
+TEST_CASE("get card tags") {
+    db_manager db_manager(
+        arguments[0], arguments[1], arguments[2], arguments[3]
+    );
+    db_manager.clear_all_tables();
+
+    quint32 user_id = db_manager.authorize_user("test_user", "test_password");
+    quint32 board_id = db_manager.insert_board(user_id, "test_board", "", "");
+    quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
+    quint32 card_id = db_manager.insert_card(list_id, "test_card", "");
+    quint32 tag_id_1 = db_manager.insert_tag("test_tag_1");
+    quint32 tag_id_2 = db_manager.insert_tag("test_tag_2");
+    quint32 tag_id_3 = db_manager.insert_tag("test_tag_3");
+
+    CHECK(db_manager.add_tag_to_card(card_id, tag_id_1));
+    CHECK(db_manager.add_tag_to_card(card_id, tag_id_2));
+    CHECK(db_manager.add_tag_to_card(card_id, tag_id_3));
+    
+    QVector<quint32> answer = {tag_id_1, tag_id_2, tag_id_3};
+
+    auto result = db_manager.get_card_tags(card_id);
+    CHECK(answer.size() == result.size());
+    for (int i = 0; i < answer.size(); ++i) {
+        CHECK(answer[i] == result[i].m_tag_id);
+    }
+}
+
+TEST_CASE("get card number") {
+    db_manager db_manager(
+        arguments[0], arguments[1], arguments[2], arguments[3]
+    );
+    db_manager.clear_all_tables();
+
+    quint32 user_id = db_manager.authorize_user("test_user", "test_password");
+    quint32 board_id = db_manager.insert_board(user_id, "test_board", "", "");
+    quint32 list_id = db_manager.insert_list(board_id, "test_list", "");
+    quint32 card_id_1 = db_manager.insert_card(list_id, "test_card_1", "");
+    quint32 card_id_2 = db_manager.insert_card(list_id, "test_card_2", "");
+    quint32 card_id_3 = db_manager.insert_card(list_id, "test_card_3", "");
+
+    CHECK(db_manager.get_card_number(card_id_1) == 1);
+    CHECK(db_manager.get_card_number(card_id_2) == 2);
+    CHECK(db_manager.get_card_number(card_id_3) == 3);
+}
+
 TEST_CASE("update order") {
     db_manager db_manager(
         arguments[0], arguments[1], arguments[2], arguments[3]
@@ -629,6 +725,45 @@ TEST_CASE("all_filter") {
     }
 }
 
+TEST_CASE("get full board") {
+    db_manager db_manager(
+        arguments[0], arguments[1], arguments[2], arguments[3]
+    );
+    db_manager.clear_all_tables();
+
+    quint32 user_id = db_manager.authorize_user("test_user", "test_password");
+    quint32 board_id = db_manager.insert_board(
+        user_id, "test_board", "test description", "test link"
+    );
+    quint32 list_id =
+        db_manager.insert_list(board_id, "test_list", "test description");
+    quint32 card_id =
+        db_manager.insert_card(list_id, "test_card", "test description");
+    quint32 tag_id = db_manager.insert_tag("test_tag");
+    db_manager.add_tag_to_card(card_id, tag_id);
+
+    board board = db_manager.get_full_board(board_id);
+
+    CHECK(board.m_user_id == user_id);
+    CHECK(board.m_name == "test_board");
+    CHECK(board.m_description == "test description");
+    CHECK(board.m_link == "test link");
+
+    CHECK(board.m_lists.size() == 1);
+    CHECK(board.m_lists[0].m_board_id == board_id);
+    CHECK(board.m_lists[0].m_name == "test_list");
+    CHECK(board.m_lists[0].m_description == "test description");
+
+    CHECK(board.m_lists[0].m_cards.size() == 1);
+    CHECK(board.m_lists[0].m_cards[0].m_list_id == list_id);
+    CHECK(board.m_lists[0].m_cards[0].m_name == "test_card");
+    CHECK(board.m_lists[0].m_cards[0].m_description == "test description");
+
+    CHECK(board.m_lists[0].m_cards[0].m_tags.size() == 1);
+    CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_tag_id == tag_id);
+    CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_name == "test_tag");
+}
+
 TEST_CASE("copy board") {
     db_manager db_manager(
         arguments[0], arguments[1], arguments[2], arguments[3]
@@ -653,15 +788,17 @@ TEST_CASE("copy board") {
     CHECK(board.m_description == "test description");
     CHECK(board.m_link == "test link");
 
-    CHECK(!board.m_lists.empty());
+    CHECK(board.m_lists.size() == 1);
     CHECK(board.m_lists[0].m_board_id == board.m_board_id);
     CHECK(board.m_lists[0].m_name == "test_list");
     CHECK(board.m_lists[0].m_description == "test description");
 
+    CHECK(board.m_lists[0].m_cards.size() == 1);
     CHECK(board.m_lists[0].m_cards[0].m_list_id == board.m_lists[0].m_list_id);
     CHECK(board.m_lists[0].m_cards[0].m_name == "test_card");
     CHECK(board.m_lists[0].m_cards[0].m_description == "test description");
 
+    CHECK(board.m_lists[0].m_cards[0].m_tags.size() == 1);
     CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_tag_id == tag_id);
     CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_name == "test_tag");
 }
