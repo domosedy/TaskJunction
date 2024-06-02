@@ -214,8 +214,8 @@ nlohmann::json ListModel::to_json() const {
         {"description", ""},
         {"cards", nlohmann::json::array()}
     };
-    for (auto& card : m_cards) {
+    for (auto &card : m_cards) {
         data["cards"].push_back(card->to_json());
     }
-    return data;    
+    return data;
 }

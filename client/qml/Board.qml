@@ -131,21 +131,21 @@ Rectangle {
             font.family: "Poppins"
             font.pointSize: 20
             color: "white"
-            anchors.centerIn: parent
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: toMenuButton.right
+            anchors.leftMargin: 10
         }
 
         Button {
             id: newListBtn
 
             width: 110
-            height: 36
+            height: parent.height / 2
             onClicked: {
                 createListPopup.open();
             }
             anchors.right: parent.right
-            //anchors.verticalCenter: parent.verticalCenter
             anchors.top: copyBtn.bottom
-            anchors.topMargin: 5
 
             Text {
                 text: "New list"
@@ -165,7 +165,7 @@ Rectangle {
             id: copyBtn
 
             width: 110
-            height: 36
+            height: parent.height / 2
             onClicked: {
                 mainClient.copy_board(0);
             }
@@ -173,7 +173,7 @@ Rectangle {
             anchors.top: parent.top
 
             Text {
-                text: mainClient.current_board.is_remote ? "Copy" : "Upload"
+                text: mainClient ? (mainClient.current_board.is_remote ? "Copy" : "Upload") : ""
                 font.family: "Poppins"
                 font.pointSize: 16
                 color: "white"
@@ -192,13 +192,19 @@ Rectangle {
             z: 1
             placeholderText: ""
             placeholderTextColor: "#bfbfbf"
-            anchors.right: filterBtn.left
+            anchors.right: newListBtn.left
             anchors.verticalCenter: parent.verticalCenter
-            anchors.topMargin: 10
+            anchors.rightMargin: 5
             font.pointSize: 16
             font.family: "Poppins"
             font.bold: true
             clip: true
+            onAccepted: {
+                mainClient.set_filter(filterHolder.text, filterTypeSwitch.checked);
+                for (let i = 0; i < listview.model.count; ++i) {
+                    listview.itemAtIndex(i).update_filter(filterHolder.text);
+                }
+            }
 
             background: Rectangle {
                 implicitWidth: 120
@@ -211,32 +217,47 @@ Rectangle {
 
         }
 
-        Button {
-            id: filterBtn
+        Switch {
+            id: filterTypeSwitch
 
-            width: 36
-            height: 36
-            onClicked: {
-                mainClient.set_filter(filterHolder.text);
-                for (let i = 0; i < listview.model.count; ++i) {
-                    listview.itemAtIndex(i).update_filter(filterHolder.text);
-                }
-            }
-            anchors.right: newListBtn.left
+            z: 1
+            implicitWidth: 26
+            implicitHeight: 36
+            anchors.right: filterHolder.left
             anchors.verticalCenter: parent.verticalCenter
+            anchors.rightMargin: 10
 
-            Text {
-                id: filter
+            indicator: Rectangle {
+                implicitWidth: filterTypeSwitch.implicitWidth
+                implicitHeight: filterTypeSwitch.implicitHeight
+                x: filterTypeSwitch.leftPadding
+                y: parent.height / 2 - height / 2
+                radius: 13
+                color: style.textFormColor
+                border.color: style.textFormColor
 
-                text: "flt"
-                font.family: "Poppins"
-                font.pointSize: 16
-                color: "white"
-                anchors.centerIn: parent
+                Rectangle {
+                    y: filterTypeSwitch.checked ? parent.height - height : 0
+                    width: 26
+                    height: 26
+                    radius: 13
+                    color: "white"
+                    border.color: "white"
+                    border.width: 5
+                    z: -1
+                }
+
             }
 
-            background: Rectangle {
-                color: parent.down ? Qt.darker(style.headerBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.headerBackgroundColor, 1.2) : style.headerBackgroundColor)
+            contentItem: Text {
+                text: filterTypeSwitch.checked ? "All" : "Any"
+                font.family: "Poppins"
+                font.pointSize: 12
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                topPadding: 5
+                color: "white"
+                rotation: 270
             }
 
         }

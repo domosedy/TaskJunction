@@ -24,8 +24,6 @@ Client::Client(QObject *parent)
         SLOT(onSocketError(QAbstractSocket::SocketError))
     );
     m_board_menu = new BoardMenu(this);
-
-    m_local_id = db.authorize_user("default", "default");
 }
 
 void Client::write(std::string &data) {
@@ -156,7 +154,9 @@ void Client::load_remote_boards(const nlohmann::json &avaliable_boards) {
         QString description = QString::fromStdString(board["description"]);
         quint32 id = board["id"];
         QString link = QString::fromStdString(board["link"]);
-        m_board_menu->create_board(name, description, id, m_user_id, link, true);
+        m_board_menu->create_board(
+            name, description, id, m_user_id, link, true
+        );
     }
 }
 
@@ -230,7 +230,7 @@ void Client::create_card(int list_index, QString name, QString description) {
     }
 }
 
-void Client::create_board(QString name, QString description, QString type) {
+void Client::create_board(QString name, QString description, bool is_remote) {
     if (name == "") {
         name = "New board";
     }
@@ -238,7 +238,7 @@ void Client::create_board(QString name, QString description, QString type) {
         description = "smth";
     }
 
-    if (type == "Local") {
+    if (!is_remote) {
         quint32 board_id = db.insert_board(m_local_id, name, description, "");
         m_board_menu->create_board(name, description, board_id, m_local_id);
     } else {
@@ -415,14 +415,20 @@ bool Client::is_filtered(int list_index, int card_index) const {
     return m_filtered_cards.find(card_id) != m_filtered_cards.end();
 }
 
-void Client::set_filter(QString filter) {
+void Client::set_filter(QString filter, bool is_all) {
     if (filter == "") {
         m_filtered_cards.clear();
         m_filter.clear();
         return;
     }
     m_filter = filter.split(", ");  // todo make better?
-    m_filtered_cards = db.all_filter_cards(m_current_board->m_board_id, m_filter);
+    if (is_all) {
+        m_filtered_cards =
+            db.all_filter_cards(m_current_board->m_board_id, m_filter);
+    } else {
+        m_filtered_cards =
+            db.any_filter_cards(m_current_board->m_board_id, m_filter);
+    }
 }
 
 void Client::connect_board(QString link) {
@@ -437,9 +443,10 @@ void Client::upload_board(int board_index) {
 }
 
 void Client::copy_board(int board_index) {
-    const nlohmann::json board_data_json = m_board_menu->board_to_json(board_index);
+    const nlohmann::json board_data_json =
+        m_board_menu->board_to_json(board_index);
     const board board_data = parser::parse_board(board_data_json, m_local_id);
-    board copy_board = db.copy_board(board_data);
+    board copy_board = db.copy_board(board_data, m_local_id);
     copy_board.m_name.append(" copy");
     qDebug() << (copy_board.m_is_remote ? "remote" : "noo");
     m_board_menu->create_board(copy_board);

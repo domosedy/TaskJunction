@@ -5,8 +5,8 @@
 #include <QScopedPointer>
 #include <QVector>
 #include <memory>
-#include <unordered_map>
 #include <nlohmann/json.hpp>
+#include <unordered_map>
 #include "boardmodel.hpp"
 #include "element_classes.hpp"
 

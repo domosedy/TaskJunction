@@ -47,7 +47,7 @@ public:
     create_card(int list_index, QString name, QString description);
     Q_INVOKABLE void create_list(QString name);
     Q_INVOKABLE void
-    create_board(QString name, QString description, QString type);
+    create_board(QString name, QString description, bool is_remote);
 
     Q_INVOKABLE void delete_tag(int list_index, int card_index, int tag_index);
     Q_INVOKABLE void delete_card(int list_index, int card_index);
@@ -64,7 +64,7 @@ public:
     move(int from_card, int to_card, int from_list, int to_list);
 
     Q_INVOKABLE bool is_filtered(int list_index, int card_index) const;
-    Q_INVOKABLE void set_filter(QString filter);
+    Q_INVOKABLE void set_filter(QString filter, bool is_all);
     Q_INVOKABLE void upload_board(int board_index);
     Q_INVOKABLE void copy_board(int board_index);
 

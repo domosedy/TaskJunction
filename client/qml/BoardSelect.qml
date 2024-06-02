@@ -20,6 +20,9 @@ Rectangle {
         y: style.headerHeight
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         focus: true
+        onOpened: {
+            groupLink.text = "";
+        }
 
         background: Rectangle {
             visible: false
@@ -67,7 +70,6 @@ Rectangle {
                 onClicked: {
                     connectBoardPopup.close();
                     mainClient.connect_board(groupLink.text);
-                    groupLink.text = "";
                 }
 
                 Text {
@@ -103,6 +105,11 @@ Rectangle {
         y: style.headerHeight
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         focus: true
+        onOpened: {
+            boardTypeSwitch.checked = false;
+            boardDescription.text = "";
+            boardName.text = "";
+        }
 
         background: Rectangle {
             visible: false
@@ -163,36 +170,44 @@ Rectangle {
 
             }
 
-            // TODO make better
-            ComboBox {
-                id: boardType
+            Switch {
+                id: boardTypeSwitch
 
                 z: 1
-                implicitWidth: parent.width - 20
+                implicitWidth: parent.width - 10
                 implicitHeight: 36
                 anchors.top: boardDescription.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.topMargin: 10
                 anchors.bottomMargin: 10
-                Component.onCompleted: {
-                    if (mainClient.connection_status == Client.Authorized)
-                        model.append({
-                        "text": "Remote"
-                    });
 
-                }
+                indicator: Rectangle {
+                    implicitWidth: parent.width - 10
+                    implicitHeight: 26
+                    x: boardTypeSwitch.leftPadding
+                    y: parent.height / 2 - height / 2
+                    radius: 13
+                    color: style.textFormColor
+                    border.color: style.textFormColor
 
-                model: ListModel {
-                    id: typeModel
-
-                    ListElement {
-                        text: "Local"
+                    Rectangle {
+                        x: boardTypeSwitch.checked ? parent.width - width : 0
+                        width: 26
+                        height: 26
+                        radius: 13
+                        color: "white"
+                        border.color: style.primaryColor
                     }
 
                 }
 
-                background: Rectangle {
-                    color: parent.down ? Qt.lighter(style.textFormColor, 1.2) : (parent.hovered ? Qt.lighter(style.textFormColor, 1.2) : style.textFormColor)
+                contentItem: Text {
+                    text: boardTypeSwitch.checked ? "Remote" : "Local"
+                    font.family: "Poppins"
+                    font.pointSize: 14
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    color: "white"
                 }
 
             }
@@ -206,9 +221,7 @@ Rectangle {
                 anchors.bottomMargin: 10
                 onClicked: {
                     createBoardPopup.close();
-                    mainClient.create_board(boardName.text, boardDescription.text, boardType.currentText);
-                    boardDescription.text = "";
-                    boardName.text = "";
+                    mainClient.create_board(boardName.text, boardDescription.text, boardTypeSwitch.checked);
                 }
 
                 Text {

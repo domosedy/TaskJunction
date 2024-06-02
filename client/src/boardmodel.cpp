@@ -209,7 +209,7 @@ nlohmann::json BoardModel::to_json() const {
         {"description", m_description.toStdString().c_str()},
         {"lists", nlohmann::json::array()}
     };
-    for (auto& list_id : m_ids) {
+    for (auto &list_id : m_ids) {
         data["lists"].push_back(m_lists.at(list_id)->to_json());
     }
     return data;

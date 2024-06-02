@@ -12,7 +12,7 @@
 class BoardModel : public QAbstractListModel, public board {
     Q_OBJECT
     Q_PROPERTY(int count READ get_count NOTIFY countChanged)
-    Q_PROPERTY(bool is_remote MEMBER m_is_remote)
+    Q_PROPERTY(bool is_remote MEMBER m_is_remote NOTIFY modeChanged)
 public:
     explicit BoardModel(QObject *parent = nullptr);
     BoardModel(
@@ -57,6 +57,7 @@ public:
 
 signals:
     void countChanged();
+    void modeChanged();
 
 private:
     QVector<quint32> m_ids;

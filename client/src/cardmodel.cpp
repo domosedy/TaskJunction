@@ -120,8 +120,8 @@ nlohmann::json CardModel::to_json() const {
         {"description", m_description.toStdString().c_str()},
         {"tags", nlohmann::json::array()}
     };
-    for (auto& tag : m_tags) {
+    for (auto &tag : m_tags) {
         data["tags"].push_back(nlohmann::json::parse(tag.to_json()));
     }
-    return data;    
+    return data;
 }

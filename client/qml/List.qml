@@ -7,6 +7,8 @@ import "qrc:"
 Rectangle {
     id: listMain
 
+    property int visibleCount: listmodel.count
+
     function deleteRequest(card_index: int) {
         mainClient.delete_card(index, card_index);
     }
@@ -28,7 +30,7 @@ Rectangle {
     }
 
     width: style.listWidth
-    height: Math.min(root.height - 80, 150 + (listmodel.count) * (style.cardHeight + style.cardSpacing))
+    height: Math.min(150 + 3 * (style.cardHeight + style.cardSpacing), 150 + (visibleCount) * (style.cardHeight + style.cardSpacing))
     color: style.listBackgroundColor
     radius: style.defaultRadius
 
@@ -287,6 +289,7 @@ Rectangle {
                             allItems.setGroups(index, 1, ["all", "filtered"]);
 
                     }
+                    visibleCount = visibleItems.count;
                 }
 
                 model: listmodel
