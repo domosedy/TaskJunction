@@ -6,6 +6,79 @@
 namespace parser {
 using json = nlohmann::json;
 
+namespace validator {
+
+using json = nlohmann::json;
+
+bool check_string(const json &object, const std::string &field) {
+    if (object.contains(field)) {
+        return object[field].is_string();
+    }
+
+    return false;
+}
+
+bool check_integer(const json &object, const std::string &field) {
+    if (object.contains(field)) {
+        return object[field].is_number_integer();
+    }
+
+    return false;
+}
+
+bool check_array(const json &object, const std::string &field) {
+    if (object.contains(field)) {
+        return object[field].is_array();
+    }
+
+    return false;
+}
+
+bool check_object(const json &object, const std::string &field) {
+    if (object.contains(field)) {
+        return object[field].is_object();
+    }
+
+    return false;
+}
+
+bool check_tag(const json &object) {
+    return check_string(object, "name") && check_integer(object, "id");
+}
+
+bool check_card(const json &object) {
+    bool result = 1;
+    result &= check_string(object, "name");
+    result &= check_string(object, "description");
+    result &= check_integer(object, "id");
+    result &= check_array(object, "tags");
+
+    return result;
+}
+
+bool check_list(const json &object) {
+    bool result = 1;
+    result &= check_string(object, "name");
+    result &= check_string(object, "description");
+    result &= check_integer(object, "id");
+    result &= check_array(object, "cards");
+
+    return result;
+}
+
+bool check_board(const json &object) {
+    bool result = 1;
+    result &= check_string(object, "name");
+    result &= check_string(object, "description");
+    result &= check_string(object, "link");
+    result &= check_integer(object, "id");
+    result &= check_array(object, "lists");
+
+    return result;
+}
+
+}  // namespace validator
+
 std::string login_request(const QString &username, const QString &password) {
     json request = {
         {"type", "login"},
@@ -112,52 +185,77 @@ std::string connect_to_board_request(const QString &link) {
     return request.dump();
 }
 
-std::string upload_request(const nlohmann::json &board_data) {
-    json request = {{"type", "upload"}, {"object-json", board_data}};
+std::string upload_request(const nlohmann::json &data) {
+    json request = {{"type", "upload"}, {"object-json", data}};
     return request.dump();
 }
 
 tag parse_tag(const json &object) {
+    if (!validator::check_tag(object)) {
+        return tag(0, "");
+    }
+
     QString name = QString::fromStdString(object["name"]);
     quint32 id = object["id"];
     return tag(id, name);
 }
 
 card parse_card(const json &object, quint32 m_parent_id) {
+    if (!validator::check_card(object)) {
+        return card(0, 0, "", "");
+    }
+
     QString name = QString::fromStdString(object["name"]);
     QString description = QString::fromStdString(object["description"]);
     quint32 id = object["id"];
-    card card(id, m_parent_id, name, description);
+    card new_card(id, m_parent_id, name, description);
     for (const auto &tag_json : object["tags"]) {
         tag tag = parse_tag(tag_json);
-        card.m_tags.push_back(tag);
+        if (tag.m_tag_id == 0) {
+            return card(0, 0, "", "");
+        }
+        new_card.m_tags.push_back(tag);
     }
-    return card;
+    return new_card;
 }
 
 list parse_list(const json &object, quint32 m_parent_id) {
+    if (!validator::check_list(object)) {
+        return list(0, 0, "", "");
+    }
+
     QString name = QString::fromStdString(object["name"]);
     QString description = QString::fromStdString(object["description"]);
     quint32 id = object["id"];
-    list list(id, m_parent_id, name, description);
+    list new_list(id, m_parent_id, name, description);
     for (const auto &card_json : object["cards"]) {
         card card = parse_card(card_json, id);
-        list.m_cards.push_back(card);
+        if (card.m_card_id == 0) {
+            return list(0, 0, "", "");
+        }
+        new_list.m_cards.push_back(card);
     }
-    return list;
+    return new_list;
 }
 
 board parse_board(const json &object, quint32 m_parent_id) {
+    if (!validator::check_board(object)) {
+        return board(0, 0, "", "");
+    }
+
     QString name = QString::fromStdString(object["name"]);
     QString description = QString::fromStdString(object["description"]);
     quint32 id = object["id"];
     QString link = QString::fromStdString(object["link"]);
-    board board(id, m_parent_id, name, description, link);
+    board new_board(id, m_parent_id, name, description);
     for (const auto &list_json : object["lists"]) {
         list list = parse_list(list_json, id);
-        board.m_lists.push_back(list);
+        if (list.m_list_id == 0) {
+            return board(0, 0, "", "");
+        }
+        new_board.m_lists.push_back(list);
     }
-    return board;
+    return new_board;
 }
 
 }  // namespace parser
