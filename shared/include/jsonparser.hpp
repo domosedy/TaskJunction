@@ -68,6 +68,8 @@ std::string move_request(
     quint32 card_id
 );
 
+std::string upload_request(const nlohmann::json &data);
+
 tag parse_tag(const json &object);
 
 card parse_card(const json &object, quint32 m_parent_id);
