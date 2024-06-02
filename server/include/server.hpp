@@ -5,8 +5,8 @@
 #include <QObject>
 #include <QTcpServer>
 #include <QTcpSocket>
-#include "database.hpp"
 #include <QWebSocketServer>
+#include "database.hpp"
 #include "logging.hpp"
 #include "query.hpp"
 
@@ -25,13 +25,15 @@ class Server : public QObject {
     quint16 port;
     database::db_manager db;
     QMap<quint32, ClientSocket *> authorized_connections;
-    QList<ClientSocket*> unauthorized_connections;
+    QList<ClientSocket *> unauthorized_connections;
 
     ReturnedValue execute_update_query(const update_query &query, quint32 id);
     ReturnedValue execute_create_query(const create_query &query, quint32 id);
     ReturnedValue execute_delete_query(const delete_query &query, quint32 id);
-    ReturnedValue execute_get_query(const get_boards_info_query &query, quint32 id);
-    ReturnedValue execute_access_query(const access_to_board &query, quint32 id);
+    ReturnedValue
+    execute_get_query(const get_boards_info_query &query, quint32 id);
+    ReturnedValue
+    execute_access_query(const access_to_board &query, quint32 id);
     ReturnedValue execute_move_query(const move_query &query, quint32 id);
     ReturnedValue execute_upload_query(copy_board_query query, quint32 id);
 

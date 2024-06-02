@@ -1,8 +1,8 @@
 #include "hashes.hpp"
 #include <QCryptographicHash>
 #include <chrono>
-#include <random>
 #include <iostream>
+#include <random>
 
 QString code_string(const QString &link, quint32 id) {
     std::mt19937 rnd(std::chrono::system_clock::now().time_since_epoch().count()
@@ -17,10 +17,10 @@ QString code_string(const QString &link, quint32 id) {
     while (link_pos < link.size() || number_pos < number.size()) {
         if (link_pos == link.size()) {
             coded_link += number[number_pos++];
-        } else if (number_pos == number.size())  {
+        } else if (number_pos == number.size()) {
             coded_link += link[link_pos++];
         } else if (static_cast<quint32>(rnd() % summary_size) < link.size()) {
-          coded_link += link[link_pos++];
+            coded_link += link[link_pos++];
         } else {
             coded_link += number[number_pos++];
         }
@@ -50,7 +50,9 @@ QString generate_string() {
     std::mt19937 rnd(std::chrono::system_clock::now().time_since_epoch().count()
     );
 
-    static const QString all_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&()*+-/:;<=>?@";
+    static const QString all_characters =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&()*+-/"
+        ":;<=>?@";
     QString data;
 
     for (int i = 0; i < 15; ++i) {

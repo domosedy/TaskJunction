@@ -4,11 +4,12 @@
 #include <string>
 #include <variant>
 #include "element_classes.hpp"
+
 // struct a {
-    // quint32 board_id;
-    // quint32 list_id;
-    // quint32 card_id;
-    // quint32 tag_id;
+// quint32 board_id;
+// quint32 list_id;
+// quint32 card_id;
+// quint32 tag_id;
 // };
 
 struct update_query {

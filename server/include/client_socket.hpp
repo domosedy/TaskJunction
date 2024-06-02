@@ -1,15 +1,13 @@
 #ifndef CLIENT_SOCKET_HPP_
 #define CLIENT_SOCKET_HPP_
 
-#include <QWebSocket>
 #include <QByteArray>
 #include <QObject>
 #include <QTcpSocket>
+#include <QWebSocket>
 #include <memory>
-#include "query.hpp"
 #include "logging.hpp"
-
-
+#include "query.hpp"
 
 class ClientSocket : public QObject {
     Q_OBJECT
@@ -21,7 +19,10 @@ private:
 public:
     ClientSocket(QWebSocket *sock, uint user_id)
         : socket(sock), user_id(user_id) {
-        connect(socket, SIGNAL(textMessageReceived(const QString&)), this, SLOT(readData(const QString&)));
+        connect(
+            socket, SIGNAL(textMessageReceived(const QString &)), this,
+            SLOT(readData(const QString &))
+        );
         connect(socket, SIGNAL(disconnected()), this, SLOT(removeConnection()));
     }
 

@@ -9,6 +9,7 @@ using json = nlohmann::json;
 namespace validator {
 
 using json = nlohmann::json;
+
 bool check_string(const json &object, const std::string &field) {
     if (object.contains(field)) {
         return object[field].is_string();
@@ -37,7 +38,7 @@ bool check_object(const json &object, const std::string &field) {
     if (object.contains(field)) {
         return object[field].is_object();
     }
-    
+
     return false;
 }
 
@@ -76,7 +77,7 @@ bool check_board(const json &object) {
     return result;
 }
 
-}
+}  // namespace validator
 
 std::string login_request(const QString &username, const QString &password) {
     json request = {

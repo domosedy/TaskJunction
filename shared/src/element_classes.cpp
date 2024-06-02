@@ -58,9 +58,9 @@ static std::string array_to_json(const QVector<T> &data) {
 
 std::string all_ids::to_json() const {
     std::stringstream ss;
-    ss << R"("board-id":)" << board_id << R"(,"list-id":)" << list_id 
-        << R"(,"card-id":)" << card_id << R"(,"tag-id":)" << tag_id;
-    
+    ss << R"("board-id":)" << board_id << R"(,"list-id":)" << list_id
+       << R"(,"card-id":)" << card_id << R"(,"tag-id":)" << tag_id;
+
     return ss.str();
 }
 
@@ -100,10 +100,10 @@ std::string board::to_json() const {
     ss << "{\"type\":\"board\",\"lists\":[";
     ss << array_to_json(m_lists);
 
-    ss << "],\"id\":" << m_board_id << ",\"name\":\""
-       << m_name.toStdString() << "\""
-       << ",\"description\":\"" << m_description.toStdString() 
-       << ",\"link\":\"" << m_link.toStdString() << "\"}";
+    ss << "],\"id\":" << m_board_id << ",\"name\":\"" << m_name.toStdString()
+       << "\""
+       << ",\"description\":\"" << m_description.toStdString() << ",\"link\":\""
+       << m_link.toStdString() << "\"}";
 
     return ss.str();
 }
@@ -148,7 +148,8 @@ std::string update_response::to_json() const {
     ss << R"({"type":"update",)";
     ss << ids.to_json() << ",";
 
-    ss << R"("new-value":")" << new_value.toStdString() << R"(","field":")" << field.toStdString() << R"("})";
+    ss << R"("new-value":")" << new_value.toStdString() << R"(","field":")"
+       << field.toStdString() << R"("})";
     return ss.str();
 }
 
@@ -162,7 +163,8 @@ std::string delete_response::to_json() const {
 std::string move_response::to_json() const {
     std::stringstream ss;
     ss << R"({"type":"move",)";
-    ss << ids.to_json() << R"(,"old-list-id":)" << old_list_id << 
-    R"(,"new-list-id":)" << new_list_id << R"(,"new-index":)" << new_index << "}";
+    ss << ids.to_json() << R"(,"old-list-id":)" << old_list_id
+       << R"(,"new-list-id":)" << new_list_id << R"(,"new-index":)" << new_index
+       << "}";
     return ss.str();
 }

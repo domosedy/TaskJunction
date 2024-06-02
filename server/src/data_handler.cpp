@@ -1,14 +1,14 @@
 #include "data_handler.hpp"
 #include <QDebug>
 #include <QObject>
+#include <nlohmann/json.hpp>
 #include <optional>
+#include <sstream>
 #include <string>
 #include <variant>
-#include <sstream>
 #include "hashes.hpp"
-#include <nlohmann/json.hpp>
-#include "logging.hpp"
 #include "jsonparser.hpp"
+#include "logging.hpp"
 
 using json = nlohmann::json;
 
@@ -26,18 +26,20 @@ get_int_field_data(const json &data, const std::string &field) {
     return static_cast<quint32>(*field_it);
 }
 
-static std::optional<all_ids>
-get_object_ids(const json &data) {
+static std::optional<all_ids> get_object_ids(const json &data) {
     auto board_id = get_int_field_data(data, "board-id");
     auto list_id = get_int_field_data(data, "list-id");
     auto card_id = get_int_field_data(data, "card-id");
     auto tag_id = get_int_field_data(data, "tag-id");
 
-    if (!board_id.has_value() || !list_id.has_value() || !card_id.has_value() || !tag_id.has_value()) {
+    if (!board_id.has_value() || !list_id.has_value() || !card_id.has_value() ||
+        !tag_id.has_value()) {
         return std::nullopt;
     }
 
-    return all_ids{board_id.value(), list_id.value(), card_id.value(), tag_id.value()};
+    return all_ids{
+        board_id.value(), list_id.value(), card_id.value(), tag_id.value()
+    };
 }
 
 static std::optional<std::string>
@@ -62,14 +64,15 @@ static std::optional<update_query> parseUpdateQuery(const json &json_data) {
     auto updated_type = get_string_field_data(json_data, "object-type");
 
     if (!value_id.has_value() || !new_value.has_value() ||
-        !value_name.has_value() || !updated_type.has_value() || 
+        !value_name.has_value() || !updated_type.has_value() ||
         !ids.has_value()) {
         return std::nullopt;
     }
 
-    return update_query{ids.value(),
-        value_id.value(), new_value.value(), value_name.value(),
-        updated_type.value()};
+    return update_query{
+        ids.value(), value_id.value(), new_value.value(), value_name.value(),
+        updated_type.value()
+    };
 }
 
 static std::optional<delete_query> parseDeleteQuery(const json &json_data) {
@@ -77,13 +80,11 @@ static std::optional<delete_query> parseDeleteQuery(const json &json_data) {
     auto value_id = get_int_field_data(json_data, "id");
     auto value_type = get_string_field_data(json_data, "object-type");
 
-    if (!value_id.has_value() || !value_type.has_value() ||
-        !ids.has_value()) {
+    if (!value_id.has_value() || !value_type.has_value() || !ids.has_value()) {
         return std::nullopt;
     }
 
-    return delete_query{ids.value(), 
-        value_id.value(), value_type.value()};
+    return delete_query{ids.value(), value_id.value(), value_type.value()};
 }
 
 static std::optional<create_query> parseCreateQuery(const json &json_data) {
@@ -99,9 +100,10 @@ static std::optional<create_query> parseCreateQuery(const json &json_data) {
         return std::nullopt;
     }
 
-    return create_query{ids.value(), 
-                        parent_id.value(), value_type.value(), 
-                        value_name.value(), value_description.value()};
+    return create_query{
+        ids.value(), parent_id.value(), value_type.value(), value_name.value(),
+        value_description.value()
+    };
 }
 
 static std::optional<login_query> parseLoginQuery(const json &json_data) {
@@ -135,8 +137,9 @@ static std::optional<move_query> parseMoveQuery(const json &json_data) {
         return std::nullopt;
     }
 
-    return move_query{ids.value(), old_list_id.value(), 
-                new_list_id.value(), new_index.value()};
+    return move_query{
+        ids.value(), old_list_id.value(), new_list_id.value(), new_index.value()
+    };
 }
 
 static std::optional<access_to_board> parseAccessQuery(const json &json_data) {

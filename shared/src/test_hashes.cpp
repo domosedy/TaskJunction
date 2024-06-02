@@ -2,7 +2,6 @@
 #include "hashes.hpp"
 
 int main() {
-
     QString lnk = generate_string();
     quint32 id = 123;
 

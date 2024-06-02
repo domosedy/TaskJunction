@@ -5,8 +5,8 @@
 #include <QVariant>
 #include <QVector>
 #include <concepts>
-#include <string>
 #include <fstream>
+#include <string>
 
 template <typename T>
 concept has_to_json_method = requires(T t) { t.to_json(); };
@@ -152,7 +152,7 @@ struct move_response {
     quint32 new_list_id;
     quint32 new_index;
 
-    std::string to_json() const;  
+    std::string to_json() const;
 };
 
 #endif  // ELEMENT_CLASSES_HPP_
