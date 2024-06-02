@@ -190,7 +190,7 @@ std::optional<query_type> parseData(const QString &data) {
         result = parseMoveQuery(parsedData);
     } else if (request == "connect") {
         result = parseAccessQuery(parsedData);
-    } else if (request == "update") {
+    } else if (request == "upload") {
         result = parseCopyQuery(parsedData);
     }
 

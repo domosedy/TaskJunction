@@ -315,7 +315,12 @@ std::pair<QString, quint32> Server::execute_login_query(const login_query &query
     return {response.to_json().c_str(), id};
 }
 
-ReturnedValue Server::execute_upload_query(const copy_board_query &query, quint32 id) {
+ReturnedValue Server::execute_upload_query(copy_board_query query, quint32 id) {
+    if (query.board_to_copy.m_board_id == 0) {
+        return {false, 0, error{"Bad format of data"}.to_json().c_str()};
+    }
+    
+    query.board_to_copy.m_link = generate_string();
     board result = db.copy_board(query.board_to_copy, id);
     return {true, result.m_board_id, result.to_json().c_str()};
 }

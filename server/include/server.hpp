@@ -33,7 +33,7 @@ class Server : public QObject {
     ReturnedValue execute_get_query(const get_boards_info_query &query, quint32 id);
     ReturnedValue execute_access_query(const access_to_board &query, quint32 id);
     ReturnedValue execute_move_query(const move_query &query, quint32 id);
-    ReturnedValue execute_upload_query(const copy_board_query &query, quint32 id);
+    ReturnedValue execute_upload_query(copy_board_query query, quint32 id);
 
     std::pair<QString, quint32> execute_login_query(const login_query &query);
 
