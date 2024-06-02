@@ -6,6 +6,68 @@
 namespace parser {
 using json = nlohmann::json;
 
+namespace validator {
+
+bool check_string(const json &object, const std::string &field) {
+    if (object.contains(field)) {
+        return object[field].is_string();
+    }
+
+    return false;
+}
+
+bool check_integer(const json &object, const std::string &field) {
+    if (object.contains(field)) {
+        return object[field].is_number_integer();
+    }
+
+    return false;
+}
+
+bool check_array(const json &object, const std::string &field) {
+    if (object.contains(field)) {
+        return object[field].is_array();
+    }
+    return false;
+}
+
+bool check_tag(const json &object) {
+    return check_string(object, "name") && check_integer(object, "id");
+}
+
+bool check_card(const json &object) {
+    bool result = 1;
+    result &= check_string(object, "name");
+    result &= check_string(object, "description");
+    result &= check_integer(object, "id");
+    result &= check_array(object, "tags");
+
+    return result;
+}
+
+bool check_list(const json &object) {
+    bool result = 1;
+    result &= check_string(object, "name");
+    result &= check_string(object, "description");
+    result &= check_integer(object, "id");
+    result &= check_array(object, "cards");
+
+    return result;
+}
+
+bool check_board(const json &object) {
+    bool result = 1;
+    result &= check_string(object, "name");
+    result &= check_string(object, "description");
+    result &= check_string(object, "link");
+    result &= check_integer(object, "id");
+    result &= check_array(object, "lists");
+
+    return result;
+}
+
+}
+
 std::string login_request(const QString &username, const QString &password) {
     json request = {
         {"type", "login"},
@@ -113,12 +175,20 @@ std::string connect_to_board_request(const QString &link) {
 }
 
 tag parse_tag(const json &object) {
+    if (!validator::check_tag(object)) {
+        return tag(0, "");
+    }
+
     QString name = QString::fromStdString(object["name"]);
     quint32 id = object["id"];
     return tag(id, name);
 }
 
 card parse_card(const json &object, quint32 m_parent_id) {
+    if (!validator::check_card(object)) {
+        return card(0, 0, "", "");
+    }
+
     QString name = QString::fromStdString(object["name"]);
     QString description = QString::fromStdString(object["description"]);
     quint32 id = object["id"];
@@ -131,6 +201,10 @@ card parse_card(const json &object, quint32 m_parent_id) {
 }
 
 list parse_list(const json &object, quint32 m_parent_id) {
+    if (!validator::check_list(object)) {
+        return list(0, 0, "", "");
+    }
+
     QString name = QString::fromStdString(object["name"]);
     QString description = QString::fromStdString(object["description"]);
     quint32 id = object["id"];
@@ -143,6 +217,10 @@ list parse_list(const json &object, quint32 m_parent_id) {
 }
 
 board parse_board(const json &object, quint32 m_parent_id) {
+    if (!validator::check_board(object)) {
+        return board(0, 0, "", "");
+    }
+
     QString name = QString::fromStdString(object["name"]);
     QString description = QString::fromStdString(object["description"]);
     quint32 id = object["id"];
