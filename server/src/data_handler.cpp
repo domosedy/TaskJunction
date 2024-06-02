@@ -6,8 +6,9 @@
 #include <variant>
 #include <sstream>
 #include "hashes.hpp"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include "logging.hpp"
+#include "jsonparser.hpp"
 
 using json = nlohmann::json;
 
@@ -150,6 +151,14 @@ static std::optional<access_to_board> parseAccessQuery(const json &json_data) {
     return access_to_board{result.second, result.first.toStdString()};
 }
 
+static std::optional<copy_board_query> parseCopyQuery(const json &json_data) {
+    if (!parser::validator::check_object(json_data, "object-json")) {
+        return std::nullopt;
+    }
+
+    return copy_board_query{parser::parse_board(json_data["object-json"], 0)};
+}
+
 std::optional<query_type> parseData(const QString &data) {
     if (!json::accept(data.toStdString())) {
         rDebug() << "Bebra";
@@ -181,6 +190,8 @@ std::optional<query_type> parseData(const QString &data) {
         result = parseMoveQuery(parsedData);
     } else if (request == "connect") {
         result = parseAccessQuery(parsedData);
+    } else if (request == "update") {
+        result = parseCopyQuery(parsedData);
     }
 
     return result;

@@ -8,6 +8,7 @@ using json = nlohmann::json;
 
 namespace validator {
 
+using json = nlohmann::json;
 bool check_string(const json &object, const std::string &field) {
     if (object.contains(field)) {
         return object[field].is_string();
@@ -28,6 +29,15 @@ bool check_array(const json &object, const std::string &field) {
     if (object.contains(field)) {
         return object[field].is_array();
     }
+
+    return false;
+}
+
+bool check_object(const json &object, const std::string &field) {
+    if (object.contains(field)) {
+        return object[field].is_object();
+    }
+    
     return false;
 }
 

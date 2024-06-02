@@ -18,7 +18,8 @@ enum class RequestType {
     LOGIN,
     GET_BOARDS_INFO,
     MOVE,
-    ACCESS
+    ACCESS,
+    UPLOAD
 };
 
 // How to emit when my connection is not authorized?
@@ -107,6 +108,8 @@ void Server::execute_query(uint user_id, const query_type &query) {
                 return RequestType::MOVE;
             } else if constexpr (std::is_same_v<T, access_to_board>) {
                 return RequestType::ACCESS;
+            } else if constexpr (std::is_same_v<T, copy_board_query>) {
+                return RequestType::UPLOAD;
             }
             return RequestType::ERROR;
         },
@@ -139,9 +142,17 @@ void Server::execute_query(uint user_id, const query_type &query) {
         executed_result = execute_move_query(std::get<move_query>(query), client_id);
     } else if (result_code == RequestType::ACCESS) {
         auto res = execute_access_query(std::get<access_to_board>(query), client_id);
-
         auto result = res.jsoned_object;
         clientSocket->sendData(result);
+        return;
+    } else if (result_code == RequestType::UPLOAD) {
+        if (client_id == 0) {
+            clientSocket->sendData(error{"You are not authorized"}.to_json().c_str());
+            return;
+        }
+
+        auto res = execute_upload_query(std::get<copy_board_query>(query), client_id);
+        clientSocket->sendData(res.jsoned_object);
         return;
     } else {
         executed_result = {false, 1, error{"Bad request format"}.to_json().c_str()};
@@ -302,6 +313,11 @@ std::pair<QString, quint32> Server::execute_login_query(const login_query &query
     }
 
     return {response.to_json().c_str(), id};
+}
+
+ReturnedValue Server::execute_upload_query(const copy_board_query &query, quint32 id) {
+    board result = db.copy_board(query.board_to_copy, id);
+    return {true, result.m_board_id, result.to_json().c_str()};
 }
 
 ReturnedValue Server::execute_move_query(const move_query &query, quint32 id) {

@@ -8,11 +8,13 @@
 
 namespace parser {
 
+using json = nlohmann::json;
 namespace validator {
 
 bool check_string(const json &object, const std::string &field);
 bool check_integer(const json &object, const std::string &field);
 bool check_array(const json &object, const std::string &field);
+bool check_object(const json &object, const std::string &field);
 
 bool check_tag(const json &object);
 bool check_card(const json &object);
@@ -21,7 +23,6 @@ bool check_board(const json &object);
 
 }
 
-using json = nlohmann::json;
 
 std::string login_request(const QString &username, const QString &password);
 

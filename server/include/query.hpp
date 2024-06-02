@@ -54,6 +54,10 @@ struct access_to_board {
     std::string link;
 };
 
+struct copy_board_query {
+    board board_to_copy;
+};
+
 using query_type = std::variant<
     update_query,
     delete_query,
@@ -61,6 +65,7 @@ using query_type = std::variant<
     login_query,
     move_query,
     get_boards_info_query,
-    access_to_board>;
+    access_to_board,
+    copy_board_query>;
 
 #endif
