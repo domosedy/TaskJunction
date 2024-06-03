@@ -99,6 +99,7 @@ TEST_CASE("select") {
         CHECK(card.m_name == "test_card");
         CHECK(card.m_list_id == list_id);
         CHECK(card.m_description == "test description");
+        CHECK(card.m_number == 1);
     }
 
     SUBCASE("select tag") {

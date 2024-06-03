@@ -25,6 +25,7 @@ struct card {
     quint32 m_list_id;
     QString m_name;
     QString m_description;
+    quint32 m_number;
     QVector<tag> m_tags;
 
     card() = default;
@@ -32,7 +33,8 @@ struct card {
         quint32 card_id,
         quint32 list_id,
         QString name,
-        QString description
+        QString description,
+        quint32 number
     );
     card(
         QString name,

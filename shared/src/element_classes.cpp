@@ -27,11 +27,12 @@ list::list(quint32 list_id, quint32 board_id, QString name, QString description)
       m_description(std::move(description)) {
 }
 
-card::card(quint32 card_id, quint32 list_id, QString name, QString description)
+card::card(quint32 card_id, quint32 list_id, QString name, QString description, quint32 number)
     : m_card_id(card_id),
       m_list_id(list_id),
       m_name(std::move(name)),
-      m_description(std::move(description)) {
+      m_description(std::move(description)),
+      m_number(number) {
 }
 
 tag::tag(quint32 tag_id, QString name)
