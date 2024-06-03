@@ -5,6 +5,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtWebSockets/QWebSocket>
+#include <QWebSocketHandshakeOptions>
 
 QT_USE_NAMESPACE
 
@@ -21,17 +22,23 @@ EchoClient::EchoClient(const QUrl &url, bool debug, QObject *parent) :
     connect(&m_webSocket, QOverload<const QList<QSslError>&>::of(&QWebSocket::sslErrors),
             this, &EchoClient::onSslErrors);
 
-    QSslConfiguration sslConfiguration;
-    QFile certFile(QStringLiteral(":/localhost.cert"));
-    certFile.open(QIODevice::ReadOnly);
-    QSslCertificate certificate(&certFile, QSsl::Pem);
-    certFile.close();
-    sslConfiguration.addCaCertificate(certificate);
-    m_webSocket.setSslConfiguration(sslConfiguration);
+    // QSslConfiguration sslConfiguration;
+    // QFile certFile(QStringLiteral(":/localhost.cert"));
+    // certFile.open(QIODevice::ReadOnly);
+    // QFile privateFile(QStringLiteral(":/localhost.key"));
+    // privateFile.open(QIODevice::ReadOnly);
+
+    // QSslKey key()
+    // QSslCertificate certificate(&certFile, QSsl::Pem);
+    // certFile.close();
+    // sslConfiguration.addCaCertificate(certificate);
+    // m_webSocket.setSslConfiguration(sslConfiguration);
 
     qDebug() << "Readed";
     m_webSocket.open(url);
-    // connect(&m_webSocket, &QWebSocket::disconnected, this, &EchoClient::closed);
+    m_webSocket.continueInterruptedHandshake();
+    qDebug() << m_webSocket.errorString();
+    // qDebug() << 
 }
 //! [constructor]
 

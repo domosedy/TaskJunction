@@ -23,20 +23,15 @@ qt_add_executable(echoclient
     main.cpp
 )
 
-set_target_properties(echoclient PROPERTIES
-    WIN32_EXECUTABLE FALSE
-    MACOSX_BUNDLE FALSE
-)
-
-target_link_libraries(echoclient PUBLIC
+target_link_libraries(echoclient PRIVATE
     Qt::Core
     Qt::WebSockets
 )
 
-qt_add_resources(echoclient "cert"
-    BASE ../..
-    FILES ../../localhost.cert
-)
+# qt_add_resources(echoclient "cert"
+#     BASE ../..
+#     FILES ../../localhost.cert
+# )
 
 set_target_properties(echoclient PROPERTIES
     WIN32_EXECUTABLE FALSE
