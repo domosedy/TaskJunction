@@ -111,14 +111,9 @@ Rectangle {
             onClicked: {
                 loader.source = "BoardSelect.qml";
             }
-
-            Text {
-                text: "<"
-                font.family: "Poppins"
-                font.pointSize: 24
-                anchors.centerIn: parent
-                color: "white"
-            }
+            icon.source: "back.svg"
+            icon.width: width
+            icon.height: height
 
             background: Rectangle {
                 color: parent.down ? Qt.darker(style.headerBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.headerBackgroundColor, 1.2) : style.headerBackgroundColor)
@@ -221,8 +216,8 @@ Rectangle {
             id: filterTypeSwitch
 
             z: 1
-            implicitWidth: 26
-            implicitHeight: 36
+            implicitWidth: 76
+            implicitHeight: 26
             anchors.right: filterHolder.left
             anchors.verticalCenter: parent.verticalCenter
             anchors.rightMargin: 10
@@ -237,14 +232,12 @@ Rectangle {
                 border.color: style.textFormColor
 
                 Rectangle {
-                    y: filterTypeSwitch.checked ? parent.height - height : 0
+                    x: filterTypeSwitch.checked ? parent.width - width : 0
                     width: 26
                     height: 26
                     radius: 13
                     color: "white"
                     border.color: "white"
-                    border.width: 5
-                    z: -1
                 }
 
             }
@@ -254,10 +247,10 @@ Rectangle {
                 font.family: "Poppins"
                 font.pointSize: 12
                 verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-                topPadding: 5
+                //horizontalAlignment: Text.AlignHCenter
+                leftPadding: 28
+                //Padding: 5
                 color: "white"
-                rotation: 270
             }
 
         }

@@ -267,14 +267,9 @@ Rectangle {
                 loader.active = false;
                 startMenu.visible = true;
             }
-
-            Text {
-                text: "<"
-                font.family: "Poppins"
-                font.pointSize: 24
-                anchors.centerIn: parent
-                color: "white"
-            }
+            icon.source: "back.svg"
+            icon.width: style.headerHeight
+            icon.height: style.headerHeight
 
             background: Rectangle {
                 color: parent.down ? Qt.darker(style.headerBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.headerBackgroundColor, 1.2) : style.headerBackgroundColor)
@@ -446,8 +441,8 @@ Rectangle {
                 Button {
                     id: deleteBoardButton
 
-                    width: 18
-                    height: 18
+                    width: 26
+                    height: 26
                     anchors.right: parent.right
                     anchors.top: parent.top
                     anchors.rightMargin: 20
@@ -455,14 +450,9 @@ Rectangle {
                     onClicked: {
                         mainClient.delete_board(index);
                     }
-
-                    Text {
-                        text: "x"
-                        font.family: "Poppins"
-                        font.pointSize: 16
-                        anchors.centerIn: parent
-                        color: "white"
-                    }
+                    icon.source: "bin.svg"
+                    icon.width: width
+                    icon.height: height
 
                     background: Rectangle {
                         color: parent.down ? Qt.darker(style.boardCardColor, 1.4) : (parent.hovered ? Qt.darker(style.boardCardColor, 1.2) : style.boardCardColor)
@@ -473,8 +463,8 @@ Rectangle {
                 Button {
                     id: shareBoardButton
 
-                    width: 18
-                    height: 18
+                    width: 26
+                    height: 26
                     anchors.right: parent.right
                     anchors.top: deleteBoardButton.bottom
                     anchors.rightMargin: 20
@@ -484,14 +474,9 @@ Rectangle {
                         createBoardPopup.close();
                         connectBoardPopup.close();
                     }
-
-                    Text {
-                        text: "@"
-                        font.family: "Poppins"
-                        font.pointSize: 12
-                        anchors.centerIn: parent
-                        color: "white"
-                    }
+                    icon.source: "link.svg"
+                    icon.width: 26
+                    icon.height: 26
 
                     background: Rectangle {
                         color: parent.down ? Qt.darker(style.boardCardColor, 1.4) : (parent.hovered ? Qt.darker(style.boardCardColor, 1.2) : style.boardCardColor)

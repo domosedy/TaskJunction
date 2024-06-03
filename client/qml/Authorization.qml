@@ -201,14 +201,9 @@ Rectangle {
                     loader.active = false;
                     startMenu.visible = true;
                 }
-
-                Text {
-                    text: "<"
-                    font.family: "Poppins"
-                    font.pointSize: 16
-                    anchors.centerIn: parent
-                    color: "white"
-                }
+                icon.source: "back.svg"
+                icon.width: width
+                icon.height: height
 
                 background: Rectangle {
                     color: parent.down ? Qt.darker(style.boardBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.boardBackgroundColor, 1.2) : style.boardBackgroundColor)

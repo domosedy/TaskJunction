@@ -205,20 +205,15 @@ Rectangle {
                 Button {
                     id: deleteListButton
 
-                    width: 18
-                    height: 18
+                    width: 26
+                    height: 26
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.rightMargin: 20
                     onClicked: mainClient.delete_list(index)
-
-                    Text {
-                        text: "x"
-                        font.family: "Poppins"
-                        font.pointSize: 16
-                        anchors.centerIn: parent
-                        color: "white"
-                    }
+                    icon.source: "bin.svg"
+                    icon.width: width
+                    icon.height: height
 
                     background: Rectangle {
                         color: parent.down ? Qt.darker(style.boardCardColor, 1.4) : (parent.hovered ? Qt.darker(style.boardCardColor, 1.2) : style.boardCardColor)

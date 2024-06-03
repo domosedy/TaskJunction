@@ -298,14 +298,9 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     visible: false
-
-                    Text {
-                        text: "x"
-                        font.family: "Poppins"
-                        font.pointSize: 16
-                        anchors.centerIn: parent
-                        color: "white"
-                    }
+                    icon.source: "bin.svg"
+                    icon.width: width
+                    icon.height: height
 
                     background: Rectangle {
                         color: parent.down ? Qt.darker(style.listBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.listBackgroundColor, 1.2) : style.listBackgroundColor)
@@ -323,8 +318,8 @@ Rectangle {
     Button {
         id: deleteCardButton
 
-        width: 18
-        height: 18
+        width: 26
+        height: 26
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.rightMargin: 20
@@ -332,14 +327,9 @@ Rectangle {
         onClicked: {
             listMain.deleteRequest(index);
         }
-
-        Text {
-            text: "x"
-            font.family: "Poppins"
-            font.pointSize: 16
-            anchors.centerIn: parent
-            color: "white"
-        }
+        icon.source: "bin.svg"
+        icon.width: width
+        icon.height: height
 
         background: Rectangle {
             color: parent.down ? Qt.darker(style.cardBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.cardBackgroundColor, 1.2) : style.cardBackgroundColor)
