@@ -63,6 +63,8 @@ public:
     db_manager &operator=(const db_manager &) = delete;
     db_manager &operator=(db_manager &&) = delete;
 
+    bool is_open() const;
+
     void print_all_tables();
     void clear_all_tables();
     void drop_all_tables();

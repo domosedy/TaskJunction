@@ -72,7 +72,7 @@ void db_manager::fill_query_name_to_sql_command() {
         "WHERE id = :key_value;";
 
     query_name_to_sql_command["select_card"] =
-        "SELECT id, list_id, name, description FROM %1.card_signature "
+        "SELECT id, list_id, name, description, number FROM %1.card_signature "
         "WHERE id = :key_value;";
 
     query_name_to_sql_command["select_tag"] =
@@ -240,6 +240,10 @@ void db_manager::clear_all_tables() {
                         );
         }
     }
+}
+
+bool db_manager::is_open() const {
+    return m_database.isOpen();
 }
 
 void db_manager::set_schema(const QString &name) {
@@ -542,7 +546,8 @@ card db_manager::select_card(quint32 id) {
     quint32 list_id = data[1].toInt();
     QString name = data[2].toString();
     QString description = data[3].toString();
-    card card(card_id, list_id, name, description);
+    quint32 number = data[4].toInt();
+    card card(card_id, list_id, name, description, number);
     card.m_tags = get_card_tags(id);
     return card;
 }

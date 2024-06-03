@@ -9,50 +9,48 @@ QVector<QString> arguments = {"postgres", "ivan", "localhost", "1"};
 
 #ifdef DEFAULT_TESTS
 
+TEST_CASE("database is open") {
+    db_manager db_manager(
+        arguments[0], arguments[1], arguments[2], arguments[3]
+    );
+
+    CHECK(db_manager.is_open());
+}
+
 TEST_CASE("create") {
     db_manager db_manager(
         arguments[0], arguments[1], arguments[2], arguments[3]
     );
     db_manager.clear_all_tables();
     const int N = 5;
-    {
-        for (int i = 1; i < N; ++i) {
-            quint32 id = db_manager.authorize_user(
-                "test_user" + QString::number(i), "test_password"
-            );
-            CHECK(id == i);
-            auto user = db_manager.select_user(id);
-            CHECK(user.m_name == "test_user" + QString::number(i));
-            CHECK(user.m_user_id == id);
-        }
+    for (int i = 1; i < N; ++i) {
+        quint32 id = db_manager.authorize_user(
+            "test_user" + QString::number(i), "test_password"
+        );
+        CHECK(id == i);
+        auto user = db_manager.select_user(id);
+        CHECK(user.m_name == "test_user" + QString::number(i));
+        CHECK(user.m_user_id == id);
     }
-    {
-        for (int i = 1; i < N; ++i) {
-            quint32 id = db_manager.insert_board(
-                1, "test_board", "test description", ""
-            );
-            CHECK(id == i);
-        }
+    for (int i = 1; i < N; ++i) {
+        quint32 id = db_manager.insert_board(
+            1, "test_board", "test description", ""
+        );
+        CHECK(id == i);
     }
-    {
-        for (int i = 1; i < N; ++i) {
-            quint32 id =
-                db_manager.insert_list(1, "test_list", "test description");
-            CHECK(id == i);
-        }
+    for (int i = 1; i < N; ++i) {
+        quint32 id =
+            db_manager.insert_list(1, "test_list", "test description");
+        CHECK(id == i);
     }
-    {
-        for (int i = 1; i < 5; ++i) {
-            quint32 id =
-                db_manager.insert_card(1, "test_card", "test description");
-            CHECK(id == i);
-        }
+    for (int i = 1; i < 5; ++i) {
+        quint32 id =
+            db_manager.insert_card(1, "test_card", "test description");
+        CHECK(id == i);
     }
-    {
-        for (int i = 1; i < N; ++i) {
-            quint32 id = db_manager.insert_tag("test_tag" + QString::number(i));
-            CHECK(id == i);
-        }
+    for (int i = 1; i < N; ++i) {
+        quint32 id = db_manager.insert_tag("test_tag" + QString::number(i));
+        CHECK(id == i);
     }
 }
 
@@ -737,34 +735,51 @@ TEST_CASE("get full board") {
     );
     quint32 list_id =
         db_manager.insert_list(board_id, "test_list", "test description");
-    quint32 card_id =
-        db_manager.insert_card(list_id, "test_card", "test description");
-    quint32 tag_id = db_manager.insert_tag("test_tag");
-    db_manager.add_tag_to_card(card_id, tag_id);
 
-    board board = db_manager.get_full_board(board_id);
+    SUBCASE("simple board") {
+        quint32 card_id =
+            db_manager.insert_card(list_id, "test_card", "test description");
+        quint32 tag_id = db_manager.insert_tag("test_tag");
+        db_manager.add_tag_to_card(card_id, tag_id);
 
-    CHECK(board.m_user_id == user_id);
-    CHECK(board.m_name == "test_board");
-    CHECK(board.m_description == "test description");
-    CHECK(board.m_link == "test link");
+        board board = db_manager.get_full_board(board_id);
 
-    CHECK(board.m_lists.size() == 1);
-    CHECK(board.m_lists[0].m_board_id == board_id);
-    CHECK(board.m_lists[0].m_name == "test_list");
-    CHECK(board.m_lists[0].m_description == "test description");
+        CHECK(board.m_user_id == user_id);
+        CHECK(board.m_name == "test_board");
+        CHECK(board.m_description == "test description");
+        CHECK(board.m_link == "test link");
 
-    CHECK(board.m_lists[0].m_cards.size() == 1);
-    CHECK(board.m_lists[0].m_cards[0].m_list_id == list_id);
-    CHECK(board.m_lists[0].m_cards[0].m_name == "test_card");
-    CHECK(board.m_lists[0].m_cards[0].m_description == "test description");
+        CHECK(board.m_lists.size() == 1);
+        CHECK(board.m_lists[0].m_board_id == board_id);
+        CHECK(board.m_lists[0].m_name == "test_list");
+        CHECK(board.m_lists[0].m_description == "test description");
 
-    CHECK(board.m_lists[0].m_cards[0].m_tags.size() == 1);
-    CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_tag_id == tag_id);
-    CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_name == "test_tag");
+        CHECK(board.m_lists[0].m_cards.size() == 1);
+        CHECK(board.m_lists[0].m_cards[0].m_list_id == list_id);
+        CHECK(board.m_lists[0].m_cards[0].m_name == "test_card");
+        CHECK(board.m_lists[0].m_cards[0].m_description == "test description");
+
+        CHECK(board.m_lists[0].m_cards[0].m_tags.size() == 1);
+        CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_tag_id == tag_id);
+        CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_name == "test_tag");
+    }
+
+    SUBCASE("check cards order") {
+        quint32 card_id_1 = db_manager.insert_card(list_id, "test_card_1", "test description");
+        quint32 card_id_2 = db_manager.insert_card(list_id, "test_card_2", "test description");
+        quint32 card_id_3 = db_manager.insert_card(list_id, "test_card_3", "test description");
+
+        board board = db_manager.get_full_board(board_id);
+
+        CHECK(board.m_lists.size() == 1);
+        CHECK(board.m_lists[0].m_cards.size() == 3);
+        CHECK(board.m_lists[0].m_cards[0].m_number == 1);
+        CHECK(board.m_lists[0].m_cards[1].m_number == 2);
+        CHECK(board.m_lists[0].m_cards[2].m_number == 3);
+    }
 }
 
-TEST_CASE("copy board") { // TODO check cards order
+TEST_CASE("copy board") {
     db_manager db_manager(
         arguments[0], arguments[1], arguments[2], arguments[3]
     );
@@ -776,31 +791,52 @@ TEST_CASE("copy board") { // TODO check cards order
     );
     quint32 list_id =
         db_manager.insert_list(board_id, "test_list", "test description");
-    quint32 card_id =
-        db_manager.insert_card(list_id, "test_card", "test description");
-    quint32 tag_id = db_manager.insert_tag("test_tag");
-    db_manager.add_tag_to_card(card_id, tag_id);
 
-    board board = db_manager.copy_board(db_manager.get_full_board(board_id), user_id);
+    SUBCASE("simple board") {
+        quint32 card_id =
+            db_manager.insert_card(list_id, "test_card", "test description");
+        quint32 tag_id = db_manager.insert_tag("test_tag");
+        db_manager.add_tag_to_card(card_id, tag_id);
 
-    CHECK(board.m_user_id == user_id);
-    CHECK(board.m_name == "test_board");
-    CHECK(board.m_description == "test description");
-    CHECK(board.m_link == "test link");
+        board board =
+            db_manager.copy_board(db_manager.get_full_board(board_id), user_id);
 
-    CHECK(board.m_lists.size() == 1);
-    CHECK(board.m_lists[0].m_board_id == board.m_board_id);
-    CHECK(board.m_lists[0].m_name == "test_list");
-    CHECK(board.m_lists[0].m_description == "test description");
+        CHECK(board.m_user_id == user_id);
+        CHECK(board.m_name == "test_board");
+        CHECK(board.m_description == "test description");
+        CHECK(board.m_link == "test link");
 
-    CHECK(board.m_lists[0].m_cards.size() == 1);
-    CHECK(board.m_lists[0].m_cards[0].m_list_id == board.m_lists[0].m_list_id);
-    CHECK(board.m_lists[0].m_cards[0].m_name == "test_card");
-    CHECK(board.m_lists[0].m_cards[0].m_description == "test description");
+        CHECK(board.m_lists.size() == 1);
+        CHECK(board.m_lists[0].m_board_id == board.m_board_id);
+        CHECK(board.m_lists[0].m_name == "test_list");
+        CHECK(board.m_lists[0].m_description == "test description");
 
-    CHECK(board.m_lists[0].m_cards[0].m_tags.size() == 1);
-    CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_tag_id == tag_id);
-    CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_name == "test_tag");
+        CHECK(board.m_lists[0].m_cards.size() == 1);
+        CHECK(
+            board.m_lists[0].m_cards[0].m_list_id == board.m_lists[0].m_list_id
+        );
+        CHECK(board.m_lists[0].m_cards[0].m_name == "test_card");
+        CHECK(board.m_lists[0].m_cards[0].m_description == "test description");
+
+        CHECK(board.m_lists[0].m_cards[0].m_tags.size() == 1);
+        CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_tag_id == tag_id);
+        CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_name == "test_tag");
+    }
+
+    SUBCASE("check cards order") {
+        quint32 card_id_1 = db_manager.insert_card(list_id, "test_card_1", "test description");
+        quint32 card_id_2 = db_manager.insert_card(list_id, "test_card_2", "test description");
+        quint32 card_id_3 = db_manager.insert_card(list_id, "test_card_3", "test description");
+
+        board board =
+            db_manager.copy_board(db_manager.get_full_board(board_id), user_id);
+
+        CHECK(board.m_lists.size() == 1);
+        CHECK(board.m_lists[0].m_cards.size() == 3);
+        CHECK(board.m_lists[0].m_cards[0].m_number == 1);
+        CHECK(board.m_lists[0].m_cards[1].m_number == 2);
+        CHECK(board.m_lists[0].m_cards[2].m_number == 3);
+    }
 }
 
 #endif  // DEFAULT_TESTS
