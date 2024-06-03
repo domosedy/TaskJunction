@@ -436,18 +436,17 @@ void Client::connect_board(QString link) {
     write(request);
 }
 
-void Client::upload_board(int board_index) {
-    nlohmann::json board_data = m_board_menu->board_to_json(board_index);
-    std::string request = parser::upload_request(board_data);
-    write(request);
-}
-
 void Client::copy_board(int board_index) {
     const nlohmann::json board_data_json =
         m_board_menu->board_to_json(board_index);
-    const board board_data = parser::parse_board(board_data_json, m_local_id);
-    board copy_board = db.copy_board(board_data, m_local_id);
-    copy_board.m_name.append(" copy");
-    qDebug() << (copy_board.m_is_remote ? "remote" : "noo");
-    m_board_menu->create_board(copy_board);
+    auto [id, is_remote] = m_board_menu->get_info(board_index);
+    if (!is_remote) {
+        std::string request = parser::upload_request(board_data_json);
+        write(request);
+    } else {
+        board board_data = parser::parse_board(board_data_json, m_local_id);
+        board_data.m_name.append(" copy");
+        board copy_board = db.copy_board(board_data, m_local_id);
+        m_board_menu->create_board(copy_board);
+    }
 }

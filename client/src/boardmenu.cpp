@@ -15,6 +15,7 @@ QHash<int, QByteArray> BoardMenu::roleNames() const {
         roles[BoardRoles::NameRole] = "name";
         roles[BoardRoles::DescriptionRole] = "description";
         roles[BoardRoles::LinkRole] = "link";
+        roles[BoardRoles::TypeRole] = "is_remote";
     }
 
     return roles;
@@ -33,6 +34,8 @@ QVariant BoardMenu::data(const QModelIndex &index, int role) const {
             return {board.m_description};
         case BoardRoles::LinkRole:
             return {board.m_link};
+        case BoardRoles::TypeRole:
+            return {board.m_is_remote};
         default:
             return {};
     }

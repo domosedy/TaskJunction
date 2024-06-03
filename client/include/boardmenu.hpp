@@ -75,7 +75,12 @@ private:
     std::unordered_map<quint32, std::unique_ptr<BoardModel>> m_loaded_boards;
     bool is_local_loaded = false;
 
-    enum BoardRoles { NameRole = Qt::UserRole + 1, DescriptionRole, LinkRole };
+    enum BoardRoles {
+        NameRole = Qt::UserRole + 1,
+        DescriptionRole,
+        LinkRole,
+        TypeRole
+    };
 };
 
 #endif  // BOARDMENU_HPP_

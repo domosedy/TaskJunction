@@ -315,8 +315,7 @@ Rectangle {
             height: style.headerHeight / 2
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            //visible: (mainClient.connection_status == Client.Authorized)
-            visible: true
+            visible: mainClient ? (mainClient.connection_status == Client.Authorized) : false
             onClicked: {
                 connectBoardPopup.open();
             }
@@ -463,6 +462,7 @@ Rectangle {
                 Button {
                     id: shareBoardButton
 
+                    visible: is_remote
                     width: 26
                     height: 26
                     anchors.right: parent.right
