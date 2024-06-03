@@ -664,17 +664,17 @@ TEST_CASE("all_filter") {
     db_manager.clear_all_tables();
 
     auto user_id = db_manager.authorize_user("test_user", "test_password");
-    auto board_id = db_manager.insert_board(user_id, "", "", "");
-    auto list_id_1 = db_manager.insert_list(board_id, "", "");
-    auto list_id_2 = db_manager.insert_list(board_id, "", "");
-    auto card_id_1 = db_manager.insert_card(list_id_1, "", "");
-    auto card_id_2 = db_manager.insert_card(list_id_1, "", "");
-    auto card_id_3 = db_manager.insert_card(list_id_1, "", "");
-    auto card_id_4 = db_manager.insert_card(list_id_1, "", "");
-    auto card_id_5 = db_manager.insert_card(list_id_2, "", "");
-    auto card_id_6 = db_manager.insert_card(list_id_2, "", "");
-    auto card_id_7 = db_manager.insert_card(list_id_2, "", "");
-    auto card_id_8 = db_manager.insert_card(list_id_2, "", "");
+    auto board_id = db_manager.insert_board(user_id, "test_board", "", "");
+    auto list_id_1 = db_manager.insert_list(board_id, "test_list_1", "");
+    auto list_id_2 = db_manager.insert_list(board_id, "test_list_2", "");
+    auto card_id_1 = db_manager.insert_card(list_id_1, "test_card_1", "");
+    auto card_id_2 = db_manager.insert_card(list_id_1, "test_card_2", "");
+    auto card_id_3 = db_manager.insert_card(list_id_1, "test_card_3", "");
+    auto card_id_4 = db_manager.insert_card(list_id_1, "test_card_4", "");
+    auto card_id_5 = db_manager.insert_card(list_id_2, "test_card_5", "");
+    auto card_id_6 = db_manager.insert_card(list_id_2, "test_card_6", "");
+    auto card_id_7 = db_manager.insert_card(list_id_2, "test_card_7", "");
+    auto card_id_8 = db_manager.insert_card(list_id_2, "test_card_8", "");
     auto tag_id_1 = db_manager.insert_tag("1");
     auto tag_id_2 = db_manager.insert_tag("2");
     auto tag_id_3 = db_manager.insert_tag("3");

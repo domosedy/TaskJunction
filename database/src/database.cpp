@@ -150,21 +150,47 @@ void db_manager::fill_query_name_to_sql_command() {
         "ORDER BY number;";
 
     query_name_to_sql_command["any_filter_cards"] =
-        "SELECT card_id FROM %1.card_to_tags WHERE tag_id = ANY (SELECT id "
+        "SELECT card_id "
+        "FROM %1.card_to_tags "
+        "WHERE tag_id = ANY (SELECT id "
         "FROM tag_signature WHERE name = ANY (:tag_names)) "
-        "INTERSECT SELECT id FROM %1.card_signature WHERE list_id = "
+        "INTERSECT "
+        "SELECT id "
+        "FROM %1.card_signature "
+        "WHERE list_id = "
         "ANY (SELECT id FROM %1.list_signature WHERE board_id = :board_id);";
 
     query_name_to_sql_command["all_filter_cards"] =
-        "WITH tag_ids AS ( SELECT id FROM  %1.tag_signature "
-        "WHERE name = ANY (:tag_names)), "
-        "card_tag_counts AS ( SELECT card_id, COUNT(tag_id) AS tag_count "
-        "FROM  %1.card_to_tags WHERE tag_id IN (SELECT id FROM tag_ids) "
-        "GROUP BY card_id ) "
-        "SELECT card_id FROM  card_tag_counts WHERE tag_count = "
-        "(SELECT COUNT(*) FROM tag_ids)"
-        "INTERSECT SELECT id FROM  %1.card_signature WHERE list_id = "
-        "ANY (SELECT id FROM  %1.list_signature WHERE board_id = :board_id);";
+        "WITH tag_ids AS (  "
+        "    SELECT id  "
+        "    FROM tag_signature  "
+        "    WHERE name = ANY (:tag_names::text[])  "
+        "), check_missing_tags AS (  "
+        "    SELECT array_length(:tag_names::text[], 1) - COUNT(*) AS missing_count  "
+        "    FROM tag_ids  "
+        "), adjusted_tag_ids AS (  "
+        "    SELECT  "
+        "        CASE  "
+        "            WHEN check_missing_tags.missing_count > 0 THEN 0  "
+        "            ELSE id  "
+        "        END AS id  "
+        "    FROM  "
+        "        check_missing_tags  "
+        "    LEFT JOIN tag_ids ON check_missing_tags.missing_count = 0  "
+        "), card_tag_counts AS (  "
+        "    SELECT card_id, COUNT(tag_id) AS tag_count  "
+        "    FROM card_to_tags  "
+        "    WHERE tag_id IN (SELECT id FROM adjusted_tag_ids)  "
+        "    GROUP BY card_id  "
+        ")  "
+        "SELECT card_id  "
+        "FROM card_tag_counts  "
+        "WHERE tag_count = (SELECT COUNT(*) FROM adjusted_tag_ids WHERE id != 0)  "
+        "INTERSECT  "
+        "SELECT id  "
+        "FROM %1.card_signature  "
+        "WHERE list_id = ANY (SELECT id FROM %1.list_signature WHERE board_id = :board_id);";
+
 
     query_name_to_sql_command["get_board_id_by_link"] =
         "SELECT id FROM %1.board_signature WHERE link = :link;";
