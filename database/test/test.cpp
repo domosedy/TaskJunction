@@ -719,13 +719,9 @@ TEST_CASE("all_filter") {
     }
 
     SUBCASE("too many tags") {
-        db_manager.insert_tag("4");
-        QSet<quint32> answer = {};
         QVector<QString> array = {"1", "2", "3", "4"};
         auto result = db_manager.all_filter_cards(board_id, array);
         CHECK(result.empty());
-        for (auto item: result)
-            qDebug() << item;
     }
 }
 
@@ -768,7 +764,7 @@ TEST_CASE("get full board") {
     CHECK(board.m_lists[0].m_cards[0].m_tags[0].m_name == "test_tag");
 }
 
-TEST_CASE("copy board") {
+TEST_CASE("copy board") { // TODO check cards order
     db_manager db_manager(
         arguments[0], arguments[1], arguments[2], arguments[3]
     );
