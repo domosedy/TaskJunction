@@ -73,6 +73,7 @@ signals:
     void statusChanged();
     void connectionStatusChanged();
 private slots:
+    void onSslErrors(const QList<QSslError> &errors);
     void readData(const QString &);
     void onConnected();
     void onSocketError(QAbstractSocket::SocketError error);

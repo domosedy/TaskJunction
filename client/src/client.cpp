@@ -23,7 +23,14 @@ Client::Client(QObject *parent)
         m_socket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this,
         SLOT(onSocketError(QAbstractSocket::SocketError))
     );
+    connect(m_socket, SIGNAL(sslErrors(const QList<QSslError> &)),
+            this, SLOT(onSslErrors(const QList<QSslError> &)));
     m_board_menu = new BoardMenu(this);
+}
+
+void Client::onSslErrors(const QList<QSslError> &errors) {
+    qDebug() << "Errors: " << errors;
+    m_socket->ignoreSslErrors(errors);
 }
 
 void Client::write(std::string &data) {
@@ -330,9 +337,10 @@ void Client::login(
     m_password = password;
     QUrl server_url;
     qDebug() << "Connecting...";
-    server_url.setScheme(QString::fromStdString("ws"));
+    server_url.setScheme(QString::fromStdString("wss"));
     server_url.setHost(server_ip);
     server_url.setPort(server_port.toUShort());
+    
     m_socket->open(server_url);
 }
 
