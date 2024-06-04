@@ -171,7 +171,11 @@ std::string move_response::to_json() const {
 }
 
 std::string filter_response::to_json() const {
-    nlohmann::json data = {{"board-id", board_id}, {"tags", tag_ids}};
+    nlohmann::json data = {
+        {"type", "filter"},
+        {"board-id", board_id}, 
+        {"cards", tag_ids}
+    };
 
     return data.dump();
 }
