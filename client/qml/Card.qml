@@ -14,6 +14,7 @@ Rectangle {
     property int listIndex_: -1
     property string name_: name
     property string description_: description
+    required property var thisCardModel
 
     signal pressed()
     signal released()
@@ -234,7 +235,7 @@ Rectangle {
             id: tagList
 
             anchors.fill: parent
-            model: cardmodel
+            model: thisCardModel
             orientation: ListView.Horizontal
             spacing: 3
             clip: true

@@ -16,6 +16,8 @@ ApplicationWindow {
         id: style
     }
 
+    color: style.primaryColor
+
     Loader {
         id: loader
     }

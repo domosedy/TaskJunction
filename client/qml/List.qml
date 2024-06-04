@@ -346,6 +346,7 @@ Rectangle {
                         visualIndex: delegateRoot.visualIndex
                         modelIndex: delegateRoot.modelIndex
                         listIndex_: parentListIndex
+                        thisCardModel: cardmodel
                         onPressed: {
                             thisList.clip = false;
                         }

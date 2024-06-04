@@ -12,12 +12,13 @@ Rectangle {
     height: root.height
     color: style.primaryColor
 
-    Frame {
+    Rectangle {
         id: loginFrame
 
         anchors.centerIn: authMain
-        width: 354
+        width: 336
         height: 480
+        color: style.primaryColor
 
         Text {
             id: loginHeader
@@ -53,6 +54,7 @@ Rectangle {
             anchors.topMargin: 5
             font.pointSize: 16
             font.family: "Poppins"
+            color: "white"
 
             background: Rectangle {
                 implicitWidth: 336
@@ -87,6 +89,7 @@ Rectangle {
             anchors.topMargin: 5
             font.pointSize: 16
             font.family: "Poppins"
+            color: "white"
 
             background: Rectangle {
                 implicitWidth: 336
@@ -121,6 +124,7 @@ Rectangle {
             anchors.topMargin: 5
             font.pointSize: 16
             font.family: "Poppins"
+            color: "white"
             text: "127.0.0.1"
             onTextChanged: {
                 background.color = style.textFormColor;
@@ -165,6 +169,7 @@ Rectangle {
             font.pointSize: 16
             font.family: "Poppins"
             text: "3030"
+            color: "white"
             onTextChanged: {
                 background.color = style.textFormColor;
                 loginIP.background.color = style.textFormColor;

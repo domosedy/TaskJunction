@@ -45,6 +45,7 @@ Rectangle {
                 font.pointSize: 16
                 font.family: "Poppins"
                 font.bold: true
+                color: "white"
 
                 background: Rectangle {
                     implicitWidth: content.width - 20

@@ -36,7 +36,7 @@ void Client::onSslErrors(const QList<QSslError> &errors) {
 }
 
 void Client::write(std::string &data) {
-    qDebug() << "Send:: " << data;
+    qDebug() << "Send:: " << data.c_str();
     m_socket->sendTextMessage(QString::fromStdString(data));
 }
 
