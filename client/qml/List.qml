@@ -22,6 +22,8 @@ Rectangle {
     }
 
     function update_filter(filter: string) {
+        //visibleCount: listmodel.count
+
         if (filter != "")
             listVisualModel.filterOnGroup = "filtered";
         else
@@ -33,6 +35,16 @@ Rectangle {
     height: Math.min(150 + 3 * (style.cardHeight + style.cardSpacing), 150 + (visibleCount) * (style.cardHeight + style.cardSpacing))
     color: style.listBackgroundColor
     radius: style.defaultRadius
+
+    Connections {
+        function onCountChanged() {
+            if (listVisualModel.filterOnGroup == "all")
+                visibleCount = listmodel.count;
+
+        }
+
+        target: listmodel
+    }
 
     Popup {
         id: createCardPopup

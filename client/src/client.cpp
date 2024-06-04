@@ -88,6 +88,7 @@ void Client::readData(const QString &data) {
         }
         board new_board =
             parser::parse_board(response["object-json"], m_user_id);
+        qDebug() << new_board.m_link;
         new_board.m_is_remote = true;
         m_board_menu->create_board(new_board);
     }
@@ -133,7 +134,7 @@ void Client::readData(const QString &data) {
         }
 
         m_board_menu->move_command(
-            board_id, old_list_id, new_list_id, card_id, new_index
+            board_id, old_list_id, new_list_id, card_id, new_index - 1
         );
     }
     if (response_type == "connect" && response["status"] == "ok") {
@@ -143,7 +144,12 @@ void Client::readData(const QString &data) {
     }
     if (response_type == "filter" && m_current_board &&
         m_current_board->m_board_id == response["board-id"]) {
-        m_filtered_cards = response["filter"].get<QSet<quint32>>();
+        for (quint32 id : response["cards"]) {
+            m_filtered_cards.insert(id);
+        }
+        for (auto x : m_filtered_cards) {
+            qDebug() << "id:" << x;
+        }
         emit filterChanged();
     }
 }
@@ -431,17 +437,18 @@ bool Client::is_filtered(int list_index, int card_index) const {
 }
 
 void Client::set_filter(QString filter, bool is_all) {
+    m_filtered_cards.clear();
+    m_filter.clear();
     if (filter == "") {
-        m_filtered_cards.clear();
-        m_filter.clear();
+        emit filterChanged();
         return;
     }
+    m_filter = filter.split(", ");
     if (m_current_board->m_is_remote) {
         std::string request =
             parser::filter_request(m_current_board->m_board_id, filter, is_all);
         write(request);
     } else {
-        m_filter = filter.split(", ");  // todo make better?
         if (is_all) {
             m_filtered_cards =
                 db.all_filter_cards(m_current_board->m_board_id, m_filter);

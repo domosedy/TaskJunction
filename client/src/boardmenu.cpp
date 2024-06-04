@@ -179,9 +179,20 @@ void BoardMenu::update_command(
 ) {
     auto [list_idx, card_idx, _] =
         m_loaded_boards[board_id]->get_indices(list_id, card_id, 0);
-    m_loaded_boards[board_id]->update_command(
-        list_idx, card_idx, field, new_value
-    );
+    if (list_idx == -1) {
+        int board_idx = std::distance(
+            m_boards.begin(),
+            std::ranges::find_if(
+                m_boards,
+                [board_id](auto board) { return board.m_board_id == board_id; }
+            )
+        );
+        update_board(board_idx, field, new_value);
+    } else {
+        m_loaded_boards[board_id]->update_command(
+            list_idx, card_idx, field, new_value
+        );
+    }
 }
 
 void BoardMenu::move_command(

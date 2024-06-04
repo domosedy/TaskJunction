@@ -155,4 +155,11 @@ struct move_response {
     std::string to_json() const;
 };
 
+struct filter_response {
+    std::vector<quint32> tag_ids;
+    quint32 board_id;
+
+    std::string to_json() const;
+};
+
 #endif  // ELEMENT_CLASSES_HPP_

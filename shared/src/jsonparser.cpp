@@ -175,7 +175,7 @@ std::string move_request(
         {"tag-id", 0},
         {"old-list-id", list_id},
         {"new-list-id", to_list_id},
-        {"new-index", new_pos}
+        {"new-index", new_pos+1}
     };
     return request.dump();
 }
@@ -194,8 +194,8 @@ std::string filter_request(quint32 id, const QString &filter, bool is_all) {
     json request = {
         {"type", "filter"},
         {"filter", filter.toStdString().c_str()},
-        {"board-id", id},
-        {"filter-type", is_all}
+        {"filter-type", is_all ? 1 : 0}, 
+        {"board-id", id}
     };
     return request.dump();
 }
@@ -257,7 +257,7 @@ board parse_board(const json &object, quint32 m_parent_id) {
     QString description = QString::fromStdString(object["description"]);
     quint32 id = object["id"];
     QString link = QString::fromStdString(object["link"]);
-    board new_board(id, m_parent_id, name, description);
+    board new_board(id, m_parent_id, name, description, link);
     for (const auto &list_json : object["lists"]) {
         list list = parse_list(list_json, id);
         if (list.m_list_id == 0) {

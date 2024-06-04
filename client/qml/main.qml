@@ -11,12 +11,11 @@ ApplicationWindow {
     width: 1280
     height: 720
     visible: true
+    color: style.primaryColor
 
     Style {
         id: style
     }
-
-    color: style.primaryColor
 
     Loader {
         id: loader
