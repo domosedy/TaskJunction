@@ -367,8 +367,16 @@ ReturnedValue Server::execute_upload_query(copy_board_query query, quint32 id) {
     }
 
     query.board_to_copy.m_link = generate_string();
-    board result = db.copy_board(query.board_to_copy, id);
-    return {true, result.m_board_id, result.to_json().c_str()};
+    // create_response result = 
+    board created_board = db.copy_board(query.board_to_copy, id);
+    created_board.m_lists.clear();
+
+    create_response result = {
+        all_ids{created_board.m_board_id, 0, 0, 0}, 
+        created_board.m_board_id, "board",
+        created_board.to_json().c_str()
+    };
+    return {true, result.ids.board_id, result.to_json().c_str()};
 }
 
 ReturnedValue Server::execute_move_query(const move_query &query, quint32 id) {
