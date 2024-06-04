@@ -59,7 +59,7 @@ EchoClient::~EchoClient() {
 void EchoClient::onConnected() {
     qDebug() << "Connected";
     sendData("{ \"type\": \"login\", \"password\": \"1\", \"username\": \"user 4\"}");
-    sendData(R"({"type":"upload", "object-json": {"type":"board","lists":[],"id":1,"name":12,"description":"this is board 3","link":""}})");
+    sendData(R"({"type":"upload", "object-json": {"type":"board","lists":[],"id":1,"name":"12","description":"this is board 3","link":""}})");
     // sendData(R"({"type":"move","board-id":1,"list-id":3,"card-id":4,"tag-id":0,"old-list-id":3,"new-list-id":4,"new-index":0})");
     // sendData(R"({"type": "update", "board-id": 1, "list-id": 2, "card-id": 3, "tag-id": 0, "id": 1, "new-value": "aboba", "field": "name", "object-type": "board"})");
     // sendData(R"({"type": "create", "board-id": 0, "list-id": 0, "card-id": 0, "tag-id": 0, "parent-id": 3, "object-type": "board", "name": "board 4", "description": "this is board 4"})");

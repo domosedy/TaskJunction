@@ -370,6 +370,7 @@ ReturnedValue Server::execute_upload_query(copy_board_query query, quint32 id) {
     // create_response result = 
     board created_board = db.copy_board(query.board_to_copy, id);
     created_board.m_lists.clear();
+    created_board.m_link = code_string(created_board.m_link, created_board.m_board_id);
 
     create_response result = {
         all_ids{created_board.m_board_id, 0, 0, 0}, 
