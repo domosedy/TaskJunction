@@ -390,12 +390,16 @@ ReturnedValue Server::execute_move_query(const move_query &query, quint32 id) {
 ReturnedValue
 Server::execute_access_query(const access_to_board &query, quint32 id) {
     auto board_link = db.select_board(query.board_id).m_link.toStdString();
-
+    rDebug() << board_link << ' ' << query.link;
     if (board_link == query.link) {
-        auto board = db.get_full_board(query.board_id);
+        db.add_user_to_board(id, query.board_id);
+        auto board = db.select_board(query.board_id);
         board.m_link = code_string(board.m_link, board.m_board_id);
-        // rDebug() << board.m_link;
-        return ReturnedValue{true, query.board_id, board.to_json().c_str()};
+        create_response response{
+            all_ids{query.board_id, 0, 0, 0}, query.board_id, "board", board.to_json().c_str()
+        };
+        rDebug() << id << ' ' << board.m_link;
+        return ReturnedValue{true, query.board_id, response.to_json().c_str()};
     }
 
     return ReturnedValue{
