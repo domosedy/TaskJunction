@@ -99,7 +99,6 @@ TEST_CASE("select") {
         CHECK(card.m_name == "test_card");
         CHECK(card.m_list_id == list_id);
         CHECK(card.m_description == "test description");
-        CHECK(card.m_number == 1);
     }
 
     SUBCASE("select tag") {
@@ -774,9 +773,9 @@ TEST_CASE("get full board") {
 
         CHECK(board.m_lists.size() == 1);
         CHECK(board.m_lists[0].m_cards.size() == 3);
-        CHECK(board.m_lists[0].m_cards[0].m_number == 1);
-        CHECK(board.m_lists[0].m_cards[1].m_number == 2);
-        CHECK(board.m_lists[0].m_cards[2].m_number == 3);
+        CHECK(board.m_lists[0].m_cards[0].m_card_id == card_id_1);
+        CHECK(board.m_lists[0].m_cards[1].m_card_id == card_id_2);
+        CHECK(board.m_lists[0].m_cards[2].m_card_id == card_id_3);
     }
 }
 
@@ -834,9 +833,9 @@ TEST_CASE("copy board") {
 
         CHECK(board.m_lists.size() == 1);
         CHECK(board.m_lists[0].m_cards.size() == 3);
-        CHECK(board.m_lists[0].m_cards[0].m_number == 1);
-        CHECK(board.m_lists[0].m_cards[1].m_number == 2);
-        CHECK(board.m_lists[0].m_cards[2].m_number == 3);
+        CHECK(board.m_lists[0].m_cards[0].m_name == "test_card_1");
+        CHECK(board.m_lists[0].m_cards[1].m_name == "test_card_2");
+        CHECK(board.m_lists[0].m_cards[2].m_name == "test_card_3");
     }
 }
 
