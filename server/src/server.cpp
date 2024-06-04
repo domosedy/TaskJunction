@@ -19,7 +19,8 @@ enum class RequestType {
     GET_BOARDS_INFO,
     MOVE,
     ACCESS,
-    UPLOAD
+    UPLOAD,
+    FILTER
 };
 
 // How to emit when my connection is not authorized?
@@ -107,6 +108,8 @@ void Server::execute_query(uint user_id, const query_type &query) {
                 return RequestType::ACCESS;
             } else if constexpr (std::is_same_v<T, copy_board_query>) {
                 return RequestType::UPLOAD;
+            } else if constexpr (std::is_same_v<T, filter_query>) {
+                return RequestType::FILTER;
             }
             return RequestType::ERROR;
         },
@@ -159,6 +162,11 @@ void Server::execute_query(uint user_id, const query_type &query) {
 
         auto res =
             execute_upload_query(std::get<copy_board_query>(query), client_id);
+        clientSocket->sendData(res.jsoned_object);
+        return;
+    } else if (result_code == RequestType::FILTER) {
+        auto res =
+            execute_filter_query(std::get<filter_query>(query), client_id);
         clientSocket->sendData(res.jsoned_object);
         return;
     } else {
@@ -396,7 +404,8 @@ Server::execute_access_query(const access_to_board &query, quint32 id) {
         auto board = db.select_board(query.board_id);
         board.m_link = code_string(board.m_link, board.m_board_id);
         create_response response{
-            all_ids{query.board_id, 0, 0, 0}, query.board_id, "board", board.to_json().c_str()
+            all_ids{query.board_id, 0, 0, 0}, query.board_id, "board",
+            board.to_json().c_str()
         };
         rDebug() << id << ' ' << board.m_link;
         return ReturnedValue{true, query.board_id, response.to_json().c_str()};
@@ -424,6 +433,32 @@ Server::execute_get_query(const get_boards_info_query &query, quint32 id) {
     rDebug() << result.m_link;
 
     return ReturnedValue{true, 0, result.to_json().c_str()};
+}
+
+ReturnedValue
+Server::execute_filter_query(const filter_query &query, quint32 id) {
+    if (!db.check_user_rights(id, query.board_id)) {
+        rDebug() << id << " " << query.board_id;
+        return ReturnedValue{
+            false, 0, error{"You have no rights"}.to_json().c_str()
+        };
+    }
+
+    rDebug() << "Filter query " << query.board_id << ' ' << query.tags;
+    std::vector<quint32> result;
+    if (query.type == FilterType::ANY) {
+        for (auto id : db.any_filter_cards(query.board_id, query.tags)) {
+            result.push_back(id);
+        }
+    } else {
+        for (auto id : db.all_filter_cards(query.board_id, query.tags)) {
+            result.push_back(id);
+        }
+    }
+
+    filter_response response{std::move(result), query.board_id};
+
+    return ReturnedValue{true, 0, response.to_json().c_str()};
 }
 
 void Server::removeConnection() {

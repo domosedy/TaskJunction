@@ -162,6 +162,31 @@ static std::optional<copy_board_query> parseCopyQuery(const json &json_data) {
     return copy_board_query{parser::parse_board(json_data["object-json"], 0)};
 }
 
+static std::optional<filter_query> parseFilterQuery(const json &json_data) {
+    if (!parser::validator::check_string(json_data, "filter")) {
+        return std::nullopt;
+    }
+
+    auto board_id = get_int_field_data(json_data, "board-id");
+    auto filter_type = get_int_field_data(json_data, "filter-type");
+
+    if (!board_id.has_value() || !filter_type.has_value() ||
+        filter_type.value() > 1) {
+        return std::nullopt;
+    }
+
+    QString filter = get_string_field_data(json_data, "filter").value().c_str();
+    QStringList tags = filter.split(',');
+
+    for (auto &it : tags) {
+        it = it.trimmed();
+    }
+
+    return filter_query{
+        tags, board_id.value(), static_cast<FilterType>(filter_type.value())
+    };
+}
+
 std::optional<query_type> parseData(const QString &data) {
     if (!json::accept(data.toStdString())) {
         rDebug() << "Bebra";
@@ -195,6 +220,8 @@ std::optional<query_type> parseData(const QString &data) {
         result = parseAccessQuery(parsedData);
     } else if (request == "upload") {
         result = parseCopyQuery(parsedData);
+    } else if (request == "filter") {
+        result = parseFilterQuery(parsedData);
     }
 
     return result;

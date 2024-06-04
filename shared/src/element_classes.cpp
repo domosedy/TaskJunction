@@ -1,5 +1,6 @@
 #include "element_classes.hpp"
 #include <map>
+#include <nlohmann/json.hpp>
 #include <sstream>
 
 user::user(quint32 user_id, QString name)
@@ -102,8 +103,8 @@ std::string board::to_json() const {
 
     ss << "],\"id\":" << m_board_id << ",\"name\":\"" << m_name.toStdString()
        << "\""
-       << ",\"description\":\"" << m_description.toStdString() << "\",\"link\":\""
-       << m_link.toStdString() << "\"}";
+       << ",\"description\":\"" << m_description.toStdString()
+       << "\",\"link\":\"" << m_link.toStdString() << "\"}";
 
     return ss.str();
 }
@@ -167,4 +168,10 @@ std::string move_response::to_json() const {
        << R"(,"new-list-id":)" << new_list_id << R"(,"new-index":)" << new_index
        << "}";
     return ss.str();
+}
+
+std::string filter_response::to_json() const {
+    nlohmann::json data = {{"board-id", board_id}, {"tags", tag_ids}};
+
+    return data.dump();
 }

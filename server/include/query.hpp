@@ -1,16 +1,12 @@
 #ifndef QUERY_HPP_
 #define QUERY_HPP_
 
+#include <QStringList>
 #include <string>
 #include <variant>
 #include "element_classes.hpp"
 
-// struct a {
-// quint32 board_id;
-// quint32 list_id;
-// quint32 card_id;
-// quint32 tag_id;
-// };
+enum class FilterType { ANY, ALL };
 
 struct update_query {
     all_ids all_id;
@@ -59,6 +55,12 @@ struct copy_board_query {
     board board_to_copy;
 };
 
+struct filter_query {
+    QStringList tags;
+    quint32 board_id;
+    FilterType type;
+};
+
 using query_type = std::variant<
     update_query,
     delete_query,
@@ -67,6 +69,7 @@ using query_type = std::variant<
     move_query,
     get_boards_info_query,
     access_to_board,
-    copy_board_query>;
+    copy_board_query,
+    filter_query>;
 
 #endif
