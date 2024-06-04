@@ -53,7 +53,7 @@ get_string_field_data(const json &data, const std::string &field) {
         return std::nullopt;
     }
 
-    return *field_it;
+    return static_cast<std::string>(*field_it);
 }
 
 static std::optional<update_query> parseUpdateQuery(const json &json_data) {
