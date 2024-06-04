@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
         Qt::QueuedConnection
     );
 
+    qmlRegisterType<CardModel>("Client", 1, 0, "ClientCardModel");
     qmlRegisterType<ListModel>("Client", 1, 0, "ClientListModel");
     qmlRegisterType<BoardModel>("Client", 1, 0, "ClientBoardModel");
     qmlRegisterType<BoardMenu>("Client", 1, 0, "ClientBoardMenu");

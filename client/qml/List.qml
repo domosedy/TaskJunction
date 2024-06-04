@@ -316,7 +316,7 @@ Rectangle {
                     property string description_: description
                     property int parentListIndex: listIndex
                     property int visualIndex: DelegateModel.itemsIndex
-                    property int modelIndex: cardIndex
+                    property int modelIndex: cardindex
 
                     width: style.cardWidth
                     height: style.cardHeight

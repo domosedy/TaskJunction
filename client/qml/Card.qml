@@ -234,7 +234,7 @@ Rectangle {
             id: tagList
 
             anchors.fill: parent
-            model: cardModel
+            model: cardmodel
             orientation: ListView.Horizontal
             spacing: 3
             clip: true

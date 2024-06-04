@@ -52,7 +52,7 @@ private:
     enum CardRoles {
         NameRole = Qt::UserRole + 1,
         DescriptionRole,
-        CardIndex,
+        CardIndexRole,
         ModelRole
     };
 };

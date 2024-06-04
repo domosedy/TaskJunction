@@ -51,8 +51,8 @@ QHash<int, QByteArray> ListModel::roleNames() const {
     if (roles.empty()) {
         roles[CardRoles::NameRole] = "name";
         roles[CardRoles::DescriptionRole] = "description";
-        roles[CardRoles::CardIndex] = "cardIndex";
-        roles[CardRoles::ModelRole] = "cardModel";
+        roles[CardRoles::CardIndexRole] = "cardindex";
+        roles[CardRoles::ModelRole] = "cardmodel";
     }
 
     return roles;
@@ -69,7 +69,7 @@ QVariant ListModel::data(const QModelIndex &index, int role) const {
             return {card->m_name};
         case CardRoles::DescriptionRole:
             return {card->m_description};
-        case CardRoles::CardIndex:
+        case CardRoles::CardIndexRole:
             return {index.row()};
         case CardRoles::ModelRole:
             return QVariant::fromValue<QObject *>(card);
