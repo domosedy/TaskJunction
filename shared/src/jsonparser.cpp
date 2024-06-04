@@ -190,6 +190,16 @@ std::string upload_request(const nlohmann::json &data) {
     return request.dump();
 }
 
+std::string filter_request(quint32 id, const QString &filter, bool is_all) {
+    json request = {
+        {"type", "filter"},
+        {"filter", filter.toStdString().c_str()},
+        {"board-id", id},
+        {"filter-type", is_all}
+    };
+    return request.dump();
+}
+
 tag parse_tag(const json &object) {
     if (!validator::check_tag(object)) {
         return tag(0, "");

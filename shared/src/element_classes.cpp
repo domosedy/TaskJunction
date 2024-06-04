@@ -102,8 +102,8 @@ std::string board::to_json() const {
 
     ss << "],\"id\":" << m_board_id << ",\"name\":\"" << m_name.toStdString()
        << "\""
-       << ",\"description\":\"" << m_description.toStdString() << ",\"link\":\""
-       << m_link.toStdString() << "\"}";
+       << ",\"description\":\"" << m_description.toStdString()
+       << "\",\"link\":\"" << m_link.toStdString() << "\"}";
 
     return ss.str();
 }

@@ -8,6 +8,7 @@ Rectangle {
     id: board
 
     visible: true
+    color: style.primaryColor
 
     Popup {
         id: createListPopup
@@ -162,10 +163,11 @@ Rectangle {
             width: 110
             height: parent.height / 2
             onClicked: {
-                mainClient.copy_board(0);
+                mainClient.copy_board();
             }
             anchors.right: parent.right
             anchors.top: parent.top
+            visible: mainClient ? mainClient.connection_status == Client.Authorized : false
 
             Text {
                 text: mainClient ? (mainClient.current_board.is_remote ? "Copy" : "Upload") : ""
@@ -193,12 +195,10 @@ Rectangle {
             font.pointSize: 16
             font.family: "Poppins"
             font.bold: true
+            color: "white"
             clip: true
             onAccepted: {
                 mainClient.set_filter(filterHolder.text, filterTypeSwitch.checked);
-                for (let i = 0; i < listview.model.count; ++i) {
-                    listview.itemAtIndex(i).update_filter(filterHolder.text);
-                }
             }
 
             background: Rectangle {
@@ -287,6 +287,18 @@ Rectangle {
 
         }
 
+    }
+
+    Connections {
+        function onFilterChanged() {
+            for (let i = 0; i < listview.model.count; ++i) {
+                if (listview.itemAtIndex(i))
+                    listview.itemAtIndex(i).update_filter(filterHolder.text);
+
+            }
+        }
+
+        target: mainClient
     }
 
 }

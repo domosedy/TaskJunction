@@ -70,6 +70,8 @@ std::string move_request(
 
 std::string upload_request(const nlohmann::json &data);
 
+std::string filter_request(quint32 id, const QString &filter, bool is_all);
+
 tag parse_tag(const json &object);
 
 card parse_card(const json &object, quint32 m_parent_id);

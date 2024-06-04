@@ -69,6 +69,7 @@ Rectangle {
                 anchors.topMargin: 10
                 font.pointSize: 16
                 font.family: "Poppins"
+                color: "white"
 
                 background: Rectangle {
                     implicitWidth: createCardContent.width - 20
@@ -92,6 +93,7 @@ Rectangle {
                 anchors.topMargin: 10
                 font.pointSize: 16
                 font.family: "Poppins"
+                color: "white"
 
                 background: Rectangle {
                     implicitWidth: createCardContent.width - 20

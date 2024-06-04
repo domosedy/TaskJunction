@@ -65,13 +65,14 @@ public:
 
     Q_INVOKABLE bool is_filtered(int list_index, int card_index) const;
     Q_INVOKABLE void set_filter(QString filter, bool is_all);
-    Q_INVOKABLE void copy_board(int board_index);
+    Q_INVOKABLE void copy_board();
 
 signals:
     void boardChanged();
     void menuChanged();
     void statusChanged();
     void connectionStatusChanged();
+    void filterChanged();
 private slots:
     void onSslErrors(const QList<QSslError> &errors);
     void readData(const QString &);

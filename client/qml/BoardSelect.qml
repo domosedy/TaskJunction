@@ -48,6 +48,7 @@ Rectangle {
                 anchors.topMargin: 10
                 font.pointSize: 16
                 font.family: "Poppins"
+                color: "white"
 
                 background: Rectangle {
                     implicitWidth: boardPopUpContent.width - 20
@@ -135,6 +136,7 @@ Rectangle {
                 anchors.topMargin: 10
                 font.pointSize: 16
                 font.family: "Poppins"
+                color: "white"
 
                 background: Rectangle {
                     implicitWidth: createBoardContent.width - 20
@@ -158,6 +160,7 @@ Rectangle {
                 anchors.topMargin: 10
                 font.pointSize: 16
                 font.family: "Poppins"
+                color: "white"
 
                 background: Rectangle {
                     implicitWidth: createBoardContent.width - 20
@@ -544,6 +547,7 @@ Rectangle {
                             font.family: "Poppins"
                             readOnly: true
                             text: link
+                            color: "white"
 
                             background: Rectangle {
                                 implicitWidth: linkPopUpContent.width - 20

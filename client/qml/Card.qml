@@ -169,6 +169,7 @@ Rectangle {
                 anchors.topMargin: 10
                 font.pointSize: 16
                 font.family: "Poppins"
+                color: "white"
 
                 background: Rectangle {
                     implicitWidth: tagContent.width - 20
