@@ -38,6 +38,7 @@ while [[ $# -gt 0 ]]; do
         -s|--server)
             build_server
             is_server_builded=1
+            shift
             ;;
         -a|--all)
             if [[ is_client_builded -eq 0 ]]; then
