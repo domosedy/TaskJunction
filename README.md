@@ -10,10 +10,16 @@ This is Linux desktop application for task managment in kanban system
 ## Build
 
 1. Fill in the config file or leave it with default values.
-2. To create database use `build-database.sh` file:
+2. To create database use `build-database.sh` script:
 ```
 ./build-database.sh [-c | --client] [-s | --server] [-a | --all]
 ```
+3. Configure ssl if you are server?? TODO
+4. To build applications use `build-app.sh` script:
+```
+./build-app.sh [-c | --client] [-s | --server] [-a | --all]
+```
+If all goes well, you will have executable files `./client-app` and/or `./server-app`.
 
 ## Features
 1. Create/Delete/Update boards, lists, cards, tags

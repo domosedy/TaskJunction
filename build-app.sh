@@ -42,9 +42,11 @@ while [[ $# -gt 0 ]]; do
         -a|--all)
             if [[ is_client_builded -eq 0 ]]; then
                 build_client
+                is_client_builded=1;
             fi
             if [[ is_server_builded -eq 0 ]]; then
                 build_server
+                is_server_builded=1
             fi
             shift
             ;;
