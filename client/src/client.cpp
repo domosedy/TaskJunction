@@ -9,9 +9,14 @@
 #include "element_classes.hpp"
 #include "jsonparser.hpp"
 
-Client::Client(QObject *parent)
+Client::Client(const QMap<QString, QString> &kwargs, QObject *parent)
     : QObject(parent),
-      db(database::db_manager("local_boards", "postgres", "localhost", "")) {
+      db(database::db_manager(
+          kwargs["LOCAL_NAME"],
+          kwargs["POSTGRES_USER"],
+          "localhost",
+          kwargs["POSTGRES_PASSWORD"]
+      )) {
     m_socket =
         new QWebSocket("Client", QWebSocketProtocol::VersionLatest, this);
     connect(m_socket, SIGNAL(connected()), this, SLOT(onConnected()));
@@ -31,7 +36,7 @@ Client::Client(QObject *parent)
 }
 
 void Client::onSslErrors(const QList<QSslError> &errors) {
-    qDebug() << "Errors: " << errors;
+    // qDebug() << "Errors: " << errors;
     m_socket->ignoreSslErrors(errors);
 }
 

@@ -30,7 +30,10 @@ public:
     };
     Q_ENUMS(ConnectionStatus)
 
-    explicit Client(QObject *parent = nullptr);
+    explicit Client(
+        const QMap<QString, QString> &kwargs,
+        QObject *parent = nullptr
+    );
 
     Q_INVOKABLE void login(
         QString username,

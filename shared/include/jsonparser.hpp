@@ -80,6 +80,8 @@ list parse_list(const json &object, quint32 m_parent_id);
 
 board parse_board(const json &object, quint32 m_parent_id);
 
+QMap<QString, QString> parse_config();
+
 }  // namespace parser
 
 #endif
