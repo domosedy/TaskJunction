@@ -1,6 +1,15 @@
 #!/bin/bash
 # In honor of Aleksey Zubakov
 
+create_database () {
+    if psql -U postgres -lqt | cut -d \| -f 1 | grep -qw $2; then
+        echo "$2 already exists!";
+    else
+        sudo -u postgres psql -c "CREATE DATABASE $2 OWNER $1;"
+        sudo -u postgres psql --username=$1 $2< $create_path
+    fi
+}
+
 if [[ -f "config" ]]; then
 
     create_path="./database/include/create_board.sql"
@@ -27,36 +36,16 @@ if [[ -f "config" ]]; then
     while [[ $# -gt 0 ]]; do
         case $1 in
             -c|--client)
-                if psql -U postgres -lqt | cut -d \| -f 1 | grep -qw ${args[2]}; then
-                    echo "${args[2]} already exists!";
-                else
-                    sudo -u postgres psql -c "CREATE DATABASE ${args[2]} OWNER ${args[0]};"
-                    sudo -u postgres psql --username=${args[0]} ${args[2]} < $create_path
-                fi
+                create_database "${args[0]}" "${args[2]}"
                 shift
                 ;;
             -s|--server)
-                if psql -U postgres -lqt | cut -d \| -f 1 | grep -qw ${args[3]}; then
-                    echo "${args[3]} already exists!";
-                else
-                    sudo -u postgres psql -c "CREATE DATABASE ${args[3]} OWNER ${args[0]};"
-                    sudo -u postgres psql --username=${args[0]} ${args[3]} < $create_path
-                fi
+                create_database "${args[0]}" "${args[3]}"
                 shift
                 ;;
             -a|--all)
-                if psql -U postgres -lqt | cut -d \| -f 1 | grep -qw ${args[2]}; then
-                    echo "${args[2]} already exists!";
-                else
-                    sudo -u postgres psql -c "CREATE DATABASE ${args[2]} OWNER ${args[0]};"
-                    sudo -u postgres psql --username=${args[0]} ${args[2]} < $create_path
-                fi
-                if psql -U postgres -lqt | cut -d \| -f 1 | grep -qw ${args[3]}; then
-                    echo "${args[3]} already exists!";
-                else
-                    sudo -u postgres psql -c "CREATE DATABASE ${args[3]} OWNER ${args[0]};"
-                    sudo -u postgres psql --username=${args[0]} ${args[3]} < $create_path
-                fi
+                create_database "${args[0]}" "${args[2]}"
+                create_database "${args[0]}" "${args[3]}"
                 shift
                 ;;
             -*|--*)
