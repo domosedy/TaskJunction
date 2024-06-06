@@ -5,46 +5,70 @@
 #include <QMap>
 #include <QVector>
 #include <nlohmann/json.hpp>
+#include <tuple>
 #include "element_classes.hpp"
 #include "listmodel.hpp"
 
 class BoardModel : public QAbstractListModel, public board {
     Q_OBJECT
     Q_PROPERTY(int count READ get_count NOTIFY countChanged)
+    Q_PROPERTY(bool is_remote MEMBER m_is_remote NOTIFY modeChanged)
 public:
     explicit BoardModel(QObject *parent = nullptr);
-    BoardModel(QObject *parent, const nlohmann::json &board_json);
-    BoardModel(QObject *parent, const board &board_base);
+    BoardModel(
+        const nlohmann::json &board_json,
+        QObject *parent = nullptr
+    );  // TODO WHERE IT NEEDED?
+    BoardModel(const board &board_base, QObject *parent = nullptr);
     QHash<int, QByteArray> roleNames() const override;
     int rowCount(const QModelIndex &parent = {}) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole)
         const override;
-    Q_INVOKABLE void create_list(QString &name);
     void create_list(const list &list_base);
     void create_card(int index, const card &new_card);
     void create_card(quint32 list_id, const card &new_card);
-    void delete_list(int index);
-    void delete_card(const int list_index, const int card_index);
     void create_card(int list_index, QString &name, QString &description);
-    void update_card_name(int list_index, int card_index, QString &name);
-    void update_card_description(
-        int list_index,
-        int card_index,
-        QString &description
-    );
-    void update_list_name(int list_index, QString &name);
+    void create_tag(quint32 list_id, quint32 card_id, const tag &new_tag);
+    void create_tag(int list_index, int card_index, const tag &new_tag);
     int get_count() const;
+    std::tuple<int, int, int>
+    get_indices(quint32 list_id, quint32 card_id, quint32 tag_id) const;
     quint32 get_list_id(const int index) const;
     quint32 get_card_id(const int list_index, const int card_index) const;
+    quint32 get_tag_id(
+        const int list_index,
+        const int card_index,
+        const int tag_index
+    ) const;
+    void move(int from_card, int to_card, int from_list, int to_list);
+
+    void delete_command(
+        const int list_index,
+        const int card_index,
+        const int tag_index
+    );
+    void update_command(
+        const int list_index,
+        const int card_index,
+        const QString &field,
+        const QString &new_value
+    );
+    nlohmann::json to_json() const;
 
 signals:
     void countChanged();
+    void modeChanged();
 
 private:
-    QVector<ListModel *> m_lists;
-    QMap<quint32, int> m_index_by_id;
+    QVector<quint32> m_ids;
+    std::unordered_map<quint32, std::unique_ptr<ListModel>> m_lists;
 
-    enum ListRoles { NameRole = Qt::UserRole + 1, DescriptionRole, ModelRole };
+    enum ListRoles {
+        NameRole = Qt::UserRole + 1,
+        DescriptionRole,
+        ModelRole,
+        IndexRole
+    };
 };
 
 #endif

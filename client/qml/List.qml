@@ -1,191 +1,383 @@
+import Client
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Client
 import "qrc:"
 
-Component {
-    Rectangle {
-        id: listMain 
-        y: 20 
-        width: style.listWidth
-        height: Math.max(90, Math.min((listmodel.count+1) * 45,mainarea.height-40))
-        color: style.listBackgroundColor
+Rectangle {
+    id: listMain
 
-        function deleteRequest(card_index : int) {
-            mainClient.delete_card(index, card_index)
+    property int visibleCount: listmodel.count
+
+    function deleteRequest(card_index: int) {
+        mainClient.delete_card(index, card_index);
+    }
+
+    function updateCardName(card_index: int, new_name: string) {
+        mainClient.update_card(index, card_index, "name", new_name);
+    }
+
+    function updateCardDescription(card_index: int, new_description: string) {
+        mainClient.update_card(index, card_index, "description", new_description);
+    }
+
+    function update_filter(filter: string) {
+        //visibleCount: listmodel.count
+
+        if (filter != "")
+            listVisualModel.filterOnGroup = "filtered";
+        else
+            listVisualModel.filterOnGroup = "all";
+        listVisualModel.update();
+    }
+
+    width: style.listWidth
+    height: Math.min(150 + 3 * (style.cardHeight + style.cardSpacing), 150 + (visibleCount) * (style.cardHeight + style.cardSpacing))
+    color: style.listBackgroundColor
+    radius: style.defaultRadius
+
+    Connections {
+        function onCountChanged() {
+            if (listVisualModel.filterOnGroup == "all")
+                visibleCount = listmodel.count;
+
         }
 
-        function updateCardName(card_index : int, new_name : string) {
-            mainClient.update_card_name(index, card_index, new_name)
+        target: listmodel
+    }
+
+    Popup {
+        id: createCardPopup
+
+        width: 210
+        height: 160
+        z: 4
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        focus: true
+        x: 0
+        y: listMain.height - 160
+
+        background: Rectangle {
+            visible: false
         }
 
-        function updateCardDescription(card_index : int, new_desctiption : string) {
-            mainClient.update_card_description(index, card_index, new_desctiption)
-        }
-        
-        Popup {
-            id: create_card
-            width: 210
-            height: 160
-            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+        contentItem: Rectangle {
+            id: createCardContent
 
-            background: Rectangle {
-                visible: false
+            border.color: style.primaryColor
+            border.width: style.defaultBorderSize
+            color: style.listBackgroundColor
+            radius: style.defaultRadius
+            Drag.active: true
+
+            TextField {
+                id: cardName
+
+                z: 1
+                placeholderText: "Enter name"
+                placeholderTextColor: "#bfbfbf"
+                anchors.top: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.topMargin: 10
+                font.pointSize: 16
+                font.family: "Poppins"
+                color: "white"
+
+                background: Rectangle {
+                    implicitWidth: createCardContent.width - 20
+                    implicitHeight: 36
+                    radius: style.defaultRadius
+                    color: style.textFormColor
+                    border.color: style.listBackgroundColor
+                    border.width: 1
+                }
+
             }
-            contentItem: Rectangle {
-                id: content
-                border.color: style.primaryColor
-                border.width: style.defaultBorderSize
-                ColumnLayout {
-                    z:1
-                    width: parent.width
-                    anchors.top: parent.top
-                    anchors.topMargin: 10
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 10
-                    TextField {
-                        z: 1
-                        id: card_name
-                        placeholderText: "New card"
-                        font.family: "Courier"
-                        font.pointSize: 12
-                        font.bold: true
-                        Layout.preferredWidth: parent.width - 20
-                        Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                    }      
-                    TextField {
-                        z: 1
-                        id: card_description
-                        placeholderText: "Description"
 
-                        font.family: "Courier"
-                        font.pointSize: 12
-                        font.bold: true
-                        Layout.preferredWidth: parent.width - 20
-                        Layout.alignment: Qt.AlignHCenter
-                    }                                
-                    Button {
-                        z: 1
-                        Layout.preferredWidth: parent.width-40
-                        Layout.preferredHeight: 30
-                        Layout.margins: 20
-                        Text {
-                            text: "Add"
-                            font.family: "Courier"
-                            font.pointSize: 12
-                            anchors.centerIn: parent
-                        }
-                        background: Rectangle {
-                            color: parent.down ? Qt.lighter(style.createBackgroundColor, 1.2) :
-                            (parent.hovered ? Qt.lighter(style.createBackgroundColor, 1.2) : style.createBackgroundColor)
-                        }     
-                        Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
+            TextField {
+                id: cardDescription
+
+                z: 1
+                placeholderText: "Enter description"
+                placeholderTextColor: "#bfbfbf"
+                anchors.top: cardName.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.topMargin: 10
+                font.pointSize: 16
+                font.family: "Poppins"
+                color: "white"
+
+                background: Rectangle {
+                    implicitWidth: createCardContent.width - 20
+                    implicitHeight: 36
+                    radius: style.defaultRadius
+                    color: style.textFormColor
+                    border.color: style.listBackgroundColor
+                    border.width: 1
+                }
+
+            }
+
+            Button {
+                z: 1
+                implicitWidth: parent.width - 20
+                implicitHeight: 36
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottomMargin: 10
+                onClicked: {
+                    createCardPopup.close();
+                    mainClient.create_card(index, cardName.text, cardDescription.text);
+                    cardDescription.text = "";
+                    cardName.text = "";
+                }
+
+                Text {
+                    text: "Add"
+                    font.family: "Poppins"
+                    font.pointSize: 16
+                    anchors.centerIn: parent
+                    color: "white"
+                }
+
+                background: Rectangle {
+                    color: parent.down ? Qt.lighter(style.primaryColor, 1.2) : (parent.hovered ? Qt.lighter(style.primaryColor, 1.2) : style.primaryColor)
+                    radius: style.defaultRadius
+                }
+
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                drag.target: parent
+            }
+
+        }
+
+    }
+
+    Rectangle {
+        id: listContent
+
+        width: parent.width
+        height: listMain.height
+        color: style.listBackgroundColor
+        radius: style.defaultRadius
+
+        ListView {
+            id: thisList
+
+            clip: true
+            anchors.fill: parent
+            spacing: style.cardSpacing
+            headerPositioning: ListView.OverlayHeader
+            footerPositioning: ListView.OverlayFooter
+
+            header: Rectangle {
+                id: listHeader
+
+                z: 3
+                width: style.listWidth
+                height: style.listHeaderHeight
+                color: style.listBackgroundColor
+                radius: style.defaultRadius
+
+                TextInput {
+                    id: listName
+
+                    z: 1
+                    text: name
+                    font.family: "Poppins"
+                    font.pointSize: 16
+                    font.bold: true
+                    color: "white"
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.leftMargin: 20
+                    clip: true
+                    readOnly: true
+                    onEditingFinished: {
+                        listName.readOnly = true;
+                        lnArea.enabled = true;
+                        mainClient.update_list(index, listName.text);
+                    }
+
+                    MouseArea {
+                        id: lnArea
+
+                        anchors.fill: parent
                         onClicked: {
-                            create_card.close()
-                            mainClient.create_card(index, card_name.text, card_description.text)
-                            card_description.text = ""
-                            card_name.text = ""
+                            listName.readOnly = false;
+                            lnArea.enabled = false;
+                            listName.cursorPosition = 0;
+                            listName.focus = true;
                         }
+                    }
+
+                }
+
+                Button {
+                    id: deleteListButton
+
+                    width: 26
+                    height: 26
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.rightMargin: 20
+                    onClicked: mainClient.delete_list(index)
+                    icon.source: "bin.svg"
+                    icon.width: width
+                    icon.height: height
+
+                    background: Rectangle {
+                        color: parent.down ? Qt.darker(style.boardCardColor, 1.4) : (parent.hovered ? Qt.darker(style.boardCardColor, 1.2) : style.boardCardColor)
+                    }
+
+                }
+
+            }
+
+            footer: Rectangle {
+                id: listFooted
+
+                z: 3
+                width: listContent.width
+                height: 68
+                color: style.listBackgroundColor
+                radius: style.defaultRadius
+
+                Button {
+                    width: style.listWidth - 40
+                    height: 40
+                    anchors.centerIn: parent
+                    onClicked: {
+                        createCardPopup.open();
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "+ New card"
+                        color: "white"
+                        font.pointSize: 16
+                        font.family: "Poppins"
+                    }
+
+                    background: Rectangle {
+                        color: parent.down ? Qt.darker(style.cardBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.cardBackgroundColor, 1.2) : style.cardBackgroundColor)
+                        radius: style.defaultRadius
+                    }
+
+                }
+
+                DropArea {
+                    id: footedDrop
+
+                    anchors.fill: parent
+                    onDropped: function(drag) {
+                        let from = drag.source.modelIndex;
+                        drag.source.dragList.clip = true;
+                        mainClient.move(from, -1, drag.source.listIndex_, listIndex);
+                        if (listIndex == drag.source.listIndex_)
+                            listVisualModel.groups[2].move(from, listmodel.count - 1);
+
                     }
                 }
-                Drag.active: true
-                MouseArea{
-                    anchors.fill: parent
-                    drag.target: parent
-                }                  
-            }
-        }        
-        Rectangle {
-            anchors.top: parent.top
-            width: parent.width
-            height: style.headerHeight 
-            color: style.primaryColor
-            id: listheader
-            Row {   
-                anchors.fill: parent 
-                layoutDirection: Qt.LeftToRight
-                Button {
-                    Text {
-                        anchors.centerIn: parent
-                        text: "+"
-                        color: "white"
-                    }
-                    height: listheader.height
-                    width: height
-                    background: Rectangle {
-                        color: parent.down ? Qt.darker(style.primaryColor, 1.4) :
-                                (parent.hovered ? Qt.darker(style.primaryColor, 1.4) : style.primaryColor)
-                    }            
-                    anchors.verticalCenter: parent.verticalCenter
-                    onClicked: {
-                        create_card.open()
-                    }
-                }  
-                TextInput {
-                    z: 1
-                    id: list_name
-                    text: name
-                    font.family: "Courier"
-                    font.pointSize: 16
-                    color: "white"
-                    width: parent.width - 2*listheader.height
-                    anchors.verticalCenter: parent.verticalCenter
-                    clip: true
 
-                    readOnly: true
-                    MouseArea {
-                        id: ln_area
-                        anchors.fill: parent
-                        onDoubleClicked: {
-                            list_name.readOnly = false
-                            ln_area.enabled = false
-                            list_name.cursorPosition = 0
+            }
+
+            model: DelegateModel {
+                id: listVisualModel
+
+                function update() {
+                    if (allItems.count == 0)
+                        return ;
+
+                    allItems.setGroups(0, allItems.count, ["all"]);
+                    for (let index = 0; index < allItems.count; index++) {
+                        if (mainClient.is_filtered(listIndex, index))
+                            allItems.setGroups(index, 1, ["all", "filtered"]);
+
+                    }
+                    visibleCount = visibleItems.count;
+                }
+
+                model: listmodel
+                Component.onCompleted: {
+                    Qt.callLater(update);
+                }
+                filterOnGroup: "all"
+                groups: [
+                    DelegateModelGroup {
+                        id: allItems
+
+                        name: "all"
+                        includeByDefault: true
+                        onCountChanged: Qt.callLater(update)
+                    },
+                    DelegateModelGroup {
+                        id: visibleItems
+
+                        name: "filtered"
+                    }
+                ]
+
+                delegate: DropArea {
+                    id: delegateRoot
+
+                    property string name_: name
+                    property string description_: description
+                    property int parentListIndex: listIndex
+                    property int visualIndex: DelegateModel.itemsIndex
+                    property int modelIndex: cardindex
+
+                    width: style.cardWidth
+                    height: style.cardHeight
+                    anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
+                    onEntered: function(drag) {
+                        let from = drag.source.visualIndex;
+                        let to = cardRoot.visualIndex;
+                        if (drag.source.listIndex_ == cardRoot.listIndex_)
+                            listVisualModel.groups[2].move(from, to);
+
+                    }
+                    onDropped: function(drag) {
+                        let from = drag.source.modelIndex;
+                        let to = (drag.source.listIndex_ != cardRoot.listIndex_) ? visualIndex : drag.source.visualIndex;
+                        drag.source.dragList.clip = true;
+                        mainClient.move(from, to, drag.source.listIndex_, cardRoot.listIndex_);
+                    }
+
+                    Card {
+                        id: cardRoot
+
+                        width: style.cardWidth
+                        height: style.cardHeight
+                        color: style.cardBackgroundColor
+                        dragParent: cardDragContainer
+                        dragList: thisList
+                        visualIndex: delegateRoot.visualIndex
+                        modelIndex: delegateRoot.modelIndex
+                        listIndex_: parentListIndex
+                        thisCardModel: cardmodel
+                        onPressed: {
+                            thisList.clip = false;
                         }
                     }
-                    onAccepted: { 
-                        list_name.readOnly = true
-                        ln_area.enabled = true
-                        list_name.focus = false
-                        mainClient.update_list_name(index, list_name.text)
-                    }
-                }                             
-                Button {
-                    Text {
-                        anchors.centerIn: parent
-                        text: "-"
-                        color: "white"
-                    }
-                    height: listheader.height
-                    width: height
-                    background: Rectangle {
-                        color: parent.down ? Qt.darker(style.primaryColor, 1.4) :
-                                (parent.hovered ? Qt.darker(style.primaryColor, 1.4) : style.primaryColor)
-                    }            
-                    anchors.verticalCenter: parent.verticalCenter
-                    onClicked: mainClient.delete_list(index)
-                }  
-            }          
+
+                }
+
+            }
+
+            displaced: Transition {
+                NumberAnimation {
+                    properties: "x,y"
+                    easing.type: Easing.OutQuad
+                }
+
+            }
+
         }
 
-        Rectangle {
-            id: listcontent
-            width: parent.width
-            height: listMain.height-40
-            anchors.top: listheader.bottom
-            color: style.listBackgroundColor
-
-            ListView {
-                id:thislist
-                clip: true
-                y: 10
-                anchors.fill: parent
-                anchors.topMargin: 10
-                anchors.leftMargin: 5
-                model: listmodel
-                spacing: 5
-                delegate: Card {}               
-            }             
-        }
     }
+
 }

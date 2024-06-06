@@ -1,4 +1,6 @@
 #include "jsonparser.hpp"
+#include <QFile>
+#include <QMap>
 #include <QString>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -175,7 +177,7 @@ std::string move_request(
         {"tag-id", 0},
         {"old-list-id", list_id},
         {"new-list-id", to_list_id},
-        {"new-index", new_pos}
+        {"new-index", new_pos + 1}
     };
     return request.dump();
 }
@@ -187,6 +189,16 @@ std::string connect_to_board_request(const QString &link) {
 
 std::string upload_request(const nlohmann::json &data) {
     json request = {{"type", "upload"}, {"object-json", data}};
+    return request.dump();
+}
+
+std::string filter_request(quint32 id, const QString &filter, bool is_all) {
+    json request = {
+        {"type", "filter"},
+        {"filter", filter.toStdString().c_str()},
+        {"filter-type", is_all ? 1 : 0},
+        {"board-id", id}
+    };
     return request.dump();
 }
 
@@ -247,7 +259,7 @@ board parse_board(const json &object, quint32 m_parent_id) {
     QString description = QString::fromStdString(object["description"]);
     quint32 id = object["id"];
     QString link = QString::fromStdString(object["link"]);
-    board new_board(id, m_parent_id, name, description);
+    board new_board(id, m_parent_id, name, description, link);
     for (const auto &list_json : object["lists"]) {
         list list = parse_list(list_json, id);
         if (list.m_list_id == 0) {
@@ -256,6 +268,22 @@ board parse_board(const json &object, quint32 m_parent_id) {
         new_board.m_lists.push_back(list);
     }
     return new_board;
+}
+
+QMap<QString, QString> parse_config() {
+    QFile config("config");
+    if (!config.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "No config file!";
+        return {};
+    }
+    QTextStream in(&config);
+    QMap<QString, QString> kwargs;
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        auto parsed = line.split("=");
+        kwargs[parsed[0]] = parsed[1];
+    }
+    return kwargs;
 }
 
 }  // namespace parser
