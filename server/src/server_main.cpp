@@ -2,6 +2,7 @@
 #include <QCoreApplication>
 #include <QStringList>
 #include "server.hpp"
+#include "jsonparser.hpp"
 
 QtMessageHandler originalHandler = nullptr;
 
@@ -41,10 +42,6 @@ int main(int argc, char *argv[]) {
     parser.addOption(port_option);
     parser.addOption(short_port_option);
 
-    // parser.addPositionalArgument("port", QCoreApplication::translate("main",
-    // "Set port to main.")); parser.addPositionalArgument("p",
-    // QCoreApplication::translate("main", "Set port to main."));
-
     parser.process(app);
 
     auto args = parser.positionalArguments();
@@ -58,6 +55,13 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    Server server(PORT);
+    auto configParameters = parser::parse_config();
+
+    if (!configParameters.contains("POSTGRES_USER") || !configParameters.contains("POSTGRES_PASSWORD") || !configParameters.contains("REMOTE_NAME")) {
+        rDebug() << "Bad format of config";
+        return 1;
+    }
+
+    Server server(PORT, configParameters);
     return app.exec();
 }

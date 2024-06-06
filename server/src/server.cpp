@@ -24,8 +24,8 @@ enum class RequestType {
 };
 
 // How to emit when my connection is not authorized?
-Server::Server(quint16 port)
-    : port(port), db("postgres", "postgres", "localhost", "") {
+Server::Server(quint16 port, const QMap<QString, QString> &config)
+    : port(port), db(config["REMOTE_NAME"], config["POSTGRES_USER"], "localhost", config["POSTGRES_PASSWORD"]) {
     server = new QWebSocketServer(
         QStringLiteral("Task Server"), QWebSocketServer::SecureMode, this
     );

@@ -40,7 +40,7 @@ class Server : public QObject {
     std::pair<QString, quint32> execute_login_query(const login_query &query);
 
 public:
-    explicit Server(quint16);
+    explicit Server(quint16 port, const QMap<QString, QString> &config);
     ~Server();
 
 public slots:

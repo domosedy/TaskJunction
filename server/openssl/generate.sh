@@ -15,3 +15,6 @@ openssl x509 -req \
     -CAcreateserial -out localhost.cert \
     -days 365 \
     -sha256 -extfile cert.conf
+
+cp localhost.cert ..
+cp localhost.key ..
