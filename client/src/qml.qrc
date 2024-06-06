@@ -1,0 +1,15 @@
+<RCC>
+    <qresource>
+        <file alias="main.qml">../qml/main.qml</file>
+        <file alias="Board.qml">../qml/Board.qml</file>
+        <file alias="Card.qml">../qml/Card.qml</file>
+        <file alias="List.qml">../qml/List.qml</file>
+        <file alias="Style.qml">../qml/Style.qml</file> 
+        <file alias="Authorization.qml">../qml/Authorization.qml</file>
+        <file alias="BoardSelect.qml">../qml/BoardSelect.qml</file>
+        <file alias="back.svg">../resources/back.svg</file>
+        <file alias="bin.svg">../resources/bin.svg</file>
+        <file alias="link.svg">../resources/link.svg</file>
+        <file alias="remote.svg">../resources/remote.svg</file>
+    </qresource>
+</RCC>
