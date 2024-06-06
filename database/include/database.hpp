@@ -64,13 +64,11 @@ public:
     db_manager &operator=(db_manager &&) = delete;
 
     bool is_open() const;
-
     void print_all_tables();
     void clear_all_tables();
     void drop_all_tables();
 
     void set_schema(const QString &name);
-
     quint32 authorize_user(const QString &login, const QString &password);
 
     quint32 insert_board(
@@ -93,7 +91,6 @@ public:
 
     bool add_user_to_board(quint32 user_id, quint32 board_id);
     bool add_tag_to_card(quint32 card_id, quint32 tag_id);
-
     bool update_command(
         const QString &table_name,
         const QString &updating_field_name,
@@ -101,7 +98,6 @@ public:
         quint32 key_value
     );
     bool move_card(int id, int new_list_id, int new_number);
-
     user select_user(quint32 id);
     board select_board(quint32 id);
     list select_list(quint32 id);

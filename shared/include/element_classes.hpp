@@ -8,6 +8,7 @@
 #include <string>
 #include <fstream>
 
+
 template <typename T>
 concept has_to_json_method = requires(T t) { t.to_json(); };
 

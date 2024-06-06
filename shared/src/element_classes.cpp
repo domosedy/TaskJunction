@@ -142,5 +142,3 @@ std::string create_response::to_json() const {
 
     return ss.str();
 }
-
-

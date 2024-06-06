@@ -12,6 +12,5 @@ int main(int argc, char *argv[]) {
     }
     using namespace database;
     db_manager db_manager(argv[1], argv[2], argv[3], argv[4]);
-
     return 0;
 }

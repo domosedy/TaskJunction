@@ -80,7 +80,7 @@ void db_manager::fill_query_name_to_sql_command() {
 
     query_name_to_sql_command["delete_command"] =
         "DELETE FROM %1.%2 WHERE id = :key_value;";
-
+  
     query_name_to_sql_command["delete_card"] = "SELECT %1.delete_card(:id);";
 
     query_name_to_sql_command["delete_from_card_to_tags"] =
@@ -397,6 +397,7 @@ bool db_manager::update_command(
         updating_field_name == "cards_number" || updating_field_name == "id") {
         return false;
     }
+    
     QSqlQuery query(m_database);
     query.prepare(query_name_to_sql_command["update_command"].arg(
         m_schema, table_name, updating_field_name
