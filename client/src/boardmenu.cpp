@@ -99,8 +99,6 @@ std::pair<quint32, bool> BoardMenu::delete_board(int board_index) {
 void BoardMenu::unload_remote_boards() {
     int index = 0;
     for (auto it = m_boards.begin(); it != m_boards.end();) {
-        qDebug() << it->m_board_id << ' ' << it->m_is_remote << ' '
-                 << it->m_name;
         if (it->m_is_remote) {
             quint32 id = it->m_board_id;
             m_loaded_boards.erase(id);

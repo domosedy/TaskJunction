@@ -155,7 +155,6 @@ CardModel *ListModel::remove(const int index) {
 }
 
 void ListModel::move(int from, int to) {
-    // qDebug() << "Moving " << from << "-->" << to;
     if (to == -1) {
         to = m_cards.size() - 1;
     }

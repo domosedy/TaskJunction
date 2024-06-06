@@ -26,7 +26,6 @@ CardModel::CardModel(QObject *parent, const card &card_base)
     m_name = card_base.m_name;
     m_description = card_base.m_description;
     m_tags = card_base.m_tags;
-    qDebug() << m_tags.size();
     int index = 0;
     for (auto &tag : m_tags) {
         m_index_by_id[tag.m_tag_id] = index++;

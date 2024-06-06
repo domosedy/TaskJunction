@@ -13,6 +13,8 @@ create_database () {
 if [[ -f "config" ]]; then
 
     create_path="./database/include/create_board.sql"
+    is_local_created=0
+    is_remote_created=0
     args=()
     while IFS= read -r line; do
         line=$(echo "$line" | xargs)
@@ -37,15 +39,23 @@ if [[ -f "config" ]]; then
         case $1 in
             -c|--client)
                 create_database "${args[0]}" "${args[2]}"
+                is_local_created=1
                 shift
                 ;;
             -s|--server)
                 create_database "${args[0]}" "${args[3]}"
+                is_remote_created=1
                 shift
                 ;;
             -a|--all)
-                create_database "${args[0]}" "${args[2]}"
-                create_database "${args[0]}" "${args[3]}"
+                if [[ is_local_created -eq 0 ]]; then
+                    create_database "${args[0]}" "${args[2]}"
+                    is_local_created=1;
+                fi
+                if [[ is_remote_created -eq 0 ]]; then
+                    create_database "${args[0]}" "${args[3]}"
+                    is_remote_created=1
+                fi
                 shift
                 ;;
             -*|--*)

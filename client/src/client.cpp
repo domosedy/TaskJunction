@@ -36,19 +36,18 @@ Client::Client(const QMap<QString, QString> &kwargs, QObject *parent)
 }
 
 void Client::onSslErrors(const QList<QSslError> &errors) {
-    // qDebug() << "Errors: " << errors;
     m_socket->ignoreSslErrors(errors);
 }
 
 void Client::write(std::string &data) {
-    qDebug() << "Send:: " << data.c_str();
+    //qDebug() << "Send:: " << data.c_str();
     m_socket->sendTextMessage(QString::fromStdString(data));
 }
 
 void Client::readData(const QString &data) {
-    qDebug() << "Recieved:: " << data;
+    //qDebug() << "Recieved:: " << data;
     if (!(nlohmann::json::accept(data.toStdString()))) {
-        qDebug() << "Cannot parse response";
+        //qDebug() << "Cannot parse response";
         return;
     }
     nlohmann::json response = nlohmann::json::parse(data.toStdString());
@@ -93,7 +92,6 @@ void Client::readData(const QString &data) {
         }
         board new_board =
             parser::parse_board(response["object-json"], m_user_id);
-        qDebug() << new_board.m_link;
         new_board.m_is_remote = true;
         m_board_menu->create_board(new_board);
     }
@@ -151,9 +149,6 @@ void Client::readData(const QString &data) {
         m_current_board->m_board_id == response["board-id"]) {
         for (quint32 id : response["cards"]) {
             m_filtered_cards.insert(id);
-        }
-        for (auto x : m_filtered_cards) {
-            qDebug() << "id:" << x;
         }
         emit filterChanged();
     }
@@ -275,7 +270,6 @@ void Client::create_board(QString name, QString description, bool is_remote) {
 
 void Client::delete_board(int board_index) {
     const auto &[board_id, is_remote] = m_board_menu->delete_board(board_index);
-    qDebug() << board_id;
     if (!is_remote) {
         db.delete_board(board_id);
     } else {
@@ -416,12 +410,9 @@ QString Client::get_current_board_name() {
 }
 
 void Client::move(int from_card, int to_card, int from_list, int to_list) {
-    qDebug() << "moving from: (" << from_list << ':' << from_card << ") to ("
-             << to_list << ":" << to_card << ')';
     quint32 list_id = m_current_board->get_list_id(from_list);
     quint32 to_list_id = m_current_board->get_list_id(to_list);
     quint32 card_id = m_current_board->get_card_id(from_list, from_card);
-    qDebug() << "move(" << card_id << to_list_id << to_card << ")";
     if (!m_current_board->m_is_remote) {
         db.move_card(card_id, to_list_id, to_card + 1);
         m_current_board->move(from_card, to_card, from_list, to_list);

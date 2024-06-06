@@ -369,6 +369,19 @@ Rectangle {
                 radius: style.defaultRadius
                 anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
 
+                Image {
+                    id: remoteImg
+                    visible: is_remote
+                    anchors.top: parent.top
+                    anchors.topMargin: 25
+                    anchors.left: parent.left
+                    anchors.leftMargin: 20
+
+                    source: "remote.svg"
+                    width: 20
+                    height: 20
+                }
+
                 TextInput {
                     id: nameHolder
 
@@ -380,9 +393,9 @@ Rectangle {
                     color: "white"
                     maximumLength: 50
                     anchors.top: parent.top
-                    anchors.left: parent.left
+                    anchors.left: is_remote ? remoteImg.right : parent.left
                     anchors.topMargin: 20
-                    anchors.leftMargin: 20
+                    anchors.leftMargin: is_remote ? 5 : 20
                     clip: true
                     readOnly: true
                     onEditingFinished: {
@@ -516,8 +529,7 @@ Rectangle {
 
                 Popup {
                     id: linkPopup
-
-                    width: 210
+                    width: 240
                     height: 60
                     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
                     focus: true
@@ -533,7 +545,7 @@ Rectangle {
                         border.width: style.defaultBorderSize
                         color: style.listBackgroundColor
                         radius: style.defaultRadius
-                        anchors.centerIn: parent
+                        anchors.fill: parent
                         Drag.active: true
 
                         TextField {
@@ -566,7 +578,6 @@ Rectangle {
                         }
 
                     }
-
                 }
 
             }

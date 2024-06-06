@@ -271,7 +271,7 @@ board parse_board(const json &object, quint32 m_parent_id) {
 }
 
 QMap<QString, QString> parse_config() {
-    QFile config("../../config");
+    QFile config("config");
     if (!config.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "No config file!";
         return {};

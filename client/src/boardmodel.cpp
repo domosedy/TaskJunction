@@ -71,14 +71,10 @@ QVariant BoardModel::data(const QModelIndex &index, int role) const {
 }
 
 void BoardModel::create_list(const list &list_base) {
-    qDebug() << "Creating list at " << m_lists.size() << " "
-             << list_base.m_list_id;
     beginInsertRows(QModelIndex(), m_lists.size(), m_lists.size());
     m_ids.append(list_base.m_list_id);
     m_lists[list_base.m_list_id] = std::make_unique<ListModel>(list_base, this);
     endInsertRows();
-    qDebug() << "Created list at " << m_lists.size() << " "
-             << list_base.m_list_id;
 
     emit countChanged();
 }
@@ -142,7 +138,6 @@ std::tuple<int, int, int> BoardModel::get_indices(
             m_ids, [list_id](quint32 id) { return id == list_id; }
         )
     );
-    qDebug() << "Got" << list_idx;
     auto [card_idx, tag_idx] =
         m_lists.at(list_id)->get_indices(card_id, tag_id);
     return {list_idx, card_idx, tag_idx};
