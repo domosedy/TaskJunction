@@ -10,26 +10,28 @@ board::board(
     quint32 board_id,
     quint32 user_id,
     QString name,
-    QString description
+    QString description,
+    QString link
 )
     : m_board_id(board_id),
       m_user_id(user_id),
       m_name(std::move(name)),
-      m_description(description) {
+      m_description(std::move(description)),
+      m_link(std::move(link)) {
 }
 
 list::list(quint32 list_id, quint32 board_id, QString name, QString description)
     : m_list_id(list_id),
       m_board_id(board_id),
       m_name(std::move(name)),
-      m_description(description) {
+      m_description(std::move(description)) {
 }
 
 card::card(quint32 card_id, quint32 list_id, QString name, QString description)
     : m_card_id(card_id),
       m_list_id(list_id),
       m_name(std::move(name)),
-      m_description(description) {
+      m_description(std::move(description)) {
 }
 
 tag::tag(quint32 tag_id, QString name)
@@ -38,7 +40,6 @@ tag::tag(quint32 tag_id, QString name)
 
 template <typename T>
     requires has_to_json_method<T>
-
 static std::string array_to_json(const QVector<T> &data) {
     std::stringstream ss;
 
