@@ -20,6 +20,18 @@ Rectangle {
     signal released()
     signal clicked()
 
+    function get_modelIndex() {
+        return delegateRoot.actual_modelIndex();
+    }
+
+    function get_visualIndex() {
+        return delegateRoot.actual_visualIndex();
+    }
+
+    function get_listIndex() {
+        return delegateRoot.actual_listIndex();
+    }
+
     z: mouseArea.drag.active ? 2 : 1
     Drag.active: mouseArea.drag.active
     Drag.source: root
@@ -84,7 +96,7 @@ Rectangle {
         onEditingFinished: {
             nameHolder.readOnly = true;
             nameArea.enabled = true;
-            mainClient.update_card(listIndex_, modelIndex, "name", nameHolder.text);
+            delegateRoot.update_card("name", nameHolder.text);
         }
 
         MouseArea {
@@ -119,7 +131,7 @@ Rectangle {
         onEditingFinished: {
             descriptionHolder.readOnly = true;
             descriptionArea.enabled = true;
-            mainClient.update_card(listIndex_, modelIndex, "description", descriptionHolder.text);
+            delegateRoot.update_card("description", descriptionHolder.text);
         }
 
         MouseArea {
@@ -192,7 +204,7 @@ Rectangle {
                 anchors.bottomMargin: 10
                 onClicked: {
                     createTagPopUp.close();
-                    mainClient.create_tag(listIndex_, modelIndex, tagName.text);
+                    delegateRoot.create_tag(tagName.text);
                     tagName.text = "";
                 }
 
@@ -295,7 +307,7 @@ Rectangle {
                     height: 20
                     z: 4
                     onClicked: {
-                        mainClient.delete_tag(listIndex_, modelIndex, index);
+                        delegateRoot.delete_tag(index);
                     }
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
