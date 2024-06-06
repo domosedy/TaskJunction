@@ -317,7 +317,7 @@ void Client::delete_tag(int list_index, int card_index, int tag_index) {
     } else {
         std::string request = parser::delete_request(
             tag_id, "tag", m_current_board->m_board_id, list_id, card_id, tag_id
-        );  // TODO FIX
+        );
         write(request);
     }
 }
@@ -332,6 +332,7 @@ void Client::onSocketError(QAbstractSocket::SocketError error) {
     Q_UNUSED(error);
     qDebug() << "Connection error!";
     m_connection_status = ConnectionStatus::Unable_to_connect;
+    m_board_menu->unload_remote_boards();
     emit connectionStatusChanged();
 }
 

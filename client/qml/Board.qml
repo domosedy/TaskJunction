@@ -171,7 +171,7 @@ Rectangle {
             visible: mainClient ? mainClient.connection_status == Client.Authorized : false
 
             Text {
-                text: mainClient ? (mainClient.current_board.is_remote ? "Copy" : "Upload") : ""
+                text: mainClient && mainClient.current_board ? (mainClient.current_board.is_remote ? "Copy" : "Upload") : ""
                 font.family: "Poppins"
                 font.pointSize: 16
                 color: "white"
