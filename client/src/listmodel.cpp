@@ -51,8 +51,8 @@ QHash<int, QByteArray> ListModel::roleNames() const {
     if (roles.empty()) {
         roles[CardRoles::NameRole] = "name";
         roles[CardRoles::DescriptionRole] = "description";
-        roles[CardRoles::CardIndexRole] = "cardindex";
-        roles[CardRoles::ModelRole] = "cardmodel";
+        roles[CardRoles::CardIndexRole] = "cardIndex";
+        roles[CardRoles::ModelRole] = "cardModel";
     }
 
     return roles;

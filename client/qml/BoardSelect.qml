@@ -371,12 +371,12 @@ Rectangle {
 
                 Image {
                     id: remoteImg
+
                     visible: is_remote
                     anchors.top: parent.top
                     anchors.topMargin: 25
                     anchors.left: parent.left
                     anchors.leftMargin: 20
-
                     source: "remote.svg"
                     width: 20
                     height: 20
@@ -529,6 +529,7 @@ Rectangle {
 
                 Popup {
                     id: linkPopup
+
                     width: 240
                     height: 60
                     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
@@ -578,6 +579,7 @@ Rectangle {
                         }
 
                     }
+
                 }
 
             }

@@ -40,14 +40,14 @@ void Client::onSslErrors(const QList<QSslError> &errors) {
 }
 
 void Client::write(std::string &data) {
-    //qDebug() << "Send:: " << data.c_str();
+    // qDebug() << "Send:: " << data.c_str();
     m_socket->sendTextMessage(QString::fromStdString(data));
 }
 
 void Client::readData(const QString &data) {
-    //qDebug() << "Recieved:: " << data;
+    // qDebug() << "Recieved:: " << data;
     if (!(nlohmann::json::accept(data.toStdString()))) {
-        //qDebug() << "Cannot parse response";
+        // qDebug() << "Cannot parse response";
         return;
     }
     nlohmann::json response = nlohmann::json::parse(data.toStdString());
