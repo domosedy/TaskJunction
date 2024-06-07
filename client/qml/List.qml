@@ -281,11 +281,13 @@ Rectangle {
                     }
                     onDropped: function(drag) {
                         let from = drag.source.get_modelIndex();
+                        let sourceList = drag.source.get_listIndex();
                         //drag.source.dragList.clip = true;
-                        mainClient.move(from, -1, drag.source.get_listIndex(), listIndex);
-                        if (listIndex == drag.source.get_listIndex())
+                        border.width = 0;  
+                        if (listIndex == sourceList) {
                             listVisualModel.groups[2].move(from, listmodel.count - 1);
-                        border.width = 0;                            
+                        }
+                        mainClient.move(from, -1, sourceList, listIndex);
                     }
                     onExited: function(drag) {
                         border.width = 0;
@@ -387,8 +389,8 @@ Rectangle {
                         let from = drag.source.get_modelIndex();
                         let to = (drag.source.get_listIndex() != listIndex) ? visualIndex : drag.source.get_visualIndex();
                         //drag.source.dragList.clip = true;
+                        cardRoot.border.color=style.listBackgroundColor;
                         mainClient.move(from, to, drag.source.get_listIndex(), listIndex);
-                        cardRoot.border.color= style.listBackgroundColor;
                     }
 
                     Card {

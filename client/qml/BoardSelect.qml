@@ -291,8 +291,9 @@ Rectangle {
         Button {
             width: 136
             height: style.headerHeight / 2
-            anchors.top: parent.top
             anchors.right: parent.right
+            anchors.top: (mainClient && mainClient.connection_status == Client.Authorized ? parent.top : undefined)
+            anchors.verticalCenter: (mainClient && mainClient.connection_status == Client.Authorized ? undefined : parent.verticalCenter)            
             onClicked: {
                 createBoardPopup.open();
             }

@@ -144,7 +144,8 @@ Rectangle {
                 createListPopup.open();
             }
             anchors.right: parent.right
-            anchors.top: copyBtn.bottom
+            anchors.top: (mainClient && mainClient.connection_status == Client.Authorized ? copyBtn.bottom : undefined)
+            anchors.verticalCenter: (mainClient && mainClient.connection_status == Client.Authorized ? undefined : parent.verticalCenter)
 
             Text {
                 text: "New list"

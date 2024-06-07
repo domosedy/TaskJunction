@@ -415,7 +415,7 @@ void Client::move(int from_card, int to_card, int from_list, int to_list) {
     quint32 to_list_id = m_current_board->get_list_id(to_list);
     quint32 card_id = m_current_board->get_card_id(from_list, from_card);
     if (!m_current_board->m_is_remote) {
-        db.move_card(card_id, to_list_id, to_card + 1);
+        db.move_card(card_id, to_list_id, to_card);
         m_current_board->move(from_card, to_card, from_list, to_list);
     } else {
         std::string request = parser::move_request(
