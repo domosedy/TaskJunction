@@ -290,6 +290,8 @@ Rectangle {
                     font.pointSize: 10
                     anchors.centerIn: parent
                     color: "white"
+                    clip: true
+                    width: parent.width-5
                 }
 
                 MouseArea {
