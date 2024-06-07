@@ -275,7 +275,7 @@ Rectangle {
                     anchors.fill: parent
                     onDropped: function(drag) {
                         let from = drag.source.get_modelIndex();
-                        drag.source.dragList.clip = true;
+                        //drag.source.dragList.clip = true;
                         mainClient.move(from, -1, drag.source.get_listIndex(), listIndex);
                         if (listIndex == drag.source.get_listIndex())
                             listVisualModel.groups[2].move(from, listmodel.count - 1);
@@ -367,7 +367,7 @@ Rectangle {
                     onDropped: function(drag) {
                         let from = drag.source.get_modelIndex();
                         let to = (drag.source.get_listIndex() != listIndex) ? visualIndex : drag.source.get_visualIndex();
-                        drag.source.dragList.clip = true;
+                        //drag.source.dragList.clip = true;
                         mainClient.move(from, to, drag.source.get_listIndex(), listIndex);
                     }
 
@@ -384,7 +384,7 @@ Rectangle {
                         listIndex_: parentListIndex
                         thisCardModel: cardModel
                         onPressed: {
-                            thisList.clip = false;
+                            //thisList.clip = false;
                         }
                     }
 
