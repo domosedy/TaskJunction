@@ -112,6 +112,7 @@ Rectangle {
             anchors.left: parent.left
             onClicked: {
                 loader.source = "BoardSelect.qml";
+                mainClient.set_filter("", 1);
             }
             icon.source: "back.svg"
             icon.width: width
