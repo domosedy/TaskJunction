@@ -34,169 +34,273 @@ db_manager::db_manager(
 QMap<QString, QString> db_manager::query_name_to_sql_command;
 
 void db_manager::fill_query_name_to_sql_command() {
-    query_name_to_sql_command["authorize_user"] =
-        "SELECT %1.authorize_user(:login, :password, :salt);";
+    query_name_to_sql_command["authorize_user"] = R"(
+        SELECT %1.authorize_user(:login, :password, :salt);
+    )";
 
-    query_name_to_sql_command["add_user_to_board"] =
-        "INSERT INTO %1.user_to_board VALUES (:user_id, :board_id);";
+    query_name_to_sql_command["add_user_to_board"] = R"(
+        INSERT INTO %1.user_to_board VALUES (:user_id, :board_id);
+    )";
 
-    query_name_to_sql_command["insert_board"] =
-        "SELECT %1.insert_board(:user_id, :name, :description, :link)";
+    query_name_to_sql_command["insert_board"] = R"(
+        SELECT %1.insert_board(:user_id, :name, :description, :link);
+    )";
 
-    query_name_to_sql_command["insert_list"] =
-        "SELECT %1.insert_list(:board_id, :name, :description)";
+    query_name_to_sql_command["insert_list"] = R"(
+        SELECT %1.insert_list(:board_id, :name, :description);
+    )";
 
-    query_name_to_sql_command["insert_card"] =
-        "SELECT %1.insert_card(:list_id, :name, :description)";
+    query_name_to_sql_command["insert_card"] = R"(
+        SELECT %1.insert_card(:list_id, :name, :description);
+    )";
 
-    query_name_to_sql_command["insert_tag"] = "SELECT %1.insert_tag(:name);";
+    query_name_to_sql_command["insert_tag"] = R"(
+        SELECT %1.insert_tag(:name);
+    )";
 
-    query_name_to_sql_command["insert_into_card_to_tags"] =
-        "INSERT INTO %1.card_to_tags VALUES (:card_id, :tag_id);";
+    query_name_to_sql_command["insert_into_card_to_tags"] = R"(
+        INSERT INTO %1.card_to_tags VALUES (:card_id, :tag_id);
+    )";
 
-    query_name_to_sql_command["update_command"] =
-        "UPDATE %1.%2 SET %3 = :new_value WHERE id = :key_value;";
+    query_name_to_sql_command["update_command"] = R"(
+        UPDATE %1.%2
+        SET %3 = :new_value
+        WHERE id = :key_value;
+    )";
 
-    query_name_to_sql_command["move_card"] =
-        "SELECT %1.move_card(:id, :new_list_id, :new_number);";
+    query_name_to_sql_command["move_card"] = R"(
+        SELECT %1.move_card(:id, :new_list_id, :new_number);
+    )";
 
-    query_name_to_sql_command["select_user"] =
-        "SELECT id, login FROM %1.user_signature WHERE id = :key_value;";
+    query_name_to_sql_command["select_user"] = R"(
+        SELECT id, login
+        FROM %1.user_signature
+        WHERE id = :key_value;
+    )";
 
-    query_name_to_sql_command["select_board"] =
-        "SELECT id, user_id, name, description, link FROM %1.board_signature "
-        "WHERE id = :key_value;";
+    query_name_to_sql_command["select_board"] = R"(
+        SELECT id, user_id, name, description, link
+        FROM %1.board_signature
+        WHERE id = :key_value;
+    )";
 
-    query_name_to_sql_command["select_list"] =
-        "SELECT id, board_id, name, description FROM %1.list_signature "
-        "WHERE id = :key_value;";
+    query_name_to_sql_command["select_list"] = R"(
+        SELECT id, board_id, name, description
+        FROM %1.list_signature
+        WHERE id = :key_value;
+    )";
 
-    query_name_to_sql_command["select_card"] =
-        "SELECT id, list_id, name, description FROM %1.card_signature "
-        "WHERE id = :key_value;";
+    query_name_to_sql_command["select_card"] = R"(
+        SELECT id, list_id, name, description
+        FROM %1.card_signature
+        WHERE id = :key_value;
+    )";
 
-    query_name_to_sql_command["select_tag"] =
-        "SELECT id, name FROM %1.tag_signature WHERE id = :key_value;";
+    query_name_to_sql_command["select_tag"] = R"(
+        SELECT id, name
+        FROM %1.tag_signature
+        WHERE id = :key_value;
+    )";
 
-    query_name_to_sql_command["delete_command"] =
-        "DELETE FROM %1.%2 WHERE id = :key_value;";
+    query_name_to_sql_command["delete_command"] = R"(
+        DELETE FROM %1.%2
+        WHERE id = :key_value;
+    )";
 
-    query_name_to_sql_command["delete_card"] = "SELECT %1.delete_card(:id);";
+    query_name_to_sql_command["delete_card"] = R"(
+        SELECT %1.delete_card(:id);
+    )";
 
-    query_name_to_sql_command["delete_from_card_to_tags"] =
-        "WITH deleted AS (DELETE FROM %1.card_to_tags WHERE "
-        "card_id = :card_id AND tag_id = :tag_id IS TRUE RETURNING *)"
-        "SELECT count(*) FROM deleted;";
+    query_name_to_sql_command["delete_from_card_to_tags"] = R"(
+        WITH deleted AS (
+            DELETE FROM %1.card_to_tags WHERE
+            card_id = :card_id AND tag_id = :tag_id IS TRUE RETURNING *
+        )
+        SELECT count(*) FROM deleted;
+    )";
 
-    query_name_to_sql_command["delete_user_from_board"] =
-        "WITH deleted AS (DELETE FROM %1.user_to_board WHERE "
-        "user_id = :user_id AND board_id = :board_id IS TRUE RETURNING *) "
-        "SELECT count(*) FROM deleted;";
+    query_name_to_sql_command["delete_user_from_board"] = R"(
+        WITH deleted AS (
+            DELETE FROM %1.user_to_board WHERE
+            user_id = :user_id AND board_id = :board_id IS TRUE RETURNING *
+        )
+        SELECT count(*) FROM deleted;
+    )";
 
-    query_name_to_sql_command["create_schema"] =
-        "CREATE SCHEMA %1;"
-        "DO $$DECLARE tbl_record RECORD;"
-        "BEGIN"
-        "FOR tbl_record IN (SELECT %1 FROM pg_tables WHERE schemaname = "
-        "'project_template') LOOP"
-        "EXECUTE 'CREATE TABLE %1.' || tbl_record.tablename || ' (LIKE "
-        "project_template.' || tbl_record.tablename || ' INCLUDING "
-        "CONSTRAINTS)';"
-        "END LOOP;"
-        "END$$;";
+    query_name_to_sql_command["create_schema"] = R"(
+        CREATE SCHEMA % 1;
+        DO $$
+        DECLARE
+            tbl_record RECORD;
+        BEGIN
+            FOR tbl_record IN (
+                SELECT
+                    % 1
+                FROM
+                    pg_tables
+                WHERE
+                    schemaname = 'project_template')
+                LOOP
+                    EXECUTE 'CREATE TABLE %1.' || tbl_record.tablename || ' (LIKE
+                project_template.' || tbl_record.tablename || ' INCLUDING
+                CONSTRAINTS)';
+                END LOOP;
+        END
+        $$;
+    )";
 
-    query_name_to_sql_command["select_board_ids_by_user_id"] =
-        "SELECT board_id FROM %1.user_to_board WHERE user_id = :id "
-        "ORDER BY board_id;";
+    query_name_to_sql_command["select_board_ids_by_user_id"] = R"(
+        SELECT board_id
+        FROM %1.user_to_board
+        WHERE user_id = :id
+        ORDER BY board_id;
+    )";
 
-    query_name_to_sql_command["select_list_ids_by_board_id"] =
-        "SELECT id FROM %1.list_signature WHERE board_id = :id ORDER BY id;";
+    query_name_to_sql_command["select_list_ids_by_board_id"] = R"(
+        SELECT id
+        FROM %1.list_signature
+        WHERE board_id = :id
+        ORDER BY id;
+    )";
 
-    query_name_to_sql_command["get_list_cards"] =
-        "SELECT id FROM %1.card_signature WHERE list_id = :id ORDER BY number";
+    query_name_to_sql_command["get_list_cards"] = R"(
+        SELECT id
+        FROM %1.card_signature
+        WHERE list_id = :id
+        ORDER BY number;
+    )";
 
-    query_name_to_sql_command["get_card_tags"] =
-        "SELECT tag_id FROM %1.card_to_tags WHERE card_id = :id ORDER BY "
-        "tag_id;";
+    query_name_to_sql_command["get_card_tags"] = R"(
+        SELECT tag_id
+        FROM %1.card_to_tags
+        WHERE card_id = :id
+        ORDER BY tag_id;
+    )";
 
-    query_name_to_sql_command["check_user_rights"] =
-        "SELECT exists (SELECT * FROM %1.user_to_board WHERE user_id = "
-        ":user_id AND board_id = :board_id);";
+    query_name_to_sql_command["check_user_rights"] = R"(
+        SELECT EXISTS (
+            SELECT *
+            FROM %1.user_to_board
+            WHERE user_id = :user_id AND board_id = :board_id
+        );
+    )";
 
-    query_name_to_sql_command["get_user_id_by_name"] =
-        "SELECT id FROM %1.user_signature WHERE name = :name;";
+    query_name_to_sql_command["get_user_id_by_name"] = R"(
+        SELECT id
+        FROM %1.user_signature
+        WHERE name = :name;
+    )";
 
-    query_name_to_sql_command["get_card_number"] =
-        "SELECT number FROM %1.card_signature WHERE id = :id;";
+    query_name_to_sql_command["get_card_number"] = R"(
+        SELECT number
+        FROM %1.card_signature
+        WHERE id = :id;
+    )";
 
-    query_name_to_sql_command["alter_sequence"] =
-        "SELECT setval('%1.%2', %3, FALSE);";
+    query_name_to_sql_command["alter_sequence"] = R"(
+        SELECT setval('%1.%2', %3, FALSE);
+    )";
 
-    query_name_to_sql_command["get_board_user_ids"] =
-        "SELECT user_id FROM %1.user_to_board WHERE board_id = :board_id "
-        "ORDER BY user_id;";
+    query_name_to_sql_command["get_board_user_ids"] = R"(
+        SELECT user_id
+        FROM %1.user_to_board
+        WHERE board_id = :board_id
+        ORDER BY user_id;
+    )";
 
-    query_name_to_sql_command["get_board_list_ids"] =
-        "SELECT id FROM %1.list_signature WHERE board_id = :board_id "
-        "ORDER BY id;";
+    query_name_to_sql_command["get_board_list_ids"] = R"(
+        SELECT id
+        FROM %1.list_signature
+        WHERE board_id = :board_id
+        ORDER BY id;
+    )";
 
-    query_name_to_sql_command["get_board_card_ids"] =
-        "SELECT id FROM %1.card_signature WHERE list_id = "
-        "ANY (SELECT id FROM %1.list_signature WHERE board_id = :board_id) "
-        "ORDER BY number;";
+    query_name_to_sql_command["get_board_card_ids"] = R"(
+        SELECT id
+        FROM %1.card_signature
+        WHERE list_id = ANY (
+            SELECT id
+            FROM %1.list_signature
+            WHERE board_id = :board_id)
+        ORDER BY number;
+    )";
 
-    query_name_to_sql_command["get_list_card_ids"] =
-        "SELECT id FROM %1.card_signature WHERE list_id = :list_id "
-        "ORDER BY number;";
+    query_name_to_sql_command["get_list_card_ids"] = R"(
+        SELECT id
+        FROM %1.card_signature
+        WHERE list_id = :list_id
+        ORDER BY number;
+    )";
 
-    query_name_to_sql_command["any_filter_cards"] =
-        "SELECT card_id "
-        "FROM %1.card_to_tags "
-        "WHERE tag_id = ANY (SELECT id "
-        "FROM tag_signature WHERE name = ANY (:tag_names)) "
-        "INTERSECT "
-        "SELECT id "
-        "FROM %1.card_signature "
-        "WHERE list_id = "
-        "ANY (SELECT id FROM %1.list_signature WHERE board_id = :board_id);";
+    query_name_to_sql_command["any_filter_cards"] = R"(
+        SELECT card_id
+        FROM %1.card_to_tags
+        WHERE tag_id = ANY (
+            SELECT id
+            FROM tag_signature
+            WHERE name = ANY (:tag_names))
+        INTERSECT
+        SELECT id
+        FROM %1.card_signature
+        WHERE list_id = ANY (
+            SELECT id
+            FROM %1.list_signature
+            WHERE board_id = :board_id);
+    )";
 
-    query_name_to_sql_command["all_filter_cards"] =
-        "WITH tag_ids AS (  "
-        "    SELECT id  "
-        "    FROM tag_signature  "
-        "    WHERE name = ANY (:tag_names::text[])  "
-        "), check_missing_tags AS (  "
-        "    SELECT array_length(:tag_names::text[], 1) - COUNT(*) AS missing_count  "
-        "    FROM tag_ids  "
-        "), adjusted_tag_ids AS (  "
-        "    SELECT  "
-        "        CASE  "
-        "            WHEN check_missing_tags.missing_count > 0 THEN 0  "
-        "            ELSE id  "
-        "        END AS id  "
-        "    FROM  "
-        "        check_missing_tags  "
-        "    LEFT JOIN tag_ids ON check_missing_tags.missing_count = 0  "
-        "), card_tag_counts AS (  "
-        "    SELECT card_id, COUNT(tag_id) AS tag_count  "
-        "    FROM card_to_tags  "
-        "    WHERE tag_id IN (SELECT id FROM adjusted_tag_ids)  "
-        "    GROUP BY card_id  "
-        ")  "
-        "SELECT card_id  "
-        "FROM card_tag_counts  "
-        "WHERE tag_count = (SELECT COUNT(*) FROM adjusted_tag_ids WHERE id != 0)  "
-        "INTERSECT  "
-        "SELECT id  "
-        "FROM %1.card_signature  "
-        "WHERE list_id = ANY (SELECT id FROM %1.list_signature WHERE board_id = :board_id);";
+    query_name_to_sql_command["all_filter_cards"] = R"(
+        WITH tag_ids AS (
+            SELECT id
+            FROM %1.tag_signature
+            WHERE name = ANY (:tag_names::text[])
+        ),
+        check_missing_tags AS (
+            SELECT array_length(:tag_names::text[], 1) - COUNT(*) AS missing_count
+            FROM tag_ids
+        ),
+        adjusted_tag_ids AS (
+            SELECT
+                CASE WHEN check_missing_tags.missing_count > 0 THEN
+                    0
+                ELSE
+                    id
+                END AS id
+            FROM
+                check_missing_tags
+            LEFT JOIN tag_ids ON check_missing_tags.missing_count = 0
+        ),
+        card_tag_counts AS (
+            SELECT card_id, COUNT(tag_id) AS tag_count
+            FROM %1.card_to_tags
+            WHERE tag_id IN (
+                SELECT id
+                FROM adjusted_tag_ids)
+            GROUP BY card_id
+        )
+        SELECT card_id
+        FROM card_tag_counts
+        WHERE tag_count = (
+            SELECT COUNT(*)
+            FROM adjusted_tag_ids
+            WHERE id != 0)
+        INTERSECT
+        SELECT id
+        FROM %1.card_signature
+        WHERE list_id = ANY (
+            SELECT id
+            FROM %1.list_signature
+            WHERE board_id = :board_id);
+    )";
 
+    query_name_to_sql_command["get_board_id_by_link"] = R"(
+        SELECT id
+        FROM %1.board_signature
+        WHERE link = :link;
+    )";
 
-    query_name_to_sql_command["get_board_id_by_link"] =
-        "SELECT id FROM %1.board_signature WHERE link = :link;";
-
-    query_name_to_sql_command["get_salt"] =
-        "SELECT salt FROM %1.user_signature WHERE login = :login;";
+    query_name_to_sql_command["get_salt"] = R"(
+        SELECT salt FROM %1.user_signature WHERE login = :login;
+    )";
 }
 
 void db_manager::drop_all_tables() {
@@ -633,7 +737,7 @@ board db_manager::get_full_board(quint32 board_id) {
     board.m_lists = get_board_lists(board_id);
     for (auto &list : board.m_lists) {
         list.m_cards = get_list_cards(list.m_list_id);
-        for (auto &card: list.m_cards) {
+        for (auto &card : list.m_cards) {
             card.m_tags = get_card_tags(card.m_card_id);
         }
     }
@@ -776,13 +880,16 @@ quint32 db_manager::get_board_id_by_link(const QString &link) {
     return query.value(0).toInt();
 }
 
-board db_manager::copy_board(const board &board, quint32 user_id) { // TODO trouble with cards order, must be only 1 query
-    quint32 board_id = insert_board(user_id, board.m_name, board.m_description, board.m_link);
-    for (const auto &list: board.m_lists) {
-        quint32 list_id = insert_list(board_id, list.m_name, list.m_description);
-        for (const auto &card: list.m_cards) {
-            quint32 card_id = insert_card(list_id, card.m_name, card.m_description);
-            for (const auto &tag: card.m_tags) {
+board db_manager::copy_board(const board &board, quint32 user_id) {
+    quint32 board_id =
+        insert_board(user_id, board.m_name, board.m_description, board.m_link);
+    for (const auto &list : board.m_lists) {
+        quint32 list_id =
+            insert_list(board_id, list.m_name, list.m_description);
+        for (const auto &card : list.m_cards) {
+            quint32 card_id =
+                insert_card(list_id, card.m_name, card.m_description);
+            for (const auto &tag : card.m_tags) {
                 quint32 tag_id = insert_tag(tag.m_name);
                 add_tag_to_card(card_id, tag_id);
             }
