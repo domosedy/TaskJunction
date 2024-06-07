@@ -1,66 +1,75 @@
 CREATE TABLE user_signature(
-login varchar(50) PRIMARY KEY,
-password text,
-id serial UNIQUE,
-salt varchar(15)
+    login varchar(50) PRIMARY KEY,
+    password text,
+    id serial UNIQUE,
+    salt varchar(15)
 );
 
 CREATE TABLE board_signature(
-id serial PRIMARY KEY,
-user_id int REFERENCES user_signature (id) ON DELETE CASCADE,
-name varchar(50),
-description text,
-link varchar(20)
+    id serial PRIMARY KEY,
+    user_id int REFERENCES user_signature (id) ON DELETE CASCADE,
+    name varchar(50),
+    description text,
+    link varchar(20)
 );
 
 CREATE TABLE list_signature(
-id serial PRIMARY KEY,
-board_id int REFERENCES board_signature ON DELETE CASCADE,
-name varchar(50),
-description text,
-cards_number int DEFAULT 0
+    id serial PRIMARY KEY,
+    board_id int REFERENCES board_signature ON DELETE CASCADE,
+    name varchar(50),
+    description text,
+    cards_number int DEFAULT 0
 );
 
 CREATE TABLE card_signature(
-id serial PRIMARY KEY,
-list_id int REFERENCES list_signature ON DELETE CASCADE,
-name varchar(50),
-description text,
-number int DEFAULT 1
+    id serial PRIMARY KEY,
+    list_id int REFERENCES list_signature ON DELETE CASCADE,
+    name varchar(50),
+    description text,
+    number int DEFAULT 1
 );
 
 CREATE TABLE tag_signature(
-name varchar(50) PRIMARY KEY,
-id serial UNIQUE
+    name varchar(50) PRIMARY KEY,
+    id serial UNIQUE
 );
 
 CREATE TABLE card_to_tags(
-card_id int REFERENCES card_signature ON DELETE CASCADE,
-tag_id int REFERENCES tag_signature (id) ON DELETE CASCADE,
-PRIMARY KEY(card_id, tag_id)
+    card_id int REFERENCES card_signature ON DELETE CASCADE,
+    tag_id int REFERENCES tag_signature (id) ON DELETE CASCADE,
+    PRIMARY KEY(card_id, tag_id)
 );
 
 CREATE TABLE user_to_board(
-user_id int REFERENCES user_signature (id) ON DELETE CASCADE,
-board_id int REFERENCES board_signature ON DELETE CASCADE,
-PRIMARY KEY(user_id, board_id)
+    user_id int REFERENCES user_signature (id) ON DELETE CASCADE,
+    board_id int REFERENCES board_signature ON DELETE CASCADE,
+    PRIMARY KEY(user_id, board_id)
 );
 
 CREATE OR REPLACE FUNCTION insert_user(login_ text, password_ text, salt_ varchar(15)) RETURNS int AS $$
 BEGIN
     INSERT INTO user_signature VALUES (login_, password_, DEFAULT, salt_);
-    return last_value FROM user_signature_id_seq;
+    RETURN last_value FROM user_signature_id_seq;
 END;
 $$ LANGUAGE plpgSQL;
 
 CREATE OR REPLACE FUNCTION authorize_user(login_ text, password_ text, salt_ varchar(15)) RETURNS int AS $$
 BEGIN
-    IF exists (SELECT * FROM user_signature WHERE login = login_ LIMIT 1) THEN
-         IF exists (SELECT * FROM user_signature WHERE login = login_ AND password = password_ LIMIT 1) THEN
-            return id FROM user_signature WHERE login = login_;
-         ELSE return 0;
-         END IF;
-    ELSE return insert_user(login_, password_, salt_);
+    IF EXISTS (
+        SELECT *
+        FROM user_signature
+        WHERE login = login_ LIMIT 1) THEN
+             IF EXISTS (
+                 SELECT * 
+                 FROM user_signature 
+                 WHERE login = login_ AND password = password_ 
+                 LIMIT 1) THEN
+                    RETURN id FROM user_signature WHERE login = login_;
+             ELSE
+                 RETURN 0;
+             END IF;
+    ELSE
+        RETURN insert_user(login_, password_, salt_);
     END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -89,8 +98,11 @@ $$ LANGUAGE plpgSQL;
 
 CREATE OR REPLACE FUNCTION insert_tag(name_ text, OUT tag_id_ int) AS $$
 BEGIN
-    IF exists (SELECT * FROM tag_signature WHERE name = name_) THEN
-        tag_id_ =  id FROM tag_signature WHERE name = name_;
+    IF EXISTS (
+        SELECT *
+        FROM tag_signature
+        WHERE name = name_) THEN
+            tag_id_ =  id FROM tag_signature WHERE name = name_;
     ELSE
         INSERT INTO tag_signature VALUES (name_, DEFAULT);
         tag_id_ = last_value FROM tag_signature_id_seq;
