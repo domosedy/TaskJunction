@@ -288,10 +288,13 @@ Rectangle {
                     text: name
                     font.family: "Poppins"
                     font.pointSize: 10
-                    anchors.centerIn: parent
+                    //anchors.centerIn: parent
+                    anchors.leftMargin: 10
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
                     color: "white"
                     clip: true
-                    width: parent.width-5
+                    width: parent.width-15
                 }
 
                 MouseArea {

@@ -269,17 +269,26 @@ Rectangle {
 
                 }
 
+                border.color: "#5D86B4"
+                border.width: 0
+
                 DropArea {
                     id: footedDrop
 
                     anchors.fill: parent
+                    onEntered: function(drag) {
+                        border.width = 5;
+                    }
                     onDropped: function(drag) {
                         let from = drag.source.get_modelIndex();
                         //drag.source.dragList.clip = true;
                         mainClient.move(from, -1, drag.source.get_listIndex(), listIndex);
                         if (listIndex == drag.source.get_listIndex())
                             listVisualModel.groups[2].move(from, listmodel.count - 1);
-
+                        border.width = 0;                            
+                    }
+                    onExited: function(drag) {
+                        border.width = 0;
                     }
                 }
 
@@ -331,15 +340,21 @@ Rectangle {
                     property int modelIndex: cardIndex
 
                     function create_tag(name) {
-                        mainClient.create_tag(listIndex, cardIndex, name);
+                        if (listIndex != undefined && cardIndex != undefined) {
+                            mainClient.create_tag(listIndex, cardIndex, name);
+                        }                           
                     }
 
                     function delete_tag(tag_index) {
-                        mainClient.delete_tag(listIndex, cardIndex, tag_index);
+                        if (listIndex != undefined && cardIndex != undefined) {
+                            mainClient.delete_tag(listIndex, cardIndex, tag_index);
+                        }                        
                     }
 
                     function update_card(type, value) {
-                        mainClient.update_card(listIndex, cardIndex, type, value);
+                        if (listIndex != undefined && cardIndex != undefined) {
+                            mainClient.update_card(listIndex, cardIndex, type, value);
+                        }
                     }
 
                     function actual_modelIndex() {
@@ -362,13 +377,18 @@ Rectangle {
                         let to = visualIndex;
                         if (drag.source.get_listIndex() == listIndex)
                             listVisualModel.groups[2].move(from, to);
-
+                        else
+                            cardRoot.border.color="#5D86B4";
+                    }
+                    onExited: function(drag) {
+                        cardRoot.border.color=style.listBackgroundColor;
                     }
                     onDropped: function(drag) {
                         let from = drag.source.get_modelIndex();
                         let to = (drag.source.get_listIndex() != listIndex) ? visualIndex : drag.source.get_visualIndex();
                         //drag.source.dragList.clip = true;
                         mainClient.move(from, to, drag.source.get_listIndex(), listIndex);
+                        cardRoot.border.color= style.listBackgroundColor;
                     }
 
                     Card {
