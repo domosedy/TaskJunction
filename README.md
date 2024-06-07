@@ -1,35 +1,36 @@
 # TaskJunction
-This is Linux desktop application for task managment in kanban system
+Приложение для ведения проектов в системе kanban под операционной системой Linux. 
 
-## Dependencies
+## Зависимости
 
 1. Qt, QtQuick 6.7
 2. PostgreSQL 16.2
 3. Nlohmann-json 3.11.2
 
-## Build
+## Сборка
 
-1. Fill in the config file or leave it with default values.
-2. To create database use `build-database.sh` script:
+1. Заполните конфиг файл или оставьте с дефолтными значениями
+2. Для создания базы данных используйте `build-database.sh` следующим образом:
 ```
 ./build-database.sh [-c | --client] [-s | --server] [-a | --all]
-```
-3. Configure ssl if you are server?? TODO
-4. To build applications use `build-app.sh` script:
-```
-./build-app.sh [-c | --client] [-s | --server] [-a | --all]
-```
-If all goes well, you will have executable files `./client-app` and/or `./server-app`.
+``` 
+В случае сборки сервера потребуется настроить ssl. В интерактивном режиме будут задаваться вопросы, можете их проигнорировать.
 
-## Features
-1. Create/Delete/Update boards, lists, cards, tags
-2. Move cards from one list to another
-3. Filter cards by tags
-4. Share boards with other users on server
-5. Make local copy of shared boards 
+3. Для сборки приложений используйте `build.sh` следующим образом:
+```
+./build.sh [-c | --client] [-s | --server] [-a | --all]
+```
+В случае успеха в корне появятся исполняемые файлы `client_app` и `server_app`.
 
-### Team
-1. Vinogradov Ilya - server
-2. Gladkikh Andrey - client
-3. Grebenkin Ivan - database
-4. Sirotkina Veronika - mentoring 
+## Возможности
+1. Создание/удаление/редактирование досок, листов, карточек, тегов
+2. Перемещение карточек между листами
+3. Фильтрация карточек по тегам
+4. Создание общих досок на сервере
+5. Копирование общих досок
+
+### Команда
+1. Виноградов Илья [@domosedy](https://github.com/domosedy) - сервер
+2. Гладких Андрей [@Qwertst](https://github.com/Qwertst) - клиент
+3. Гребенкин Иван [@quuger](https://github.com/quuger) - база данных
+4. Сироткина Вероника [@ozzush](https://github.com/ozzush) - менторинг

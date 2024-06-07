@@ -1,0 +1,4 @@
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=
+LOCAL_NAME=local_boards
+REMOTE_NAME=remote_boards

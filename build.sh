@@ -20,6 +20,13 @@ build_server () {
     cd ../../
 }
 
+build_ssl () {
+    cd ./server/openssl
+    chmod +x generate.sh
+    ./generate.sh
+    cd ../../
+}
+
 is_client_builded=0
 is_server_builded=0
 
@@ -36,6 +43,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         -s|--server)
+            build_ssl
             build_server
             is_server_builded=1
             shift
@@ -46,6 +54,7 @@ while [[ $# -gt 0 ]]; do
                 is_client_builded=1;
             fi
             if [[ is_server_builded -eq 0 ]]; then
+                build_ssl
                 build_server
                 is_server_builded=1
             fi
