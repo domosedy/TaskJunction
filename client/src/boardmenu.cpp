@@ -1,5 +1,6 @@
 #include "boardmenu.hpp"
 #include "element_classes.hpp"
+#include "hashes.hpp"
 
 BoardMenu::BoardMenu(QObject *parent) : QAbstractListModel(parent) {
 }
@@ -213,4 +214,11 @@ void BoardMenu::move_command(
 nlohmann::json BoardMenu::board_to_json(int index) const {
     quint32 id = m_boards[index].m_board_id;
     return m_loaded_boards.at(id)->to_json();
+}
+
+bool BoardMenu::board_already_connected(const QString &link) const {
+    const QString decoded = decode_string(link).first;
+    return std::ranges::find_if(m_boards, [&decoded](auto b) {
+               return decode_string(b.m_link).first == decoded;
+           }) != m_boards.end();
 }

@@ -99,7 +99,6 @@ ApplicationWindow {
             }
 
             background: Rectangle {
-                // color: parent.down ? Qt.darker(style.deleteBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.deleteBackgroundColor, 1.2) : style.deleteBackgroundColor)
                 color: parent.down ? Qt.darker("#f5f5f5", 1.4) : (parent.hovered ? Qt.darker("#f5f5f5", 1.2) : "#f5f5f5")
                 radius: style.defaultRadius
             }

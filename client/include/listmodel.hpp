@@ -43,6 +43,7 @@ public:
 
     void delete_command(const int card_index, const int tag_index);
     nlohmann::json to_json() const;
+    bool tag_already_exists(int card_index, const QString &name) const;
 signals:
     void countChanged();
 

@@ -1,4 +1,5 @@
 #include "cardmodel.hpp"
+#include <ranges>
 
 CardModel::CardModel(QObject *parent) : QAbstractListModel(parent) {
 }
@@ -123,4 +124,8 @@ nlohmann::json CardModel::to_json() const {
         data["tags"].push_back(nlohmann::json::parse(tag.to_json()));
     }
     return data;
+}
+
+bool CardModel::tag_already_exists(const QString &name) const {
+    return std::ranges::find(m_tags, name, &tag::m_name) != m_tags.end();
 }

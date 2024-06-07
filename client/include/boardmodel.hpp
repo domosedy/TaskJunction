@@ -54,6 +54,8 @@ public:
         const QString &new_value
     );
     nlohmann::json to_json() const;
+    bool tag_already_exists(int list_index, int card_index, const QString &name)
+        const;
 
 signals:
     void countChanged();

@@ -33,6 +33,7 @@ public:
     quint32 get_tag_id(const int index) const;
     int get_tag_idx(quint32 tag_id) const;
     nlohmann::json to_json() const;
+    bool tag_already_exists(const QString &name) const;
 
 signals:
     void countChanged();

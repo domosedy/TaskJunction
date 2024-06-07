@@ -7,6 +7,7 @@
 #include "boardmenu.hpp"
 #include "database.hpp"
 #include "element_classes.hpp"
+#include "hashes.hpp"
 #include "jsonparser.hpp"
 
 Client::Client(const QMap<QString, QString> &kwargs, QObject *parent)
@@ -216,6 +217,9 @@ void Client::create_tag(int list_index, int card_index, QString name) {
     quint32 board_id = m_current_board->m_board_id;
     quint32 list_id = m_current_board->get_list_id(list_index);
     quint32 card_id = m_current_board->get_card_id(list_index, card_index);
+    if (m_current_board->tag_already_exists(list_index, card_index, name)) {
+        return;
+    }
     if (!m_current_board->m_is_remote) {
         quint32 tag_id = db.insert_tag(name);
         db.add_tag_to_card(card_id, tag_id);
@@ -458,6 +462,9 @@ void Client::set_filter(QString filter, bool is_all) {
 }
 
 void Client::connect_board(QString link) {
+    if (m_board_menu->board_already_connected(link)) {
+        return;
+    }
     std::string request = parser::connect_to_board_request(link);
     write(request);
 }

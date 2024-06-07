@@ -65,6 +65,7 @@ public:
         int new_index
     );
     nlohmann::json board_to_json(int index) const;
+    bool board_already_connected(const QString &link) const;
 
     friend class Client;
 signals:

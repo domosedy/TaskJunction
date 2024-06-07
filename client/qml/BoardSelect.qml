@@ -271,8 +271,8 @@ Rectangle {
                 startMenu.visible = true;
             }
             icon.source: "back.svg"
-            icon.width: style.headerHeight
-            icon.height: style.headerHeight
+            icon.width: 20
+            icon.height: 20
 
             background: Rectangle {
                 color: parent.down ? Qt.darker(style.headerBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.headerBackgroundColor, 1.2) : style.headerBackgroundColor)
@@ -293,7 +293,7 @@ Rectangle {
             height: style.headerHeight / 2
             anchors.right: parent.right
             anchors.top: (mainClient && mainClient.connection_status == Client.Authorized ? parent.top : undefined)
-            anchors.verticalCenter: (mainClient && mainClient.connection_status == Client.Authorized ? undefined : parent.verticalCenter)            
+            anchors.verticalCenter: (mainClient && mainClient.connection_status == Client.Authorized ? undefined : parent.verticalCenter)
             onClicked: {
                 createBoardPopup.open();
             }
@@ -386,7 +386,7 @@ Rectangle {
                 TextInput {
                     id: nameHolder
 
-                    width: parent.width - 60
+                    width: parent.width - 60 - 40 * (is_remote)
                     text: name
                     font.family: "Poppins"
                     font.pointSize: 16
@@ -422,8 +422,8 @@ Rectangle {
                 TextInput {
                     id: descriptionHolder
 
-                    width: parent.width - 40
-                    height: parent.height - 70
+                    width: parent.width - 40 - 40 * (is_remote)
+                    height: parent.height - 110
                     text: description
                     font.family: "Poppins"
                     font.pointSize: 12
@@ -434,6 +434,7 @@ Rectangle {
                     anchors.leftMargin: 20
                     readOnly: true
                     wrapMode: TextInput.Wrap
+                    clip: true
                     onEditingFinished: {
                         descriptionHolder.readOnly = true;
                         descriptionArea.enabled = true;

@@ -37,7 +37,7 @@ std::pair<QString, quint32> decode_string(const QString &coded_link) {
         if (it.isNumber()) {
             // QDebug() << it;
             id = id * 10 + it.digitValue();
-            std::cout << id << std::endl;
+            // std::cout << id << std::endl;
         } else {
             link += it;
         }

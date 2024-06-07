@@ -5,8 +5,6 @@ import QtQuick.Layouts
 import "qrc:"
 
 Rectangle {
-    //visibleCount: listmodel.count
-
     id: listMain
 
     property int visibleCount: listmodel.count
@@ -245,6 +243,8 @@ Rectangle {
                 height: 68
                 color: style.listBackgroundColor
                 radius: style.defaultRadius
+                border.color: style.defaultMoveColor
+                border.width: 0
 
                 Button {
                     width: style.listWidth - 40
@@ -269,9 +269,6 @@ Rectangle {
 
                 }
 
-                border.color: style.defaultMoveColor
-                border.width: 0
-
                 DropArea {
                     id: footedDrop
 
@@ -282,11 +279,10 @@ Rectangle {
                     onDropped: function(drag) {
                         let from = drag.source.get_modelIndex();
                         let sourceList = drag.source.get_listIndex();
-                        //drag.source.dragList.clip = true;
-                        border.width = 0;  
-                        if (listIndex == sourceList) {
+                        border.width = 0;
+                        if (listIndex == sourceList)
                             listVisualModel.groups[2].move(from, listmodel.count - 1);
-                        }
+
                         mainClient.move(from, -1, sourceList, listIndex);
                     }
                     onExited: function(drag) {
@@ -342,21 +338,21 @@ Rectangle {
                     property int modelIndex: cardIndex
 
                     function create_tag(name) {
-                        if (listIndex != undefined && cardIndex != undefined) {
+                        if (listIndex != undefined && cardIndex != undefined)
                             mainClient.create_tag(listIndex, cardIndex, name);
-                        }                           
+
                     }
 
                     function delete_tag(tag_index) {
-                        if (listIndex != undefined && cardIndex != undefined) {
+                        if (listIndex != undefined && cardIndex != undefined)
                             mainClient.delete_tag(listIndex, cardIndex, tag_index);
-                        }                        
+
                     }
 
                     function update_card(type, value) {
-                        if (listIndex != undefined && cardIndex != undefined) {
+                        if (listIndex != undefined && cardIndex != undefined)
                             mainClient.update_card(listIndex, cardIndex, type, value);
-                        }
+
                     }
 
                     function actual_modelIndex() {
@@ -380,16 +376,15 @@ Rectangle {
                         if (drag.source.get_listIndex() == listIndex)
                             listVisualModel.groups[2].move(from, to);
                         else
-                            cardRoot.border.color=style.defaultMoveColor;
+                            cardRoot.border.color = style.defaultMoveColor;
                     }
                     onExited: function(drag) {
-                        cardRoot.border.color=style.listBackgroundColor;
+                        cardRoot.border.color = style.listBackgroundColor;
                     }
                     onDropped: function(drag) {
                         let from = drag.source.get_modelIndex();
                         let to = (drag.source.get_listIndex() != listIndex) ? visualIndex : drag.source.get_visualIndex();
-                        //drag.source.dragList.clip = true;
-                        cardRoot.border.color=style.listBackgroundColor;
+                        cardRoot.border.color = style.listBackgroundColor;
                         mainClient.move(from, to, drag.source.get_listIndex(), listIndex);
                     }
 
@@ -405,9 +400,6 @@ Rectangle {
                         modelIndex: delegateRoot.modelIndex
                         listIndex_: parentListIndex
                         thisCardModel: cardModel
-                        onPressed: {
-                            //thisList.clip = false;
-                        }
                     }
 
                 }

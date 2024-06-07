@@ -218,3 +218,7 @@ nlohmann::json ListModel::to_json() const {
     }
     return data;
 }
+
+bool ListModel::tag_already_exists(int card_index, const QString &name) const {
+    return m_cards[card_index]->tag_already_exists(name);
+}

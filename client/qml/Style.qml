@@ -10,7 +10,6 @@ QtObject {
     readonly property color deleteBackgroundColor: "#ff6666"
     readonly property color createBackgroundColor: "#91C9AA"
     readonly property color defaultTextColor: "white"
-    //readonly property color defaultMoveColor: "#5D86B4"
     readonly property color defaultMoveColor: "#f5f5f5"
     readonly property color textFormColor: "#131313"
     readonly property int listWidth: 300

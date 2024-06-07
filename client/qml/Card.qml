@@ -81,7 +81,7 @@ Rectangle {
     TextInput {
         id: nameHolder
 
-        width: parent.width - 30
+        width: parent.width - 50
         text: name
         font.family: "Poppins"
         font.pointSize: 16
@@ -116,7 +116,7 @@ Rectangle {
     TextInput {
         id: descriptionHolder
 
-        width: parent.width - 30
+        width: parent.width - 50
         height: parent.height - 70
         text: description
         font.family: "Poppins"
@@ -183,6 +183,10 @@ Rectangle {
                 font.pointSize: 16
                 font.family: "Poppins"
                 color: "white"
+
+                validator: RegularExpressionValidator {
+                    regularExpression: /[^,\s]+/
+                }
 
                 background: Rectangle {
                     implicitWidth: tagContent.width - 20
@@ -288,13 +292,12 @@ Rectangle {
                     text: name
                     font.family: "Poppins"
                     font.pointSize: 10
-                    //anchors.centerIn: parent
                     anchors.leftMargin: 10
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     color: "white"
                     clip: true
-                    width: parent.width-15
+                    width: parent.width - 15
                 }
 
                 MouseArea {

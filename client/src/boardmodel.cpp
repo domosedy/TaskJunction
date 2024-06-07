@@ -210,3 +210,11 @@ nlohmann::json BoardModel::to_json() const {
     }
     return data;
 }
+
+bool BoardModel::tag_already_exists(
+    int list_index,
+    int card_index,
+    const QString &name
+) const {
+    return m_lists.at(m_ids[list_index])->tag_already_exists(card_index, name);
+}

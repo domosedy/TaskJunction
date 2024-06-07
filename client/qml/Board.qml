@@ -116,8 +116,8 @@ Rectangle {
                 mainClient.set_filter("", 1);
             }
             icon.source: "back.svg"
-            icon.width: width
-            icon.height: height
+            icon.width: 20
+            icon.height: 20
 
             background: Rectangle {
                 color: parent.down ? Qt.darker(style.headerBackgroundColor, 1.4) : (parent.hovered ? Qt.darker(style.headerBackgroundColor, 1.2) : style.headerBackgroundColor)
@@ -205,6 +205,10 @@ Rectangle {
                 mainClient.set_filter(filterHolder.text, filterTypeSwitch.checked);
             }
 
+            validator: RegularExpressionValidator {
+                regularExpression: /([^,\s]*,\s)*/
+            }
+
             background: Rectangle {
                 implicitWidth: 120
                 implicitHeight: 36
@@ -251,9 +255,7 @@ Rectangle {
                 font.family: "Poppins"
                 font.pointSize: 12
                 verticalAlignment: Text.AlignVCenter
-                //horizontalAlignment: Text.AlignHCenter
                 leftPadding: 28
-                //Padding: 5
                 color: "white"
             }
 
