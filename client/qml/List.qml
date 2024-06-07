@@ -269,7 +269,7 @@ Rectangle {
 
                 }
 
-                border.color: "#5D86B4"
+                border.color: style.defaultMoveColor
                 border.width: 0
 
                 DropArea {
@@ -277,7 +277,7 @@ Rectangle {
 
                     anchors.fill: parent
                     onEntered: function(drag) {
-                        border.width = 5;
+                        border.width = style.moveRadius;
                     }
                     onDropped: function(drag) {
                         let from = drag.source.get_modelIndex();
@@ -380,7 +380,7 @@ Rectangle {
                         if (drag.source.get_listIndex() == listIndex)
                             listVisualModel.groups[2].move(from, to);
                         else
-                            cardRoot.border.color="#5D86B4";
+                            cardRoot.border.color=style.defaultMoveColor;
                     }
                     onExited: function(drag) {
                         cardRoot.border.color=style.listBackgroundColor;

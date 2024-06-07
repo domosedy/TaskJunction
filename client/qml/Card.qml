@@ -38,7 +38,7 @@ Rectangle {
     Drag.hotSpot.x: root.width / 2
     Drag.hotSpot.y: root.height / 2
     radius: style.defaultRadius
-    border.width: style.defaultBorderSize + 1
+    border.width: style.moveRadius
     border.color: style.listBackgroundColor
     states: [
         State {
