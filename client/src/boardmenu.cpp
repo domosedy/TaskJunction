@@ -125,11 +125,18 @@ void BoardMenu::update_board(
         if (m_loaded_boards.find(id) != m_loaded_boards.end()) {
             m_loaded_boards[id]->m_name = value;
         }
+        emit dataChanged(
+            this->index(index, 0), this->index(index, 0), {BoardRoles::NameRole}
+        );
     } else {
         m_boards[index].m_description = value;
         if (m_loaded_boards.find(id) != m_loaded_boards.end()) {
             m_loaded_boards[id]->m_description = value;
         }
+        emit dataChanged(
+            this->index(index, 0), this->index(index, 0),
+            {BoardRoles::DescriptionRole}
+        );
     }
 }
 
@@ -176,9 +183,7 @@ void BoardMenu::update_command(
     const QString &field,
     const QString &new_value
 ) {
-    auto [list_idx, card_idx, _] =
-        m_loaded_boards[board_id]->get_indices(list_id, card_id, 0);
-    if (list_idx == -1) {
+    if (list_id == 0) {
         int board_idx = std::distance(
             m_boards.begin(),
             std::ranges::find_if(
@@ -188,6 +193,11 @@ void BoardMenu::update_command(
         );
         update_board(board_idx, field, new_value);
     } else {
+        if (!is_board_loaded(board_id)) {
+            return;
+        }
+        auto [list_idx, card_idx, _] =
+            m_loaded_boards[board_id]->get_indices(list_id, card_id, 0);
         m_loaded_boards[board_id]->update_command(
             list_idx, card_idx, field, new_value
         );

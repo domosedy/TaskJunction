@@ -71,7 +71,7 @@ void Client::readData(const QString &data) {
         quint32 card_id = response["card-id"];
         quint32 tag_id = response["tag-id"];
 
-        if (m_board_menu->is_board_loaded(board_id) && list_id == 0) {
+        if (!m_board_menu->is_board_loaded(board_id) && list_id != 0) {
             return;
         }
         if (tag_id != 0) {
@@ -119,9 +119,6 @@ void Client::readData(const QString &data) {
         QString new_value = QString::fromStdString(response["new-value"]);
         QString field = QString::fromStdString(response["field"]);
 
-        if (!m_board_menu->is_board_loaded(board_id)) {
-            return;
-        }
         m_board_menu->update_command(
             board_id, list_id, card_id, field, new_value
         );
