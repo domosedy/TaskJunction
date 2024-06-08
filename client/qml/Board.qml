@@ -206,7 +206,7 @@ Rectangle {
             }
 
             validator: RegularExpressionValidator {
-                regularExpression: /([^,\s]*,\s)*/
+                regularExpression: /(^$)|(([^,\s]*)((,\s)[^,\s]*)*)/
             }
 
             background: Rectangle {
