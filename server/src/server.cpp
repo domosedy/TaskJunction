@@ -230,7 +230,11 @@ Server::execute_delete_query(const delete_query &query, quint32 id) {
     bool result = false;
 
     if (query.value_type == "board") {
-        result = db.delete_board(query.value_id);
+        if (db.get_board_user_ids(query.value_id).size() > 1) {
+            result = db.delete_user_from_board(id, query.value_id);
+        } else {
+            result = db.delete_board(query.value_id);
+        }
     } else if (query.value_type == "list") {
         result = db.delete_list(query.value_id);
     } else if (query.value_type == "card") {
